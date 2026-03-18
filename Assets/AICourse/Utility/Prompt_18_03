@@ -1,0 +1,82 @@
+﻿PROMPT DE CONTEXT PER REPRENDRE EL DISSENY (AMB CODI BASE):
+Rol i Objectiu:
+Ets un expert en arquitectura de programari i IA per a videojocs en Unity. M'estàs ajudant a dissenyar un framework de Utility AI des de zero. El públic objectiu d'aquest framework són els meus estudiants; per tant, l'arquitectura ha de ser neta, fàcil d'entendre i ha d'afavorir que l'alumne entengui què passa per sota (fomentem el disseny programàtic "Code as Configuration" pur C# per sobre de l'ús de l'Inspector de Unity).
+
+Context i Filosofia del Framework:
+Aquest sistema de Utility AI s'integra dins d'un framework propi preexistent que ja compta amb Arbres de Comportament (BTs) i Màquines d'Estats (FSMs).
+Volem simetria: la Utility AI ha de funcionar exactament igual que els meus BTs i FSMs: els alumnes programen la IA instanciant objectes per codi dins d'un mètode OnConstruction() d'un ScriptableObject. Després, un MonoBehaviour s'encarrega d'executar-ho previ pas d'una contextualització.
+
+💻 CODI BASE DE REFERÈNCIA (Ecosistema actual):
+Aquest és el codi reduït de les meves classes base actuals sobre les quals s'ha de sustentar el sistema. No modifiquis aquestes classes externes, només utilitza-les com a context de com funcionen els meus nodes i la memòria:
+
+C#
+// --- ECOSISTEMA BASE DE BEHAVIOR TREES ---
+public interface INode {
+    Status GetStatus();
+    Status Tick();
+    void Contextualize(GameObject g);
+}
+
+public abstract class Node : INode {
+    public GameObject gameObject { get; private set; }
+    public DynamicBlackboard blackboard { get { return gameObject.GetComponent<DynamicBlackboard>(); } }
+    
+    public virtual void Contextualize(GameObject gm) { gameObject = gm; }
+    public Status Tick() { /* ... */ return OnTick(); }
+    public abstract Status OnTick();
+}
+
+public abstract class Action : Node {
+    public Action(string name) : base(name) { }
+}
+
+public class DynamicBlackboard : MonoBehaviour {
+    // Emmagatzema l'estat. Permet obtenir variables via clau:
+    public T Get<T>(string key) { /* ... */ }
+}
+Aquest és l'esquelet actual que ja hem dissenyat per a la Utility AI (basat en el patró Composite):
+
+C#
+// --- NOU ECOSISTEMA DE UTILITY AI ---
+namespace Utility {
+    public interface IConsideration {
+        void Contextualize(GameObject go);
+        float GetScore(); 
+    }
+
+    public abstract class Consideration : IConsideration {
+        public GameObject gameObject;
+        public DynamicBlackboard blackboard;
+        
+        public virtual void Contextualize(GameObject go) {
+            gameObject = go;
+            blackboard = gameObject.GetComponent<DynamicBlackboard>();
+        }
+        public abstract float GetScore();
+    }
+
+    // Patró Composite: Un Scorer avalua una llista de consideracions filles i les agrega
+    public abstract class Scorer : IConsideration {
+        public GameObject gameObject;
+        public DynamicBlackboard blackboard;
+        
+        public virtual void Contextualize(GameObject go) { /* Mateix que Consideration */ }
+        public abstract float GetScore();
+    }
+
+    // El contenidor on els alumnes programen la IA (equivalent a un BehaviourTree)
+    public abstract class UtilityActionSet : ScriptableObject {
+        // Internament guarda una llista de parells [Action, IConsideration]
+        public virtual void OnConstruction() { }
+    }
+}
+Cap a on anem (Propers passos pendents):
+Tenim l'esquelet llest, ara hem de programar la lògica interna d'aquestes tres peces:
+
+Desenvolupar la classe Scorer: Implementar la iteració dels fills i programar les diferents Polítiques d'Agregació matemàtiques.
+
+Desenvolupar les Corbes de Resposta (Curves): Crear una classe estàtica amb funcions matemàtiques (Lineal, Exponencial, etc.) i definir com es passen via delegates/lambdes als constructors de les Consideration per avaluar els valors llegits del DynamicBlackboard.
+
+Desenvolupar el vincle a UtilityActionSet: Definir l'estructura de dades interna que aparella una Action amb la seva IConsideration avaluadora (l'Scorer).
+
+Si us plau, confirma que has entès el context, repassa el codi i demana'm per quin dels tres "Propers passos" volem començar a escriure codi.

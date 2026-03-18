@@ -1,22 +1,20 @@
-using UnityEngine;
-using System.Collections.Generic;
+﻿using UnityEngine;
 
-namespace Utility 
+namespace Utility
 {
-    [CreateAssetMenu(fileName = "Scorer", menuName = "Scriptable Objects/Scorer")]
-    // segurament en el futur la voldré fer abstracta 
-    public class Scorer : ScriptableObject
+    public abstract class Scorer : IConsideration
     {
-        public List<Consideration> considerations = new List<Consideration>();
-        public float score = 25;
-
-        public AnimationCurve curve = AnimationCurve.Linear(0, 0, 1, 1);
-
-        public float Evaluate()
+        // internally a Scorer keeps a list of considerations
+        
+        public GameObject gameObject;
+        public DynamicBlackboard blackboard;
+        public void Contextualize(GameObject go)
         {
-            return 0.99f;
+            gameObject = go;
+            blackboard = gameObject.GetComponent<DynamicBlackboard>();
         }
+
+        public abstract float GetScore();
+
     }
 }
-
-
