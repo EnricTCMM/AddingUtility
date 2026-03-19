@@ -3,21 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Globalization;
 
-public class DynamicBlackboard : MonoBehaviour
+// As of April 2024 DynamicBlackboard has been "promoted" to Utility Target since
+// any blackboard of this type is a property provider.
+
+// As of April 2024 DynamicBlackboard also considers properties
+
+public class DynamicBlackboard : MonoBehaviour /*, Utility.IUtilityTarget */
 {
     private Dictionary<string, object> map = new Dictionary<string, object>();
     private Dictionary<string, FieldInfo> fields = new Dictionary<string, FieldInfo>();
+    private Dictionary<string, PropertyInfo> properties = new Dictionary<string, PropertyInfo>();
     private bool initialised = false;
     
     private void Initialize()
     {
-       
         // Reflection-based discovery of public fields
         FieldInfo[] allFields = this.GetType().GetFields();
         foreach (FieldInfo field in allFields)
         {
             string name = field.Name.ToUpper();
             fields.Add(name, field);
+        }
+
+        // Reflection-based discovery of public properties
+        PropertyInfo[] allProperties = this.GetType().GetProperties();
+        foreach (PropertyInfo property in allProperties)
+        {
+            string name = property.Name.ToUpper();
+            properties.Add(name, property);
         }
 
         initialised = true;
@@ -92,6 +105,8 @@ public class DynamicBlackboard : MonoBehaviour
         name = name.ToUpper();
         if (fields.ContainsKey(name)) // name refers to a field 
             value = fields[name].GetValue(this);
+        else if (properties.ContainsKey(name))
+            value = properties[name].GetValue(this);
         else if (map.ContainsKey(name))
             value = map[name];
         else
@@ -100,14 +115,25 @@ public class DynamicBlackboard : MonoBehaviour
         return (T)value;
     }
 
-    public void Put (string name, object value)
+    public void Put(string name, object value)
     {
         if (!initialised) Initialize();
+
         name = name.ToUpper();
+
         if (fields.ContainsKey(name)) // name refers to a field 
             fields[name].SetValue(this, value);
+        else if (properties.ContainsKey(name))
+        {
+            // the property exists. Can we change it?
+            if (properties[name].CanWrite)
+                properties[name].SetValue(this, value);
+            else
+                Debug.LogWarning("property "+name+" cannot be set");
+        }
         else
             map[name] = value;  // adds or updates...
+        
     }
 
     public void PutIfNotPresent(string name, object value)
@@ -123,6 +149,10 @@ public class DynamicBlackboard : MonoBehaviour
         return map.ContainsKey(key) || fields.ContainsKey(key);
     }
 
+
+    // -- required by IUtilityTarget interface
+    public object targetObject => this.gameObject;
+
     //--------------------------------------- 
 
     public void Dump ()
@@ -133,5 +163,18 @@ public class DynamicBlackboard : MonoBehaviour
         {
             Debug.Log(s);
         }
+    }
+
+    // ----------- autokey generation
+    private static string prefix = "__autoKey_";
+    private static int seq = 0;
+
+
+
+    public string NewKey()
+    {
+        string result = prefix + seq;
+        seq++;
+        return result;  
     }
 }
