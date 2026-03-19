@@ -3,34 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Globalization;
 
-// As of April 2024 DynamicBlackboard has been "promoted" to Utility Target since
-// any blackboard of this type is a property provider.
-
-// As of April 2024 DynamicBlackboard also considers properties
-
 public class DynamicBlackboard : MonoBehaviour /*, Utility.IUtilityTarget */
 {
     private Dictionary<string, object> map = new Dictionary<string, object>();
     private Dictionary<string, FieldInfo> fields = new Dictionary<string, FieldInfo>();
     private Dictionary<string, PropertyInfo> properties = new Dictionary<string, PropertyInfo>();
+    
+    // March 2026 fields and properties may have ranges. We need to keep track of them for Utility normalization.
+    private Dictionary<string, (float min, float max)> propertyRanges = new Dictionary<string, (float, float)>();
+    
     private bool initialised = false;
     
     private void Initialize()
     {
-        // Reflection-based discovery of public fields
+        RangeAttribute rangeAttr;
+        
+        // Reflection-based discovery of public fields (and 2026 their ranges)
         FieldInfo[] allFields = this.GetType().GetFields();
         foreach (FieldInfo field in allFields)
         {
             string name = field.Name.ToUpper();
             fields.Add(name, field);
+            
+            // let's know the min/max range of this field
+            rangeAttr = field.GetCustomAttribute<RangeAttribute>();
+            if (rangeAttr != null)
+                propertyRanges.Add(name, (rangeAttr.min, rangeAttr.max));
         }
 
-        // Reflection-based discovery of public properties
+        // Reflection-based discovery of public properties (and 2026 their ranges)
         PropertyInfo[] allProperties = this.GetType().GetProperties();
         foreach (PropertyInfo property in allProperties)
         {
             string name = property.Name.ToUpper();
             properties.Add(name, property);
+            
+            rangeAttr = property.GetCustomAttribute<RangeAttribute>();
+            if (rangeAttr != null) 
+                propertyRanges.Add(name, (rangeAttr.min, rangeAttr.max));
         }
 
         initialised = true;
@@ -149,6 +159,27 @@ public class DynamicBlackboard : MonoBehaviour /*, Utility.IUtilityTarget */
         return map.ContainsKey(key) || fields.ContainsKey(key);
     }
 
+    public bool TryGetRange(string key, out float min, out float max)
+    {
+        (float min, float max) range; 
+        
+        if (!initialised) Initialize();
+        key=key.ToUpper();
+        if (propertyRanges.TryGetValue(key, out range))
+        {
+            min = range.min;
+            max = range.max;
+            return true;
+        }
+        else
+        {
+            min = 0;
+            max = 100;
+            return false;
+        }
+        
+    }
+    
 
     // -- required by IUtilityTarget interface
     public object targetObject => this.gameObject;
