@@ -1,0 +1,88 @@
+﻿📋 PROMPT DE CONTEXT PER REPRENDRE EL DISSENY (AMB CODI COMPLET):
+Rol i Objectiu:
+Ets un expert en arquitectura de programari i IA per a videojocs en Unity. M'estàs ajudant a dissenyar un framework de Utility AI des de zero. El públic objectiu d'aquest framework són els meus estudiants; afavorim el disseny programàtic "Code as Configuration" pur C# per sobre de l'ús de l'Inspector de Unity.
+
+Context i Filosofia del Framework:
+Aquest sistema s'integra dins d'un framework propi amb Arbres de Comportament (BTs). Funciona igual: els alumnes programen la IA instanciant objectes per codi dins de l'OnConstruction() d'un ScriptableObject. Tota la memòria es gestiona a través d'un DynamicBlackboard (un component de Unity que emmagatzema i recupera valors dinàmics).
+
+Estat Actual de l'Arquitectura (El que ja tenim tancat):
+
+C#
+// --- DYNAMIC BLACKBOARD (Fragment rellevant per a Utility AI) ---
+public class DynamicBlackboard : MonoBehaviour {
+    // Guarda els límits llegits de l'atribut [Range(min, max)] de Unity via Reflexió
+    private Dictionary<string, (float min, float max)> propertyRanges = new Dictionary<string, (float, float)>();
+    
+    public T Get<T>(string key) { /* ... */ }
+    
+    public bool TryGetRange(string key, out float min, out float max) {
+        if (!initialised) Initialize();
+        key = key.ToUpper();
+        if (propertyRanges.TryGetValue(key, out var range)) {
+            min = range.min; max = range.max; return true;
+        }
+        min = 0; max = 100; return false; // Fallback intel·ligent per defecte
+    }
+}
+
+// --- INTERFÍCIE BASE ---
+namespace Utility {
+    public interface IConsideration {
+        string Name { get; } 
+        void Contextualize(GameObject go);
+        float GetScore();
+    }
+
+// --- CLASSE CONSIDERATION (Avaluador de propietats - Tancat) ---
+    public class Consideration : IConsideration {
+        public string Name { get; set; }
+        public GameObject gameObject;
+        public DynamicBlackboard blackboard;
+        
+        private Func<float, float> responseCurve;
+        private Func<float> syntheticProperty;
+        private string propertyKey; 
+        private float propertyMin, propertyMax;
+        private bool explicitRangeProvided = false;
+
+        // Constructor 1: Propietats de la Pissarra
+        public Consideration(string key, Func<float, float> responseCurve, string name = null) {
+            this.propertyKey = key; this.responseCurve = responseCurve;
+            this.explicitRangeProvided = false;
+            Name = name == null ? "Consideration("+key+")" : name + "("+key+")";
+        }
+
+        // Constructor 2: Propietats Sintètiques (Lambda)
+        public Consideration(Func<float> syntheticProperty, Func<float, float> responseCurve, float min, float max, string name = null) {
+            this.syntheticProperty = syntheticProperty; this.responseCurve = responseCurve;
+            this.explicitRangeProvided = true; propertyMin = min; propertyMax = max;
+            Name = name == null ? "Synth. Consideration" : name;
+        }
+        
+        public void Contextualize(GameObject go) {
+            gameObject = go; blackboard = gameObject.GetComponent<DynamicBlackboard>();
+            if (!explicitRangeProvided) {
+                bool hasRange = blackboard.TryGetRange(propertyKey, out propertyMin, out propertyMax);
+                if(!hasRange) Debug.LogWarning("Consideration " + propertyKey + " is not ranged. Using [0, 100]."); 
+            }
+            if (propertyMin == propertyMax) Debug.LogError("Consideration " + propertyKey + " has zero range.");
+        }
+
+        public float GetScore() {
+            float val = syntheticProperty != null ? syntheticProperty() : blackboard.Get<float>(propertyKey);
+            val = (val - propertyMin) / (propertyMax - propertyMin); // Normalització [0,1]
+            return Mathf.Clamp01(responseCurve(Mathf.Clamp01(val)));
+        }
+    }
+}
+En què estem treballant ara mateix (Propers passos):
+
+Dissenyar la classe Scorer (Agregador / Patró Composite): Estem convertint-la en una classe concreta. Avalua una llista de IConsiderations (fills). Volem implementar un enum AggregationPolicy (Multiply, Average, etc.), un mètode AddConsideration amb Fluent API, i assegurar que el Contextualize() es propaga als fills.
+
+Desenvolupar les Corbes de Resposta (Curves): Crear una classe estàtica amb funcions matemàtiques (Lineal, Exponencial, etc.) per passar a les Consideration.
+
+Vincle a UtilityActionSet: Estructura que aparella una Action (del framework de BTs) amb la seva IConsideration avaluadora.
+
+Amb aquest format, no hi ha marge d'error. Quan ho reprenguem, la IA sabrà fins i tot quin fallback vas posar o com gestiones les excepcions de la teva pissarra.
+
+T'agrada com queda? Vols que comencem a redactar el codi de la classe Scorer segons les regles que hem marcat al punt 1 dels propers passos?

@@ -4,6 +4,7 @@ namespace Utility
 {
     public abstract class Scorer : IConsideration
     {
+        public string Name { get; set; }
         // internally a Scorer keeps a list of considerations
         
         public GameObject gameObject;
@@ -12,6 +13,7 @@ namespace Utility
         {
             gameObject = go;
             blackboard = gameObject.GetComponent<DynamicBlackboard>();
+            // contextualize your considerations...
         }
 
         public abstract float GetScore();
