@@ -15,7 +15,7 @@ namespace FSMs
 
         // the check function is a parameterless bool function
         public delegate bool TransitionCheckDelegate();
-        // the OnTrigger action is just a parameterless void action
+        // the OnTrigger actionName is just a parameterless void actionName
         public delegate void TransitionOnTriggerAction();
 
         private TransitionCheckDelegate triggeringCondition;

@@ -16,6 +16,6 @@ class ACTION_ChooseRandomCorner : Action
 
         /* COMPLETE */
 
-        return Status.FAILED;  // change when complete (you don't want this action to fail)
+        return Status.FAILED;  // change when complete (you don't want this actionName to fail)
     }
 }

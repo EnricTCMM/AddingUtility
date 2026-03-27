@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using BTs;
+using UnityEditor.Tilemaps;
 
 namespace Utility
 {
@@ -8,18 +9,20 @@ namespace Utility
     public abstract class UtilityActionSet : ScriptableObject
     {
         public List<ActionConsiderationPair> list = new List<ActionConsiderationPair>();
+        private List<ActionScorePair> scores = new List<ActionScorePair>();
 
         public void Contextualize(GameObject go)
         {
             foreach (ActionConsiderationPair pair in list)
             {
+                pair.action.Contextualize(go);
                 pair.consideration.Contextualize(go);
             }
         }
 
         private ActionConsiderationPair GetPair(Action action)
         {
-            // in list find the pair that matches the action
+            // in list find the pair that matches the actionName
             return list.Find(pair => pair.action == action);
         }
         
@@ -31,18 +34,31 @@ namespace Utility
             if (consideration == null) 
                 throw new System.ArgumentNullException("consideration", "Consideration cannot be null in Bind");
             
-            // only one consideration per action is allowed so...
+            // only one consideration per actionName is allowed so...
             if (GetPair(action).action ==null)
             {
-                // if action in the returned pair is null it means that no pair containing this action
+                // if actionName in the returned pair is null it means that no pair containing this actionName
                 // exists. So we can safely add a new pair.
                 list.Add(new ActionConsiderationPair(action, consideration));
             }
             else throw new System.ArgumentException("Action "+action.Name+" already bound to a consideration");
         }
+
+        public List<ActionScorePair> ScoreAllActions()
+        {
+            scores.Clear();
+            foreach (ActionConsiderationPair pair in list)
+            {
+                scores.Add(new ActionScorePair(pair.action, pair.consideration.GetScore()));
+            }
+            // sort in descending order
+            scores.Sort((a,b) => b.score.CompareTo(a.score));
+            return scores;
+        }
         
         public virtual void OnConstruction()
         {
+            // this is the only method that subclasses must implement
         }
     }
     
@@ -56,6 +72,17 @@ namespace Utility
             this.consideration = consideration;
         }
     }
+    
+    public struct ActionScorePair {
+        public Action action;
+        public float score;
+        
+        public ActionScorePair(Action action, float score)
+        {
+            this.action = action;
+            this.score = score;
+        }
+    }   
 }
 
 

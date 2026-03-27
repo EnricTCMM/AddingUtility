@@ -19,7 +19,7 @@ public class FSM_BatcatChase : FiniteStateMachine
     public override void OnEnter()
     {
         /* Write here the FSM initialization code. This code is execute every time the FSM is entered.
-         * It's equivalent to the on enter action of any state 
+         * It's equivalent to the on enter actionName of any state 
          * Usually this code includes .GetComponent<...> invocations */
 
         pursue = GetComponent<PursuePlusOA>();
@@ -33,7 +33,7 @@ public class FSM_BatcatChase : FiniteStateMachine
     public override void OnExit()
     {
         /* Write here the FSM exiting code. This code is execute every time the FSM is exited.
-         * It's equivalent to the on exit action of any state 
+         * It's equivalent to the on exit actionName of any state 
          * Usually this code turns off behaviours that shouldn't be on when one the FSM has
          * been exited. */
         DisableAllSteerings();

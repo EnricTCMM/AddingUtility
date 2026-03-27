@@ -84,7 +84,7 @@ namespace FSMs
                 }
             }
 
-            // every update a InState action is executed
+            // every update a InState actionName is executed
             currentState.InState();
         }
 

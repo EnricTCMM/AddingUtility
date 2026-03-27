@@ -31,13 +31,13 @@ public class ACTION_WanderAround : Action
 
     public override Status OnTick ()
     {
-        // write here the code to be executed every time the action is ticked
+        // write here the code to be executed every time the actionName is ticked
         return Status.RUNNING;
     }
 
     public override void OnAbort()
     {
-        // write here the code to be executed if the action is aborted while running
+        // write here the code to be executed if the actionName is aborted while running
         wanderAround.enabled = false;
     }
 

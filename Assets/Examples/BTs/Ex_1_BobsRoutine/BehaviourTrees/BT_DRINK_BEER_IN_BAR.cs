@@ -5,7 +5,7 @@ using BTs;
 public class BT_DRINK_BEER_IN_BAR : BehaviourTree
 {
     // This behaviour fails if BuyBeer fails
-    // It succeeds if the last action (DrinkBeer) Succeeds
+    // It succeeds if the last actionName (DrinkBeer) Succeeds
     
     public override void OnConstruction()
     {
