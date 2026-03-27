@@ -52,7 +52,7 @@ namespace Utility
             };
         }
 
-        public static Func<float, float> InvertedSigmoid(float steepness, float midpoint)
+        public static Func<float, float> InvertedSigmoid(float steepness =12f, float midpoint = 0.5f)
         {
             Func<float, float> sigmoid = Sigmoid(steepness, midpoint);
             return (x) =>
