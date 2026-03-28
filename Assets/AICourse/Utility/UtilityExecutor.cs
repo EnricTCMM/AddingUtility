@@ -1,23 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using BTs;
 using Action = BTs.Action;
 
 namespace Utility
 {
-    public class UtilityExecutor : MonoBehaviour 
+    public class UtilityExecutor : MonoBehaviour
     {
         public UtilityActionSet actionSet;
-        private Action currentAction;
+        public Action currentAction;
         public string actionName;
         public float currentScore;
         public Status status;
         public float scoringInterval = 0.2f;
         public float inertiaThreshold = 0.1f;
 
-        private StringBuilder info = new StringBuilder();
         private float timeSinceLastScoring = 0;
         private List<ActionScorePair> currentScores;
 
@@ -44,8 +42,6 @@ namespace Utility
 
         void Update()
         {
-            info.Clear();
-            
             if (actionSet == null) throw new System.NullReferenceException("UtilityExecutor.actionSet is null");
 
             timeSinceLastScoring += Time.deltaTime;
@@ -53,7 +49,7 @@ namespace Utility
             if (currentAction == null || currentAction.IsTerminated())
             {
                 // first frame or after termination of the current action
-                currentScores = actionSet.ScoreAllActions(info);
+                currentScores = actionSet.ScoreAllActions();
                 currentAction = currentScores[0].action;
                 currentScore = currentScores[0].score;
                 actionName = currentAction.Name;
@@ -65,7 +61,7 @@ namespace Utility
             else if (timeSinceLastScoring >= scoringInterval)
             {
                 // let's re-evaluate utility. This may involve abortion of the current action
-                currentScores = actionSet.ScoreAllActions(info);
+                currentScores = actionSet.ScoreAllActions();
 
                 if (currentScores[0].action != currentAction)
                 {

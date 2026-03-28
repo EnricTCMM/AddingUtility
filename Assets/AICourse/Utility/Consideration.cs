@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using UnityEngine;
 
 namespace Utility
@@ -75,11 +74,9 @@ namespace Utility
                 Debug.LogError("In "+Name+" " + propertyKey + " has zero range. This is not allowed");
         }
 
-        public float GetScore(StringBuilder info)
+        public float GetScore()
         {
             float propertyValue;
-            float result;
-            // the info StringBuilder comes created from the UtilityExecutor
             propertyValue = syntheticProperty!=null ? 
                             syntheticProperty() : blackboard.Get<float>(propertyKey);
             // values in [min, max] must be mapped to [0, 1]
@@ -87,10 +84,7 @@ namespace Utility
             
             propertyValue = Mathf.Clamp01(propertyValue);
             
-            result =  Mathf.Clamp01(responseCurve(propertyValue));
-            
-            info.AppendLine(Name + "-->" + result);
-            return result;
+            return Mathf.Clamp01(responseCurve(propertyValue));
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace Utility
@@ -47,10 +46,8 @@ namespace Utility
             }
         }
 
-        public float GetScore(StringBuilder info)
+        public float GetScore()
         {
-            float result;
-            string innerInfo;
             if (considerations.Count == 0) 
             {
                 throw new System.InvalidOperationException("Cannot get score from scorer " + Name + " because it has no considerations");
@@ -59,52 +56,42 @@ namespace Utility
             switch (policy)
             {
                 case AggregationPolicy.MULTIPLY:
-                    result =  AggregateMultiply(info);
-                    break;
+                    return AggregateMultiply();
                 case AggregationPolicy.ADJUSTED_MULTIPLY:
-                    result = AggregateAdjustedMultiply(info);
-                    break;
+                    return AggregateAdjustedMultiply();
                 case AggregationPolicy.AVERAGE:
-                    result = AggregateAverage(info);
-                    break;
+                    return AggregateAverage();
                 default:
-                    info = new StringBuilder("Invalid/unknown aggregation policy");
-                    innerInfo = "";
-                    result = 0;
-                    break;
+                    return 0;
             }
-
-            info.AppendLine("\t" + Name + "(" + policy.ToString() + ") --> " + result);
-            
-            return result;
         }
 
-        private float AggregateMultiply(StringBuilder info)
+        private float AggregateMultiply()
         {
             float product = 1;
             foreach (IConsideration consideration in considerations)
             {
-                product *= consideration.GetScore(info);
-                // if (product ==0) return 0f;  // immediate veto
+                product *= consideration.GetScore();
+                if (product ==0) return 0f;  // immediate veto
             }
             return product;
         }
 
-        private float AggregateAdjustedMultiply(StringBuilder info)
+        private float AggregateAdjustedMultiply()
         {
-            float product = AggregateMultiply(info);
+            float product = AggregateMultiply();
             float modFactor = 1f - (1f / considerations.Count);
             float makeupValue = (1f - product) * modFactor;
             
             return product + (makeupValue * product);
         }
 
-        private float AggregateAverage(StringBuilder info)
+        private float AggregateAverage()
         {
             float sum = 0;
             foreach (IConsideration consideration in considerations)
             {
-                sum += consideration.GetScore(info);
+                sum += consideration.GetScore();
             }
             return sum / considerations.Count;
         }

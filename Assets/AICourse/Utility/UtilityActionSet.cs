@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using BTs;
 using UnityEditor.Tilemaps;
@@ -45,15 +44,12 @@ namespace Utility
             else throw new System.ArgumentException("Action "+action.Name+" already bound to a consideration");
         }
 
-        public List<ActionScorePair> ScoreAllActions(StringBuilder info)
+        public List<ActionScorePair> ScoreAllActions()
         {
-            
             scores.Clear();
             foreach (ActionConsiderationPair pair in list)
             {
-                float score = pair.consideration.GetScore(info);
-                scores.Add(new ActionScorePair(pair.action, score));
-                info.AppendLine(pair.action.Name + " --> " + score + "\n");
+                scores.Add(new ActionScorePair(pair.action, pair.consideration.GetScore()));
             }
             // sort in descending order
             scores.Sort((a,b) => b.score.CompareTo(a.score));
