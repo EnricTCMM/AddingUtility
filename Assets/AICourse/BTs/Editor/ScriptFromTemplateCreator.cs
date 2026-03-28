@@ -8,7 +8,8 @@ public class ScriptFromTemplateCreator
     private const string pathToTemplate_Condition = "Assets/AICourse/BTs/Editor/Templates/Condition_Template.cs.txt";
     private const string pathToTemplate_FSM = "Assets/AICourse/BTs/Editor/Templates/FSM_Template.cs.txt";
     private const string pathToTemplate_LinearSteering = "Assets/AICourse/BTs/Editor/Templates/LinearSteering_Template.cs.txt";
-
+    private const string pathToTemplate_UTILITY = "Assets/AICourse/BTs/Editor/Templates/UTILITY_Template.cs.txt";
+    
     [MenuItem(itemName: "Assets/Create/C# BT Script", isValidateFunction: false, priority: 22)]
     public static void CreateScriptFromTemplate_00()
     {
@@ -37,5 +38,11 @@ public class ScriptFromTemplateCreator
     public static void CreateScriptFromTemplate_04()
     {
         ProjectWindowUtil.CreateScriptAssetFromTemplateFile(pathToTemplate_LinearSteering, "new Steering.cs");
+    }
+    
+    [MenuItem(itemName: "Assets/Create/C# UTILITY Action Set", isValidateFunction: false, priority: 22)]
+    public static void CreateScriptFromTemplate_05()
+    {
+        ProjectWindowUtil.CreateScriptAssetFromTemplateFile(pathToTemplate_UTILITY, "new UT_ActionSet.cs");
     }
 }

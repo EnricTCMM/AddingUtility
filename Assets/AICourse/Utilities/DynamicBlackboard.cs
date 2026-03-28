@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Globalization;
 
-public class DynamicBlackboard : MonoBehaviour /*, Utility.IUtilityTarget */
+public class DynamicBlackboard : MonoBehaviour
 {
     private Dictionary<string, object> map = new Dictionary<string, object>();
     private Dictionary<string, FieldInfo> fields = new Dictionary<string, FieldInfo>();

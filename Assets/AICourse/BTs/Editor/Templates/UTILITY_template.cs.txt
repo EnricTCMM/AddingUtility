@@ -1,0 +1,38 @@
+﻿using UnityEngine;
+using Utility;
+using BTs;
+
+[CreateAssetMenu(fileName = "#SCRIPTNAME#", menuName = "Utility/#SCRIPTNAME#", order = 1)]
+public class #SCRIPTNAME# : UtilityActionSet
+{
+    public override void OnConstruction()
+    {
+        /* STAGE 1: Create a Scorer for a specific Action
+         * ----------------------------------------------
+         * Choose an AggregationPolicy (MULTIPLY, ADJUSTED_MULTIPLY, AVERAGE)
+         
+        Scorer myActionScorer = new Scorer("MyActionScorer", AggregationPolicy.ADJUSTED_MULTIPLY);
+        */
+
+
+        /* STAGE 2: Add Considerations to the Scorer
+         * -----------------------------------------
+         * Use blackboard property names and select an appropriate Curve from Curves.cs.
+         * You can also define min/max if the property doesn't have a [Range] attribute.
+         
+        myActionScorer.AddConsideration(new Consideration("BlackboardKey", Curves.Linear, "ConsiderationName"));
+        // myActionScorer.AddConsideration(new Consideration("AnotherKey", Curves.InvertedExponential(2f), 0f, 100f, "AnotherName"));
+        */
+
+
+        /* STAGE 3: Bind the Action to the Scorer
+         * --------------------------------------
+         * Make sure the action inherits from BTs.Action.
+         
+        Bind(new MyCustomAction(), myActionScorer);
+        */
+        
+        
+        /* Repeat STAGES 1 to 3 for all the actions this Utility AI needs to evaluate */
+    }
+}

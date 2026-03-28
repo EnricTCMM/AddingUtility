@@ -26,7 +26,7 @@ namespace Utility
             return list.Find(pair => pair.action == action);
         }
         
-        private void Bind(Action action, IConsideration consideration)
+        public void Bind(Action action, IConsideration consideration)
         {
             // sanity checks: no nulls allowed
             if (action == null) 
