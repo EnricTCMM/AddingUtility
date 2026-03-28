@@ -49,7 +49,7 @@ namespace Utility
             scores.Clear();
             foreach (ActionConsiderationPair pair in list)
             {
-                scores.Add(new ActionScorePair(pair.action, pair.consideration.GetScore()));
+                scores.Add(new ActionScorePair(pair.action, pair.consideration.GetScore(), pair.consideration));
             }
             // sort in descending order
             scores.Sort((a,b) => b.score.CompareTo(a.score));
@@ -74,15 +74,18 @@ namespace Utility
     }
     
     public struct ActionScorePair {
+        // even if it's named "Pair" it is a triplet...
         public Action action;
         public float score;
+        public IConsideration consideration; // <--- the scorer responsible for this score
         
-        public ActionScorePair(Action action, float score)
+        public ActionScorePair(Action action, float score, IConsideration consideration)
         {
             this.action = action;
             this.score = score;
+            this.consideration = consideration;
         }
-    }   
+    } 
 }
 
 

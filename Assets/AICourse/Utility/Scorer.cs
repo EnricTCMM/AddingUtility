@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace Utility
@@ -12,6 +13,8 @@ namespace Utility
         private List<IConsideration> considerations = new List<IConsideration>();
 
         public AggregationPolicy policy = AggregationPolicy.ADJUSTED_MULTIPLY;
+        
+        private float lastScore;
         
         public void Contextualize(GameObject go)
         {
@@ -56,14 +59,19 @@ namespace Utility
             switch (policy)
             {
                 case AggregationPolicy.MULTIPLY:
-                    return AggregateMultiply();
+                    lastScore = AggregateMultiply();
+                    break;
                 case AggregationPolicy.ADJUSTED_MULTIPLY:
-                    return AggregateAdjustedMultiply();
+                    lastScore = AggregateAdjustedMultiply();
+                    break;
                 case AggregationPolicy.AVERAGE:
-                    return AggregateAverage();
+                    lastScore = AggregateAverage();
+                    break;
                 default:
-                    return 0;
+                    lastScore = 0;
+                    break;
             }
+            return lastScore;
         }
 
         private float AggregateMultiply()
@@ -94,6 +102,15 @@ namespace Utility
                 sum += consideration.GetScore();
             }
             return sum / considerations.Count;
+        }
+        
+        public void AppendDebugInfo(StringBuilder info, int depth)
+        {
+            info.Append('\t', depth).AppendLine(Name + "("+policy.ToString()+") --> " + lastScore);
+            foreach (IConsideration consideration in considerations)
+            {
+                consideration.AppendDebugInfo(info, depth+1);
+            }
         }
 
     }

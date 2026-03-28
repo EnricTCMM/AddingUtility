@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEngine;
 
 namespace Utility
@@ -22,6 +23,8 @@ namespace Utility
         private float propertyMax;
         
         private bool explicitRangeProvided = false;
+
+        private float lastScore; // for debugging purposes
 
         // Beware: at construction time the consideration is not yet contextualized.
         // This is the "normal" constructor. A Consideration out of a "blackboarded" property. 
@@ -84,7 +87,13 @@ namespace Utility
             
             propertyValue = Mathf.Clamp01(propertyValue);
             
-            return Mathf.Clamp01(responseCurve(propertyValue));
+            lastScore =  Mathf.Clamp01(responseCurve(propertyValue));
+            return lastScore;
+        }
+
+        public void AppendDebugInfo(StringBuilder info, int depth)
+        {
+            info.Append('\t', depth).AppendLine(Name + " --> " + lastScore);
         }
     }
 }

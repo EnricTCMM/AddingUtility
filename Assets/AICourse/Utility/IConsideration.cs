@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEngine;
 
 namespace Utility
@@ -7,6 +8,7 @@ namespace Utility
         string Name { get; } // all considerations should have a name at least for debugging purposes
         public void Contextualize(GameObject go);
         public float GetScore();
+        public void AppendDebugInfo(StringBuilder info, int depth);
     }
 }
 
