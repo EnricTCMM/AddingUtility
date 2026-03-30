@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Goat_BLACKBOARD : DynamicBlackboard
@@ -13,10 +14,22 @@ public class Goat_BLACKBOARD : DynamicBlackboard
 
     [Header("Environmental Factors")]
     [Range(0f, 100f)] public float DistanceToCabbage = 100f; // 100 means no cabbage around
-    [Range(0f, 100f)] public float DangerLevel = 0f;         // 0 is safe, 100 means a predator is near
+    [Range(0f, 100f)] public float DistanceToPredator = 0f;         // 0 is safe, 100 means a predator is near
 
     [Header("Base Drives")]
-    [Range(0f, 1f)] public float WanderDrive = 0.15f; 
+    [Range(0f, 1f)] public float WanderDrive = 0.15f;
+
+    [Header("Other stuff")] 
+    public float hungerDecrementPerCabbage = 33;
+    public float energyIncrementPerSecond = 3;
+    public GameObject sleepParticleSystem;
+    public GameObject predator; 
+    public GameObject cabbage;
+
+    private void Start()
+    {
+        sleepParticleSystem = transform.Find("SleepParticleSystem").gameObject;
+    }
 
     void Update()
     {
@@ -24,15 +37,26 @@ public class Goat_BLACKBOARD : DynamicBlackboard
         Energy -= Time.deltaTime * 1.5f; 
         Hunger += Time.deltaTime * 2.0f;
 
-        // Simulating environmental changes for testing purposes
-        // In a real game, sensors or colliders would update these values
-        DistanceToCabbage = Mathf.PingPong(Time.time * 10f, 100f); // Moves between 0 and 100
-        
-        // Danger spikes every 15 seconds to simulate a predator passing by
-        if (Time.time % 15f < 2f) DangerLevel = 80f; 
-        else DangerLevel = Mathf.Max(0, DangerLevel - Time.deltaTime * 10f); // Cools down slowly
-
         Energy = Mathf.Clamp(Energy, 0f, 100f);
         Hunger = Mathf.Clamp(Hunger, 0f, 100f);
+        
+        // Continous monitoring of the environment
+        cabbage = SensingUtils.FindInstanceWithinRadius(gameObject, "CABBAGE", 99f);
+        if (cabbage == null) DistanceToCabbage = 100f;
+        else DistanceToCabbage = SensingUtils.DistanceToTarget(gameObject, cabbage);
+        
+        predator = SensingUtils.FindInstanceWithinRadius(gameObject, "PREDATOR", 99f);
+        if (predator == null) DistanceToPredator = 0f;
+        else DistanceToPredator = SensingUtils.DistanceToTarget(gameObject, predator);
+    }
+
+    public void EatCabbage()
+    {
+        Hunger = Mathf.Clamp(Hunger - hungerDecrementPerCabbage, 0f, 100f);
+    }
+
+    public void Sleep()
+    {
+        Energy = Mathf.Clamp(Energy + energyIncrementPerSecond*Time.deltaTime, 0f, 100f);
     }
 }

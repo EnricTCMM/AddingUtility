@@ -14,7 +14,7 @@ public class ACTION_WanderAround : Action
         this.keyAttractor = keyAttractor;
         this.keySeekWeight = keySeekWeight;
     }
-
+    
     private WanderAround wanderAround; 
 
     public override void OnInitialize()
@@ -24,8 +24,12 @@ public class ACTION_WanderAround : Action
         wanderAround = GetComponent<WanderAround>();
         if (wanderAround == null) wanderAround = AddComponent<WanderAround>();
 
-        wanderAround.attractor = blackboard.Get<GameObject>(keyAttractor);
-        wanderAround.Context.seekWeight = blackboard.Get<float>(keySeekWeight);
+        // null keys mean: use the values in the Steering or the Context
+        if (keyAttractor!=null)
+            wanderAround.attractor = blackboard.Get<GameObject>(keyAttractor);
+        if  (keySeekWeight != null)
+            wanderAround.Context.seekWeight = blackboard.Get<float>(keySeekWeight);
+        
         wanderAround.enabled = true;
     }
 
