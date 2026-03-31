@@ -17,7 +17,7 @@ namespace Utility
         public float scoringInterval = 0.2f;
         public float inertiaThreshold = 0.1f;
 
-        [TextArea(15, 30)]
+        [TextArea(15, 45)]
         public string debugInfoText;
         
         private float timeSinceLastScoring = 0;
@@ -96,6 +96,7 @@ namespace Utility
                     else
                     {
                         debugInfo.AppendLine($"*** MAINTAINING ACTION: {currentAction.Name} score: {currentScores[0].score} ***\n");
+                        currentScore = currentScores[0].score;
                     }
                 }
 

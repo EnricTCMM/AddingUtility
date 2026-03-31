@@ -2,29 +2,28 @@ using System.ComponentModel.Design.Serialization;
 using UnityEngine;
 using Utility;
 using BTs;
+using Steerings;
 
 [CreateAssetMenu(fileName = "UT_Goat", menuName = "Utility/UT_Goat", order = 1)]
 public class UT_Goat : UtilityActionSet
 {
     public override void OnConstruction()
     {
-       
-        
         //----- EATING
         Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
-        eatScorer.AddConsideration(new Consideration("Hunger", Curves.Linear, "Hunger Level"));
-        eatScorer.AddConsideration(new Consideration("DistanceToCabbage", Curves.InverseLinear, "Distance to Cabbage"));
+        eatScorer.AddConsideration(new Consideration("Hunger", Curves.AGGRESSIVE_EXPONENTIAL, "Hunger Level"));
+        eatScorer.AddConsideration(new Consideration("DistanceToCabbage", Curves.INVERTED_AGGRESSIVE_EXPONENTIAL, "Distance to Cabbage"));
         Bind(new ACTION_Eat(), eatScorer);
         
         // --- SLEEPING
         Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
-        sleepScorer.AddConsideration(new Consideration("Energy", Curves.InverseLinear, "Energy Level"));
-        sleepScorer.AddConsideration(new Consideration("DistanceToPredator", Curves.InverseLinear, "Danger Level"));
+        sleepScorer.AddConsideration(new Consideration("Energy", Curves.InvertedSigmoid(20, 0.3f), "Energy Level"));
+        sleepScorer.AddConsideration(new Consideration("DistanceToPredator", Curves.AGGRESSIVE_EXPONENTIAL, "Danger Level"));
         Bind(new ACTION_Sleep(), sleepScorer);
         
         // --- FLEEING
-        Consideration fleeingConsideration = new Consideration("DistanceToPredator", Curves.MEDIUM_EXPONENTIAL, "Distance to Predator");
-        Bind(new ACTION_Flee("predator"), fleeingConsideration);
+        Consideration fleeingConsideration = new Consideration("DistanceToPredator", Curves.InvertedExponential(8), "Distance to Predator");
+        Bind(new ACTION_Evade("predator"), fleeingConsideration);
         
         // --- WANDERING (fallback action)
         Consideration wanderingConsideration = new Consideration("WanderDrive", Curves.Linear, "Wander Drive");
@@ -34,24 +33,31 @@ public class UT_Goat : UtilityActionSet
 
 // local actions
 
-class ACTION_Flee : Action
+class ACTION_Evade : Action
 {
     public string keyTarget;
 
-    public ACTION_Flee(string keyTarget)
+    public ACTION_Evade(string keyTarget)
     {
         this.keyTarget = keyTarget;
     }
 
-    private Steerings.Flee flee;
+    private Steerings.Evade evade;
+    private SteeringContext context;
 
     public override void OnInitialize()
     {
-        flee = GetComponent<Steerings.Flee>();
-        if (flee == null) flee = AddComponent<Steerings.Flee>();
+        evade = GetComponent<Steerings.Evade>();
+        if (evade == null) evade = AddComponent<Steerings.Evade>();
 
-        flee.target = blackboard.Get<GameObject>(keyTarget);
-        flee.enabled = true;
+        context = GetComponent<SteeringContext>();
+        context.maxSpeed *= 3;
+        context.maxAcceleration *= 9;
+        
+        evade.target = blackboard.Get<GameObject>(keyTarget);
+        evade.enabled = true;
+        
+        
     }
 
     public override Status OnTick()
@@ -61,18 +67,24 @@ class ACTION_Flee : Action
 
     public override void OnAbort()
     {
-        flee.enabled = false;
+        evade.enabled = false;
+        context.maxSpeed /= 3;
+        context.maxAcceleration /= 9;
     }
 }
 
 class ACTION_Sleep : Action
 {
-    private GameObject parSystem;
+    private GameObject parSystemContainer;
+    private ParticleSystem parSys;
 
     public override void OnInitialize()
     {
-        parSystem = blackboard.Get<GameObject>("SleepParticleSystem");
-        parSystem.GetComponent<ParticleSystem>().Play();
+        parSystemContainer = blackboard.Get<GameObject>("SleepParticleSystem");
+        parSys = parSystemContainer.GetComponent<ParticleSystem>();
+        parSys.Play();
+        var em = parSys.emission;
+        em.enabled = true;
     }
     public override Status OnTick()
     {
@@ -82,7 +94,7 @@ class ACTION_Sleep : Action
     
     public override void OnAbort()
     {
-        parSystem.GetComponent<ParticleSystem>().Stop();
+        parSys.GetComponent<ParticleSystem>().Stop();
     }
 }
 

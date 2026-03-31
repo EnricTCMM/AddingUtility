@@ -14,7 +14,7 @@ public class Goat_BLACKBOARD : DynamicBlackboard
 
     [Header("Environmental Factors")]
     [Range(0f, 100f)] public float DistanceToCabbage = 100f; // 100 means no cabbage around
-    [Range(0f, 100f)] public float DistanceToPredator = 0f;         // 0 is safe, 100 means a predator is near
+    [Range(0f, 100f)] public float DistanceToPredator = 100f;  // 100 means no predator around
 
     [Header("Base Drives")]
     [Range(0f, 1f)] public float WanderDrive = 0.15f;
@@ -44,10 +44,12 @@ public class Goat_BLACKBOARD : DynamicBlackboard
         cabbage = SensingUtils.FindInstanceWithinRadius(gameObject, "CABBAGE", 99f);
         if (cabbage == null) DistanceToCabbage = 100f;
         else DistanceToCabbage = SensingUtils.DistanceToTarget(gameObject, cabbage);
+        // no need to clamp since detection radius is 99
         
         predator = SensingUtils.FindInstanceWithinRadius(gameObject, "PREDATOR", 99f);
-        if (predator == null) DistanceToPredator = 0f;
+        if (predator == null) DistanceToPredator = 100f;
         else DistanceToPredator = SensingUtils.DistanceToTarget(gameObject, predator);
+        // no need to clamp since detection radius is 99
     }
 
     public void EatCabbage()

@@ -317,6 +317,7 @@ GameObject:
   - component: {fileID: 256909060}
   - component: {fileID: 256909059}
   - component: {fileID: 256909061}
+  - component: {fileID: 256909062}
   m_Layer: 0
   m_Name: GOAT
   m_TagString: Untagged
@@ -536,6 +537,20 @@ MonoBehaviour:
   scoringInterval: 0.2
   inertiaThreshold: 0.1
   debugInfoText: 
+--- !u!114 &256909062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256909053}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38f112c9822224f4fa8ba0af659b7c86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Steerings.Evade
+  rotationalPolicy: 1
+  target: {fileID: 0}
 --- !u!1 &314152226
 GameObject:
   m_ObjectHideFlags: 0
