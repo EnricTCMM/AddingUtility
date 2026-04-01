@@ -11,18 +11,18 @@ public class UT_Goat : UtilityActionSet
     {
         //----- EATING
         Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
-        eatScorer.AddConsideration(new Consideration("Hunger", Curves.AGGRESSIVE_EXPONENTIAL, "Hunger Level"));
+        eatScorer.AddConsideration(new Consideration("hunger", Curves.AGGRESSIVE_EXPONENTIAL, "hunger Level"));
         eatScorer.AddConsideration(new Consideration("DistanceToCabbage", Curves.INVERTED_AGGRESSIVE_EXPONENTIAL, "Distance to Cabbage"));
         Bind(new ACTION_Eat(), eatScorer);
         
         // --- SLEEPING
         Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
-        sleepScorer.AddConsideration(new Consideration("Energy", Curves.InvertedSigmoid(20, 0.3f), "Energy Level"));
-        sleepScorer.AddConsideration(new Consideration("DistanceToPredator", Curves.AGGRESSIVE_EXPONENTIAL, "Danger Level"));
+        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(20, 0.3f), "energy Level"));
+        sleepScorer.AddConsideration(new Consideration("panicLevel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "panic Level"));
         Bind(new ACTION_Sleep(), sleepScorer);
         
         // --- FLEEING
-        Consideration fleeingConsideration = new Consideration("DistanceToPredator", Curves.InvertedExponential(8), "Distance to Predator");
+        Consideration fleeingConsideration = new Consideration("panicLevel", Curves.AGGRESSIVE_LOGARITHMIC, "Distance to Predator");
         Bind(new ACTION_Evade("predator"), fleeingConsideration);
         
         // --- WANDERING (fallback action)

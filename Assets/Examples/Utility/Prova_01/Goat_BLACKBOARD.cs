@@ -8,9 +8,10 @@ public class Goat_BLACKBOARD : DynamicBlackboard
      Although 0-100 is quite common, other ranges are possible.
      */
     
-    [Header("Internal Needs")]
-    [Range(0f, 100f)] public float Energy = 100f;
-    [Range(0f, 100f)] public float Hunger = 0f;
+    [Header("Internal Needs and states")]
+    [Range(0f, 100f)] public float energy = 100f;
+    [Range(0f, 100f)] public float hunger = 0f;
+    [Range(0f, 100f)] public float panicLevel = 0f;
 
     [Header("Environmental Factors")]
     [Range(0f, 100f)] public float DistanceToCabbage = 100f; // 100 means no cabbage around
@@ -20,12 +21,15 @@ public class Goat_BLACKBOARD : DynamicBlackboard
     [Range(0f, 1f)] public float WanderDrive = 0.15f;
 
     [Header("Other stuff")] 
-    public float hungerDecrementPerCabbage = 33;
-    public float energyIncrementPerSecond = 3;
+    public float hungerDecrementPerCabbage = 100;
+    public float energyIncrementPerSecond = 6; // energy increases 6 units per second when sleeping
+    public float panicDecreaseFactor = 20; // panic level decreases 20 units per second
     public GameObject sleepParticleSystem;
     public GameObject predator; 
     public GameObject cabbage;
 
+    private GameObject visiblePredator;
+    
     private void Start()
     {
         sleepParticleSystem = transform.Find("SleepParticleSystem").gameObject;
@@ -34,11 +38,11 @@ public class Goat_BLACKBOARD : DynamicBlackboard
     void Update()
     {
         // Internal needs change constantly
-        Energy -= Time.deltaTime * 1.5f; 
-        Hunger += Time.deltaTime * 2.0f;
+        energy -= Time.deltaTime * 1.5f; 
+        hunger += Time.deltaTime * 2.0f;
 
-        Energy = Mathf.Clamp(Energy, 0f, 100f);
-        Hunger = Mathf.Clamp(Hunger, 0f, 100f);
+        energy = Mathf.Clamp(energy, 0f, 100f);
+        hunger = Mathf.Clamp(hunger, 0f, 100f);
         
         // Continous monitoring of the environment
         cabbage = SensingUtils.FindInstanceWithinRadius(gameObject, "CABBAGE", 99f);
@@ -46,19 +50,32 @@ public class Goat_BLACKBOARD : DynamicBlackboard
         else DistanceToCabbage = SensingUtils.DistanceToTarget(gameObject, cabbage);
         // no need to clamp since detection radius is 99
         
-        predator = SensingUtils.FindInstanceWithinRadius(gameObject, "PREDATOR", 99f);
-        if (predator == null) DistanceToPredator = 100f;
-        else DistanceToPredator = SensingUtils.DistanceToTarget(gameObject, predator);
-        // no need to clamp since detection radius is 99
+        visiblePredator = SensingUtils.FindInstanceWithinRadius(gameObject, "PREDATOR", 99f);
+        if (visiblePredator != null)
+        {
+            // predator is visible. Maximum PANIC!!!
+            predator = visiblePredator;
+            DistanceToPredator = SensingUtils.DistanceToTarget(gameObject, predator);
+            panicLevel=100f;
+        }
+        else if (predator != null)
+        {
+            // predator is not visible. Reduce PANIC
+            DistanceToPredator = 100f; // equivalent to no predator around
+            panicLevel -= Time.deltaTime * panicDecreaseFactor;
+            panicLevel = Mathf.Clamp(panicLevel, 0f, 100f);
+            if (panicLevel<=0) 
+                predator = null;
+        }
     }
 
     public void EatCabbage()
     {
-        Hunger = Mathf.Clamp(Hunger - hungerDecrementPerCabbage, 0f, 100f);
+        hunger = Mathf.Clamp(hunger - hungerDecrementPerCabbage, 0f, 100f);
     }
 
     public void Sleep()
     {
-        Energy = Mathf.Clamp(Energy + energyIncrementPerSecond*Time.deltaTime, 0f, 100f);
+        energy = Mathf.Clamp(energy + energyIncrementPerSecond*Time.deltaTime, 0f, 100f);
     }
 }
