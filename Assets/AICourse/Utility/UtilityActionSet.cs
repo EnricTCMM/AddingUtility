@@ -39,9 +39,24 @@ namespace Utility
             {
                 // if actionName in the returned pair is null it means that no pair containing this actionName
                 // exists. So we can safely add a new pair.
-                list.Add(new ActionConsiderationPair(action, consideration));
+                // notice that default inertia is used.
+                list.Add(new ActionConsiderationPair(action, consideration, 0.1f));
             }
             else throw new System.ArgumentException("Action "+action.Name+" already bound to a consideration");
+        }
+
+        public void SetInertia(Action action, float inertia)
+        {
+            int index = list.FindIndex((p)=> p.action == action);
+            if (index<0)
+                throw new System.ArgumentException($"Cannot set inertia. Action {action.Name} is not bound yet.");
+            
+            // cannot work with a reference to the pair because it's a struct
+            // list[index].inertia =... does not change the value of the pair stored. 
+            // for list[index] returns a copy...
+            ActionConsiderationPair pair = list[index];
+            pair.inertia = inertia;
+            list[index] = pair;
         }
 
         public List<ActionScorePair> ScoreAllActions()
@@ -49,7 +64,7 @@ namespace Utility
             scores.Clear();
             foreach (ActionConsiderationPair pair in list)
             {
-                scores.Add(new ActionScorePair(pair.action, pair.consideration.GetScore(), pair.consideration));
+                scores.Add(new ActionScorePair(pair.action, pair.consideration.GetScore(), pair.consideration, pair.inertia) );
             }
             // sort in descending order
             scores.Sort((a,b) => b.score.CompareTo(a.score));
@@ -63,27 +78,33 @@ namespace Utility
     }
     
     public struct ActionConsiderationPair {
+        // even if it's named "Pair" it is a triad...
         public Action action;
         public IConsideration consideration; // quite often this will be a Scorer
+        public float inertia;
         
-        public ActionConsiderationPair(Action action, IConsideration consideration)
+        public ActionConsiderationPair(Action action, IConsideration consideration, float inertia = 0.1f)
         {
             this.action = action;
             this.consideration = consideration;
+            this.inertia = inertia;
         }
     }
     
+    // keeps last score of an action for later retrieval
     public struct ActionScorePair {
-        // even if it's named "Pair" it is a triplet...
+        // even if it's named "Pair" it is a quartet...
         public Action action;
         public float score;
         public IConsideration consideration; // <--- the scorer responsible for this score
+        public float inertia;
         
-        public ActionScorePair(Action action, float score, IConsideration consideration)
+        public ActionScorePair(Action action, float score, IConsideration consideration, float inertia)
         {
             this.action = action;
             this.score = score;
             this.consideration = consideration;
+            this.inertia = inertia;
         }
     } 
 }

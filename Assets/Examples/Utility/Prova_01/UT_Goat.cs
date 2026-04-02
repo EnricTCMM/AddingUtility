@@ -16,18 +16,23 @@ public class UT_Goat : UtilityActionSet
         Bind(new ACTION_Eat(), eatScorer);
         
         // --- SLEEPING
+        Action sleep = new ACTION_Sleep();
         Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
-        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(20, 0.3f), "energy Level"));
+        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(10, 0.6f), "energy Level"));
         sleepScorer.AddConsideration(new Consideration("panicLevel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "panic Level"));
-        Bind(new ACTION_Sleep(), sleepScorer);
+        Bind(sleep, sleepScorer);
+        SetInertia(sleep, 0.12f); // sleep has a considerable inertia 
+        
         
         // --- FLEEING
         Consideration fleeingConsideration = new Consideration("panicLevel", Curves.AGGRESSIVE_LOGARITHMIC, "Distance to Predator");
         Bind(new ACTION_Evade("predator"), fleeingConsideration);
         
         // --- WANDERING (fallback action)
+        Action wander = new ACTION_WanderAround();
         Consideration wanderingConsideration = new Consideration("WanderDrive", Curves.Linear, "Wander Drive");
-        Bind(new ACTION_WanderAround(), wanderingConsideration);
+        Bind(wander, wanderingConsideration);
+        SetInertia(wander, 0); // wander has no inertia at all. It's a fallback hence interrupting it is not an issue.
     }
 }
 

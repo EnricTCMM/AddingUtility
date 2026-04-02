@@ -538,7 +538,6 @@ MonoBehaviour:
   currentScore: 0
   status: 0
   scoringInterval: 0.2
-  inertiaThreshold: 0.1
   debugInfoText: 
 --- !u!114 &256909062
 MonoBehaviour:
@@ -639,7 +638,6 @@ MonoBehaviour:
   currentScore: 0
   status: 3
   scoringInterval: 0.2
-  inertiaThreshold: 0.1
   debugInfoText: 
 --- !u!4 &327673733
 Transform:
@@ -6240,7 +6238,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1012428479
 SpriteRenderer:
   serializedVersion: 2

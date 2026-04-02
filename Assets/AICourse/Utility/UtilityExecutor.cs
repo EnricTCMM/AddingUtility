@@ -15,7 +15,6 @@ namespace Utility
         public float currentScore;
         public Status status;
         public float scoringInterval = 0.2f;
-        public float inertiaThreshold = 0.1f;
 
         [TextArea(15, 45)]
         public string debugInfoText;
@@ -75,11 +74,13 @@ namespace Utility
                     if (currentScores[0].action != currentAction)
                     {
                         // there's a new best action candidate. Let's see if inertia allows the current action to continue or not
-                        float currentActionScoreNow = currentScores.Find(x => x.action == currentAction).score;
+                        ActionScorePair currentPair = currentScores.Find(x => x.action == currentAction);
+                        float currentActionScoreNow = currentPair.score;
+                        float currentActionInertia = currentPair.inertia;
                         
-                        if (currentActionScoreNow + inertiaThreshold < currentScores[0].score)
+                        if (currentActionScoreNow + currentActionInertia < currentScores[0].score)
                         {
-                            debugInfo.AppendLine($"*** ABORTING ACTION: {currentAction.Name} score: {currentActionScoreNow} + {inertiaThreshold}  ***");
+                            debugInfo.AppendLine($"*** ABORTING ACTION: {currentAction.Name} score: {currentActionScoreNow} + {currentActionInertia}  ***");
                             debugInfo.AppendLine($"*** SELECTED ACTION: {currentScores[0].action.Name} score: {currentScores[0].score} ***\n");
                             
                             currentAction.Abort();
