@@ -18,10 +18,10 @@ public class UT_Goat : UtilityActionSet
         // --- SLEEPING
         Action sleep = new ACTION_Sleep();
         Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
-        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(10, 0.6f), "energy Level"));
+        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(20, 0.3f), "energy Level"));
         sleepScorer.AddConsideration(new Consideration("panicLevel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "panic Level"));
         Bind(sleep, sleepScorer);
-        SetInertia(sleep, 0.12f); // sleep has a considerable inertia 
+        SetInertia(sleep, 0.2f); // sleep has a considerable inertia 
         
         
         // --- FLEEING
@@ -94,7 +94,13 @@ class ACTION_Sleep : Action
     public override Status OnTick()
     {
         ((Goat_BLACKBOARD)blackboard).Sleep();
-        return Status.RUNNING;
+        if (((Goat_BLACKBOARD)blackboard).energy > 99)
+        {
+            parSys.GetComponent<ParticleSystem>().Stop();
+            return Status.SUCCEEDED;
+        }
+        else 
+            return Status.RUNNING;
     }
     
     public override void OnAbort()
