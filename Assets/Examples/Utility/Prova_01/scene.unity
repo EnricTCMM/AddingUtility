@@ -383,7 +383,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 860498388}
   m_HandleRect: {fileID: 860498387}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -463,7 +463,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 910.00006, y: -415.6449}
-  m_SizeDelta: {x: 735.79395, y: 474.01404}
+  m_SizeDelta: {x: 735.7939, y: 481.6933}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &210571967
 MonoBehaviour:
@@ -741,6 +741,7 @@ MonoBehaviour:
   status: 0
   scoringInterval: 0.2
   debugInfoText: 
+  onScreenInfo: {fileID: 1114274951}
 --- !u!114 &256909062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -841,6 +842,7 @@ MonoBehaviour:
   status: 3
   scoringInterval: 0.2
   debugInfoText: 
+  onScreenInfo: {fileID: 0}
 --- !u!4 &327673733
 Transform:
   m_ObjectHideFlags: 0
@@ -996,10 +998,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
   m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Left: 10
+    m_Right: 10
+    m_Top: 10
+    m_Bottom: 10
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
@@ -7273,6 +7275,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1114274950}
+  - component: {fileID: 1114274951}
+  - component: {fileID: 1114274952}
   m_Layer: 5
   m_Name: OnScreenInfo
   m_TagString: Untagged
@@ -7300,6 +7304,31 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1114274951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114274949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee27555f51284b1f9e64018ef370087e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OnScreenInfo
+  maxLogEntries: 25
+--- !u!114 &1114274952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114274949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b4045c24e47f8e4eb7ce61d48a61681, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StartStopController
 --- !u!1 &1142618120
 GameObject:
   m_ObjectHideFlags: 0
@@ -7574,9 +7603,9 @@ MonoBehaviour:
   m_Content: {fileID: 373323029}
   m_Horizontal: 1
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
-  m_Inertia: 1
+  m_Inertia: 0
   m_DecelerationRate: 0.135
   m_ScrollSensitivity: 1
   m_Viewport: {fileID: 1694228147}
@@ -8987,8 +9016,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 16
+  m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

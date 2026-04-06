@@ -19,6 +19,8 @@ namespace Utility
         [TextArea(15, 45)]
         public string debugInfoText;
         
+        public OnScreenInfo onScreenInfo;
+        
         private float timeSinceLastScoring = 0;
         private List<ActionScorePair> currentScores;
         
@@ -56,11 +58,14 @@ namespace Utility
                                    currentAction.IsTerminated() || 
                                    timeSinceLastScoring >= scoringInterval;
 
+            
+            
             if (needsEvaluation)
             {
                 currentScores = actionSet.ScoreAllActions();
                 debugInfo.Clear();
-
+                
+                debugInfo.AppendLine("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*\n");
                 
                 if (currentAction == null || currentAction.IsTerminated()) // No action selected yet, or current action is terminated
                 {
@@ -116,6 +121,11 @@ namespace Utility
                 }
                 
                 debugInfoText = debugInfo.ToString();
+                if (onScreenInfo != null)
+                {
+                    onScreenInfo.InjectInfo(debugInfoText, true);
+                }
+
                 timeSinceLastScoring = 0;
             }
 
