@@ -106,7 +106,8 @@ namespace Utility
         
         public void AppendDebugInfo(StringBuilder info, int depth)
         {
-            info.Append('\t', depth).AppendLine(Name + "("+policy.ToString()+") --> " + lastScore);
+            //info.Append('\t', depth).AppendLine(Name + "("+policy.ToString()+") --> " + lastScore);
+            info.Append('\t', depth).AppendLine($"{Name} ({policy.ToString()}) -->  {lastScore:F4}");
             foreach (IConsideration consideration in considerations)
             {
                 consideration.AppendDebugInfo(info, depth+1);

@@ -69,12 +69,12 @@ namespace Utility
                 
                 if (currentAction == null || currentAction.IsTerminated()) // No action selected yet, or current action is terminated
                 {
-                    debugInfo.AppendLine($"*** STARTING ACTION: {currentScores[0].action.Name} score: {currentScores[0].score} ***\n");
+                    debugInfo.AppendLine($"*** STARTING ACTION: {currentScores[0].action.Name} score: {currentScores[0].score:F4} ***\n");
                     currentAction = currentScores[0].action;
                     currentScore = currentScores[0].score;
                     actionName = currentAction.Name;
                     currentAction.Initialize();
-                } else {  // it's time to check if we should abort the current action or keeo it going
+                } else {  // it's time to check if we should abort the current action or keep it going
                     
                     if (currentScores[0].action != currentAction)
                     {
@@ -85,8 +85,8 @@ namespace Utility
                         
                         if (currentActionScoreNow + currentActionInertia < currentScores[0].score)
                         {
-                            debugInfo.AppendLine($"*** ABORTING ACTION: {currentAction.Name} score: {currentActionScoreNow} + {currentActionInertia}  ***");
-                            debugInfo.AppendLine($"*** SELECTED ACTION: {currentScores[0].action.Name} score: {currentScores[0].score} ***\n");
+                            debugInfo.AppendLine($"*** ABORTING ACTION: {currentAction.Name} score: {currentActionScoreNow:F4} + {currentActionInertia:F4} = {currentActionScoreNow + currentActionInertia:F4} < {currentScores[0].score:F4} ***");
+                            debugInfo.AppendLine($"*** SELECTED ACTION: {currentScores[0].action.Name} score: {currentScores[0].score:F4} ***\n");
                             
                             currentAction.Abort();
                             currentAction = currentScores[0].action;
@@ -96,12 +96,12 @@ namespace Utility
                         }
                         else
                         {
-                            debugInfo.AppendLine($"*** INERTIA KEPT ACTION: {currentAction.Name} (Score: {currentActionScoreNow}). Top was {currentScores[0].action.Name} ({currentScores[0].score}) ***\n");
+                            debugInfo.AppendLine($"*** INERTIA KEPT ACTION: {currentAction.Name} (Score: {currentActionScoreNow:F4} + {currentActionInertia:F4} = {currentActionScoreNow+currentActionInertia:F4}). Top was {currentScores[0].action.Name} ({currentScores[0].score}) ***\n");
                         }
                     }
                     else
                     {
-                        debugInfo.AppendLine($"*** MAINTAINING ACTION: {currentAction.Name} score: {currentScores[0].score} ***\n");
+                        debugInfo.AppendLine($"*** MAINTAINING ACTION: {currentAction.Name} score: {currentScores[0].score:F4} ***\n");
                         currentScore = currentScores[0].score;
                     }
                 }
@@ -112,7 +112,7 @@ namespace Utility
                 debugInfo.AppendLine();
                 foreach (ActionScorePair pair in currentScores)
                 {
-                    debugInfo.AppendLine($"[ACTION] {pair.action.Name} : {pair.score:F2}");
+                    debugInfo.AppendLine($"[ACTION] {pair.action.Name} : {pair.score:F4}");
                     if (pair.consideration != null) 
                     {
                         pair.consideration.AppendDebugInfo(debugInfo, 1);

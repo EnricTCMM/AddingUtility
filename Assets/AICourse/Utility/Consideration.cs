@@ -25,6 +25,7 @@ namespace Utility
         private bool explicitRangeProvided = false;
 
         private float lastScore; // for debugging purposes
+        private float lastValue; // id
 
         // Beware: at construction time the consideration is not yet contextualized.
         // This is the "normal" constructor. A Consideration out of a "blackboarded" property. 
@@ -86,6 +87,7 @@ namespace Utility
             propertyValue = (propertyValue - propertyMin) / (propertyMax - propertyMin);
             
             propertyValue = Mathf.Clamp01(propertyValue);
+            lastValue = propertyValue;
             
             lastScore =  Mathf.Clamp01(responseCurve(propertyValue));
             return lastScore;
@@ -93,7 +95,8 @@ namespace Utility
 
         public void AppendDebugInfo(StringBuilder info, int depth)
         {
-            info.Append('\t', depth).AppendLine(Name + " --> " + lastScore);
+            //info.Append('\t', depth).AppendLine(Name + " --> " + lastScore);
+            info.Append('\t', depth).AppendLine($"{Name}[={lastValue:F4}] --> {lastScore:F4}");
         }
     }
 }

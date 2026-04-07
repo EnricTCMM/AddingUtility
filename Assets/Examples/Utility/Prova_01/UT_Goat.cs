@@ -10,10 +10,13 @@ public class UT_Goat : UtilityActionSet
     public override void OnConstruction()
     {
         //----- EATING
+        Action eat = new ACTION_Eat();
         Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
-        eatScorer.AddConsideration(new Consideration("hunger", Curves.AGGRESSIVE_EXPONENTIAL, "hunger Level"));
+        eatScorer.AddConsideration(new Consideration("hunger", Curves.MILD_EXPONENTIAL, "hunger Level"));
         eatScorer.AddConsideration(new Consideration("DistanceToCabbage", Curves.INVERTED_AGGRESSIVE_EXPONENTIAL, "Distance to Cabbage"));
-        Bind(new ACTION_Eat(), eatScorer);
+        Bind(eat, eatScorer);
+        SetInertia(eat, 0.10f); // commitment to eating is quite high 
+    
         
         // --- SLEEPING
         Action sleep = new ACTION_Sleep();
@@ -29,7 +32,7 @@ public class UT_Goat : UtilityActionSet
         Bind(new ACTION_Evade("predator"), fleeingConsideration);
         
         // --- WANDERING (fallback action)
-        Action wander = new ACTION_WanderAround();
+        Action wander = new ACTION_ConstrainedWander();
         Consideration wanderingConsideration = new Consideration("WanderDrive", Curves.Linear, "Wander Drive");
         Bind(wander, wanderingConsideration);
         SetInertia(wander, 0); // wander has no inertia at all. It's a fallback hence interrupting it is not an issue.
@@ -90,6 +93,7 @@ class ACTION_Sleep : Action
         parSys.Play();
         var em = parSys.emission;
         em.enabled = true;
+        parSystemContainer.SetActive(true);
     }
     public override Status OnTick()
     {
@@ -97,6 +101,7 @@ class ACTION_Sleep : Action
         if (((Goat_BLACKBOARD)blackboard).energy > 99)
         {
             parSys.GetComponent<ParticleSystem>().Stop();
+            parSystemContainer.SetActive(false);
             return Status.SUCCEEDED;
         }
         else 
@@ -106,6 +111,7 @@ class ACTION_Sleep : Action
     public override void OnAbort()
     {
         parSys.GetComponent<ParticleSystem>().Stop();
+        parSystemContainer.SetActive(false);
     }
 }
 
@@ -141,5 +147,58 @@ class ACTION_Eat : Action
     public override void OnAbort()
     {
         eatBehaviorTree.Abort();
+    }
+}
+
+class ACTION_ConstrainedWander : Action
+{
+    private BT_ConstrainedWander constrainedWanderBehaviorTree;
+
+    public override void OnInitialize()
+    {
+        constrainedWanderBehaviorTree = ScriptableObject.CreateInstance<BT_ConstrainedWander>();
+        constrainedWanderBehaviorTree.Contextualize(gameObject);
+    }
+    public override Status OnTick()
+    {
+        return constrainedWanderBehaviorTree.Tick();
+    }
+    public override void OnAbort()
+    {
+        constrainedWanderBehaviorTree.Abort();
+    }
+}
+
+class BT_ConstrainedWander : BehaviourTree
+{
+    public override void OnConstruction()
+    {
+        root = new DynamicSelector();
+        
+        root.AddChild(
+            new LambdaCondition(()=>
+            {
+                return ((Goat_BLACKBOARD)blackboard).CentreAnxious();
+            }),
+            new Sequence(
+                new LambdaAction(() =>
+                {
+                    GetComponent<SteeringContext>().seekWeight = 0.8f;
+                    return Status.SUCCEEDED;
+                }),
+                new ACTION_WanderAround()
+           )
+        ); // first child ends here
+        
+        root.AddChild( new CONDITION_AlwaysTrue(), 
+            new Sequence(
+                new LambdaAction(() =>
+                {
+                    GetComponent<SteeringContext>().seekWeight = 0.2f;
+                    return Status.SUCCEEDED;
+                }),
+                new ACTION_WanderAround()
+            )
+        ); // second child ends here
     }
 }

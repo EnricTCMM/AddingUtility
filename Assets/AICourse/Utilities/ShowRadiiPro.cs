@@ -24,16 +24,31 @@ public class ShowRadiiPro : MonoBehaviour
         type = component.GetType();
         innerField = type.GetField(innerFieldName);
         outerField = type.GetField(outerFieldName);
+        
+        if (component == null) Debug.LogWarning("No component named " + componentTypeName + " in " + gameObject.name);
+        else
+        {
+            if (innerField == null) Debug.LogWarning("No field named " + innerFieldName + " in " + componentTypeName);
+            if (outerField == null) Debug.LogWarning("No field named " + outerFieldName + " in " + componentTypeName);
+        }
+        
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        float inner = (float)innerField.GetValue(component);
-        float outer = (float)outerField.GetValue(component);
+        if (innerField != null)
+        {
+            float inner = (float)innerField.GetValue(component);
+            DebugExtension.DebugCircle(transform.position, up, Color.blue, inner);
+        }
 
-        DebugExtension.DebugCircle(transform.position, up, Color.blue, inner);
-        DebugExtension.DebugCircle(transform.position, up, Color.red, outer);
+        if (outerField != null)
+        {
+            float outer = (float)outerField.GetValue(component);
+            DebugExtension.DebugCircle(transform.position, up, Color.red, outer);
+        }
+        
     }
 }

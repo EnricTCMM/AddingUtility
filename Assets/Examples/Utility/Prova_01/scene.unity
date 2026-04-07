@@ -319,6 +319,8 @@ GameObject:
   - component: {fileID: 256909061}
   - component: {fileID: 256909062}
   - component: {fileID: 256909063}
+  - component: {fileID: 256909064}
+  - component: {fileID: 256909065}
   m_Layer: 0
   m_Name: GOAT
   m_TagString: Untagged
@@ -419,10 +421,13 @@ MonoBehaviour:
   DistanceToCabbage: 100
   DistanceToPredator: 100
   WanderDrive: 0.15
-  hungerDecrementPerCabbage: 100
+  relaxRadius: 80
+  nonRelaxRadius: 140
+  hungerDecrementPerCabbage: 33
   energyIncrementPerSecond: 6
   panicDecreaseFactor: 20
   sleepParticleSystem: {fileID: 0}
+  centre: {fileID: 314152226}
   predator: {fileID: 0}
   cabbage: {fileID: 0}
 --- !u!114 &256909057
@@ -574,6 +579,35 @@ MonoBehaviour:
     uiBar: {fileID: 1106262765}
   - blackboardKey: panicLevel
     uiBar: {fileID: 1799456379}
+--- !u!114 &256909064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256909053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c310f44b1bea2c4e942b7537734de3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoveToClick
+  rightClick: 1
+--- !u!114 &256909065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256909053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4e97bc0cf1e5ba4a8354a489731be4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShowRadiiPro
+  componentTypeName: Goat_BLACKBOARD
+  innerFieldName: cabbageDetectionRadius
+  outerFieldName: 
+  listenedObject: {fileID: 0}
 --- !u!1 &314152226
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,6 +617,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 314152227}
+  - component: {fileID: 314152228}
   m_Layer: 0
   m_Name: CenterOfScene
   m_TagString: Untagged
@@ -605,6 +640,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &314152228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 314152226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e95c501fd6aa5942b69d5c2e2f7856d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShowRadii
+  inner: 80
+  outer: 140
 --- !u!1 &327673731
 GameObject:
   m_ObjectHideFlags: 0
@@ -881,7 +930,7 @@ Transform:
   m_GameObject: {fileID: 655010882}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 3.1074657, y: -0.13351107, z: 0}
+  m_LocalPosition: {x: -0.29, y: -0.08, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6242,6 +6291,7 @@ GameObject:
   - component: {fileID: 1012428483}
   - component: {fileID: 1012428482}
   - component: {fileID: 1012428481}
+  - component: {fileID: 1012428485}
   m_Layer: 0
   m_Name: WOLF
   m_TagString: PREDATOR
@@ -6420,6 +6470,19 @@ MonoBehaviour:
   speed: 0
   angularSpeed: 0
   groupManager: {fileID: 0}
+--- !u!114 &1012428485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012428478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c310f44b1bea2c4e942b7537734de3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoveToClick
+  rightClick: 0
 --- !u!1 &1069565889
 GameObject:
   m_ObjectHideFlags: 0
