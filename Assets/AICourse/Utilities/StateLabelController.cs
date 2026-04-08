@@ -7,6 +7,10 @@ public class StateLabelController : MonoBehaviour
     private IStateNameProvider stateNameProvider;
     private SpriteRenderer parentSprite; // We need to reference the parent's sprite
 
+    [Header("Optional State Name Provider. Overrides default")]
+    [Tooltip("drag parent and select the right script/component\nUse the two-inspector trick")]
+    [SerializeField] private MonoBehaviour specificProviderComponent;
+    
     // private Vector3 initialLocalPosition;
     private Vector3 initialScale;
     
@@ -17,8 +21,31 @@ public class StateLabelController : MonoBehaviour
     {
         text = GetComponent<TextMeshPro>();
 
-        // Automatically searches for the parent's script
-        stateNameProvider = GetComponentInParent<IStateNameProvider>();
+        // 1. MANUAL INTENT: Check if a specific script has been assigned in the Inspector
+        if (specificProviderComponent != null)
+        {
+            // Try to convert the MonoBehaviour to our interface
+            stateNameProvider = specificProviderComponent as IStateNameProvider;
+
+            if (stateNameProvider == null)
+            {
+                Debug.LogError($"The component '{specificProviderComponent.GetType().Name}' does not implement IStateNameProvider!");
+            }
+        }
+
+        // 2. AUTOMATIC INTENT (Fallback): If nothing is manually assigned, search in the parent
+        if (stateNameProvider == null)
+        {
+            stateNameProvider = GetComponentInParent<IStateNameProvider>();
+            if (stateNameProvider == null)
+            {
+                Debug.LogWarning("No StateNameProvider found in the parent hierarchy! state label won't work.");
+                if (text != null)
+                {
+                    text.text = "????";
+                }
+            }
+        }
 
         // Search for the SpriteRenderer in the parent
         parentSprite = transform.parent.GetComponent<SpriteRenderer>();
