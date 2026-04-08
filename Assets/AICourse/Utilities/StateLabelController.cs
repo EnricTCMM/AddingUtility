@@ -29,7 +29,7 @@ public class StateLabelController : MonoBehaviour
 
             if (stateNameProvider == null)
             {
-                Debug.LogError($"The component '{specificProviderComponent.GetType().Name}' does not implement IStateNameProvider!");
+                Debug.LogWarning($"The component '{specificProviderComponent.GetType().Name}' does not implement IStateNameProvider!");
             }
         }
 
