@@ -7,7 +7,7 @@ using Action = BTs.Action;  // otherwise it's ambiguous since System also has Ac
 
 namespace Utility
 {
-    public class UtilityExecutor : MonoBehaviour
+    public class UtilityExecutor : MonoBehaviour , IStateNameProvider
     {
         public UtilityActionSet actionSet;
         private Action currentAction;
@@ -26,6 +26,9 @@ namespace Utility
         
         private StringBuilder debugInfo = new StringBuilder();
 
+        /* IStateNameProvider */
+        public event Action<string> OnStateNameChanged;
+        
         void Start()
         {
             if (actionSet == null) return; // should we complain instead of silently returning?
@@ -74,6 +77,8 @@ namespace Utility
                     currentScore = currentScores[0].score;
                     actionName = currentAction.Name;
                     currentAction.Initialize();
+                    OnStateNameChanged?.Invoke(currentAction.Name);
+                    
                 } else {  // it's time to check if we should abort the current action or keep it going
                     
                     if (currentScores[0].action != currentAction)
@@ -93,6 +98,7 @@ namespace Utility
                             currentScore = currentScores[0].score;
                             actionName = currentAction.Name;
                             currentAction.Initialize();
+                            OnStateNameChanged?.Invoke(currentAction.Name);
                         }
                         else
                         {
