@@ -20,9 +20,11 @@ public class UT_Goat : UtilityActionSet
         
         // --- SLEEPING
         Action sleep = new ACTION_Sleep();
-        Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
+        Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.ADJUSTED_MULTIPLY);
         sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(20, 0.3f), "energy Level"));
         sleepScorer.AddConsideration(new Consideration("panicLevel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "panic Level"));
+        // uncomment the following line for "hungry goats don't sleep" (they rather find food)
+        // sleepScorer.AddConsideration(new Consideration("hunger", Curves.InverseLinear, "hunger Level"));
         Bind(sleep, sleepScorer);
         SetInertia(sleep, 0.2f); // sleep has a considerable inertia 
         
