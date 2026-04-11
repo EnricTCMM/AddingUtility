@@ -11,15 +11,9 @@ public class LANDLADY_Blackboard : DynamicBlackboard
     
     [Range(0, 1)] public float  baselineUtility = 0.1f;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public void incClientsWaitingBeer() { clientsWaitingBeer = Mathf.Min(clientsWaitingBeer + 1, 20); }
+    public void decClientsWaitingBeer() { clientsWaitingBeer = Mathf.Max(clientsWaitingBeer - 1, 0); }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public void incDirtyTables() { dirtyTables = Mathf.Min(dirtyTables + 1, 5); }
+    public void decDirtyTables() { dirtyTables = Mathf.Max(dirtyTables - 1, 0); }
 }
