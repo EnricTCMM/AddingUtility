@@ -16,4 +16,15 @@ public class LANDLADY_Blackboard : DynamicBlackboard
 
     public void incDirtyTables() { dirtyTables = Mathf.Min(dirtyTables + 1, 5); }
     public void decDirtyTables() { dirtyTables = Mathf.Max(dirtyTables - 1, 0); }
+    
+    public void incSleepingDrunkards() { sleepingDrunkards = Mathf.Min(sleepingDrunkards + 1, 4); }
+    public void decSleepingDrunkards() { sleepingDrunkards = Mathf.Max(sleepingDrunkards - 1, 0); }
+    
+    public void incClientsQuarreling() { clientsQuarreling = Mathf.Min(clientsQuarreling + 1, 1); }
+    public void decClientsQuarreling() { clientsQuarreling = Mathf.Max(clientsQuarreling - 1, 0); }
+    
+    public void incTankardsInBarrel() { tankardsInBarrel = Mathf.Min(tankardsInBarrel + 1, 100); }
+    public void decTankardsInBarrel() { tankardsInBarrel = Mathf.Max(tankardsInBarrel - 1, 0); }
+    
+    public void emptyBarrel() { tankardsInBarrel = 0; }
 }
