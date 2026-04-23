@@ -4,19 +4,20 @@ using BTs;
 
 public class ACTION_Speak : Action
 {
-
     public string keyMessage;
-
 
     // construtor
     public ACTION_Speak(string keyMessage)  {
         this.keyMessage = keyMessage;
     }
-
+    
     private string theMessage;
     private GameObject bubble;
     private TextMeshPro textLine;
 
+    /* NOTICE USAGE: gameobject must have a child tagged BUBBLE. Child must parent a TextMeshPro
+     where the actual text will be displayed
+    */
     public override void OnInitialize()
     {
         theMessage = blackboard.Get<string>(keyMessage);

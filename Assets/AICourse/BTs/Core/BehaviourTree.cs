@@ -10,18 +10,29 @@ namespace BTs
 
     public abstract class BehaviourTree : ScriptableObject, INode
     {
-
+        // (April 2026) implicit conversion of BehaviourTree to Action (for BT-based actions)
+        // with this, any Action variable can be assigned a BT !!! 
+        public static implicit operator Action(BehaviourTree bt)
+        {
+            // implicit => do not ask for explicit casting
+            // operator Action => cast something to Action
+            // (BehaviourTree bt) => the thing that must be casted
+            
+            if (bt == null) return null;
+            else return new BTBasedAction(bt);  // inner class BTBasedAction is defined below, at the end of the class
+        }
+        
         protected Node root; // value must be set in onConstruction
         public string Name { get; set; }
 
         // NOTA: aquest constructor l'utilitza "el sistema". Quan es fa la creació 
         // encara no es coneix el gameObject associat. Per aquesta raó no es pot
         // donar el gameObject a root.
-        public BehaviourTree () : base ()
+        public BehaviourTree() : base()
         {
             Name = GetType().ToString();
         }
-        
+
 
         // Aquí és on es materialitza la construcció de l'estructura arbòria.
         // No es fa al constructor, es fa aquí.
@@ -30,7 +41,7 @@ namespace BTs
         // - a InternalNode. Quan un internal node rep el seu gameObject el propaga vers els
         // seus fills.Si el fill és un BT, la contextualització també significarà la construcció
         // de l'estructura arbòria.
-        public void Contextualize (GameObject gameObject)
+        public void Contextualize(GameObject gameObject)
         {
             this.gameObject = gameObject;
             OnConstruction();
@@ -38,7 +49,7 @@ namespace BTs
             root.Contextualize(gameObject);
         }
 
-        
+
         // -------------------------
         // this is the one and only method that subclasses must implement.
         // -------------------------
@@ -96,8 +107,35 @@ namespace BTs
         // As a result of this, SteeringContext cannot extend from Blackboard 
         // In future releases this issue could be addressed (maybe merging all blackboards in a single
         // object?)
-        public DynamicBlackboard blackboard { get => GetComponent<DynamicBlackboard>(); }
+        public DynamicBlackboard blackboard
+        {
+            get => GetComponent<DynamicBlackboard>();
+        }
+        
+        private class BTBasedAction : Action
+        {
+            private BehaviourTree bt;
+            
+            public BTBasedAction(BehaviourTree bt) : base(bt.Name)
+            {
+                this.bt = bt;
+            }
 
-    }
-
+            public override void OnInitialize()
+            {
+                bt.Contextualize(gameObject);
+            }
+            
+            public override Status OnTick()
+            {
+                return bt.Tick();
+            }
+            
+            public override void OnAbort()
+            {
+                bt.Abort();
+            }
+        } // end of inner class BTBasedAction
+        
+    } // end of class BehaviourTree
 }
