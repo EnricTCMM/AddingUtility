@@ -7,6 +7,7 @@ public class StartStopController : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+        if (!this.enabled) return; 
         timeScale = Time.timeScale;
         Time.timeScale = 0;
         Debug.Log("NOW PAUSED. Press space bar to (re)start/pause");

@@ -39,8 +39,8 @@ namespace Utility
             {
                 // if actionName in the returned pair is null it means that no pair containing this actionName
                 // exists. So we can safely add a new pair.
-                // notice that default inertia is used.
-                list.Add(new ActionConsiderationPair(action, consideration, 0.1f));
+                // (Notice/Remember: inertia is initialized to 0.0f)
+                list.Add(new ActionConsiderationPair(action, consideration));
             }
             else throw new System.ArgumentException("Action "+action.Name+" already bound to a consideration");
         }
@@ -83,11 +83,11 @@ namespace Utility
         public IConsideration consideration; // quite often this will be a Scorer
         public float inertia;
         
-        public ActionConsiderationPair(Action action, IConsideration consideration, float inertia = 0.1f)
+        public ActionConsiderationPair(Action action, IConsideration consideration)
         {
             this.action = action;
             this.consideration = consideration;
-            this.inertia = inertia;
+            this.inertia = 0.0f; // no default inertia exists. Inertia must be set explicitly.
         }
     }
     

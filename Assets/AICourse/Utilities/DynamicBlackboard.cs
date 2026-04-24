@@ -122,7 +122,11 @@ public class DynamicBlackboard : MonoBehaviour
         else if (map.ContainsKey(name))
             value = map[name];
         else
-            Debug.LogWarning("Unknown key in blackboard: "+name);
+        {
+            // no soft landing here. This is serious...
+            // Debug.LogError("Unknown key in blackboard: " + name);
+            throw new System.Exception("Unknown key in blackboard: " + name);
+        }
 
         // now, what if T is float and value is int? 
         // (T)value causes an Exception.

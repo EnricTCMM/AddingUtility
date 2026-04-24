@@ -2820,6 +2820,26 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2781688464797009668, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_fontSize
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2781688464797009668, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_fontSizeMax
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2781688464797009668, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2781688464797009668, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2781688464797009668, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
