@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Globalization;
+using UnityEditor.AnimatedValues;
 
 public class DynamicBlackboard : MonoBehaviour
 {
@@ -53,6 +54,7 @@ public class DynamicBlackboard : MonoBehaviour
 
         if (!initialised) Initialize();
 
+        // first of all code considers the possibility of verbatim keys
         if (typeof(T).Equals(typeof(float)))
         {
             // if key parses to a float then return the float itself
@@ -122,6 +124,16 @@ public class DynamicBlackboard : MonoBehaviour
         else
             Debug.LogWarning("Unknown key in blackboard: "+name);
 
+        // now, what if T is float and value is int? 
+        // (T)value causes an Exception.
+        // so let's take this into account and save the situation
+
+        if (value.GetType()==typeof(int) && typeof(T)==typeof(float))
+        {
+            float val = (int)value;
+            value = val;
+        }
+
         return (T)value;
     }
 
@@ -139,7 +151,7 @@ public class DynamicBlackboard : MonoBehaviour
             if (properties[name].CanWrite)
                 properties[name].SetValue(this, value);
             else
-                Debug.LogWarning("property "+name+" cannot be set");
+                Debug.LogWarning("property "+name+" exists but cannot be set");
         }
         else
             map[name] = value;  // adds or updates...

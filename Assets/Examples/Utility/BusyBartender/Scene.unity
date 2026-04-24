@@ -2816,6 +2816,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1888052860093589110, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -4003,7 +4007,7 @@ MonoBehaviour:
   actionName: 
   currentScore: 0
   status: 0
-  scoringInterval: 0.2
+  scoringInterval: 1
   debugInfoText: 
   onScreenInfo: {fileID: 1988173261}
 --- !u!224 &1988173259 stripped

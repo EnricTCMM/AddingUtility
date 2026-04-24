@@ -7,9 +7,9 @@ public class StartStopController : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-        Debug.Log("Press space bar to (re)start/pause");
         timeScale = Time.timeScale;
         Time.timeScale = 0;
+        Debug.Log("NOW PAUSED. Press space bar to (re)start/pause");
     }
 
     // Update is called once per frame
@@ -20,10 +20,12 @@ public class StartStopController : MonoBehaviour
             if (Time.timeScale == 0f)
             {
                 Time.timeScale = timeScale;
+                Debug.Log("NOW RUNNING. Press space bar to (re)start/pause");
             }
             else
             {
                 Time.timeScale = 0f;
+                Debug.Log("NOW PAUSED. Press space bar to (re)start/pause");
             }
         }
     }
@@ -31,10 +33,12 @@ public class StartStopController : MonoBehaviour
     public void Pause()
     {
         Time.timeScale = 0f;
+        Debug.Log("NOW PAUSED. Press space bar to (re)start/pause");
     }
 
     public void Resume()
     {
         Time.timeScale = timeScale;
+        Debug.Log("NOW RUNNING. Press space bar to (re)start/pause");
     }
 }

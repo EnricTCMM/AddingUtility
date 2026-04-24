@@ -24,7 +24,7 @@ public class UT_Landlady : UtilityActionSet
         serveBeerScorer.AddConsideration(new Consideration("tankardsInBarrel",
             (x) => { return x == 0 ? 0 : 1;}, "tankardsInBarrel"));
         // A quarrel makes any other activity almost impossible
-        serveBeerScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.Linear, "clientsQuarreling"));
+        serveBeerScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
         Bind(serveBeer, serveBeerScorer);
         SetInertia(serveBeer, 0.5f); // high inertia for serving beer
         
@@ -33,7 +33,7 @@ public class UT_Landlady : UtilityActionSet
         // the more dirty tables, the more urgent it is to clean them
         cleanTablesScorer.AddConsideration(new Consideration("dirtyTables", Curves.Linear, "dirtyTables"));
         // A quarrel makes any other activity almost impossible
-        cleanTablesScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.Linear, "clientsQuarreling"));
+        cleanTablesScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
         Bind(cleanTables, cleanTablesScorer);
         SetInertia(cleanTables, 0.2f); // mid inertia for cleaning tables
 
@@ -42,7 +42,7 @@ public class UT_Landlady : UtilityActionSet
         // having the barrel full is important to keep the bussiness going
         refillScorer.AddConsideration(new Consideration("tankardsInBarrel", Curves.INVERTED_AGGRESSIVE_EXPONENTIAL, "tankardsInBarrel"));
         // A quarrel makes any other activity almost impossible
-        refillScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.Linear, "clientsQuarreling"));
+        refillScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
         Bind(refill, refillScorer);
         SetInertia(refill, 0.6f); // high inertia for refilling the barrel
         
@@ -51,7 +51,7 @@ public class UT_Landlady : UtilityActionSet
         // the more drunkards sleeping, the more urgent it is to kick them out
         kickOutDrunkardsScorer.AddConsideration(new Consideration("sleepingDrunkards", Curves.MEDIUM_EXPONENTIAL, "sleepingDrunkards"));
         // A quarrel makes any other activity almost impossible
-        kickOutDrunkardsScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.Linear, "clientsQuarreling"));
+        kickOutDrunkardsScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
         Bind(kickOutDrunkards, kickOutDrunkardsScorer);
         SetInertia(kickOutDrunkards, 0.4f); // once started, end the job 
         
@@ -75,8 +75,10 @@ class BT_Contemplate : BehaviourTree
     {
         root = new Sequence(
                 new ACTION_Quiet(),
-            new ACTION_Speak("Hello")
-                );
+                new ACTION_Speak("Just contemplating the universe and asking myself the important questions"),
+                // this is a never ending behaviour
+                new ACTION_RunForever()
+        );
     }
 }
 
