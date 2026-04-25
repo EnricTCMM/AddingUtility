@@ -1,0 +1,110 @@
+﻿using TMPro;
+using UnityEngine;
+using UnityEngine.Rendering.Universal;
+
+public class DayNightCycle2D : MonoBehaviour
+{
+    [Header("Time Settings")]
+    [Tooltip("How many in-game minutes pass per real-life second.")]
+    public float timeMultiplier = 60f; 
+    
+    [Tooltip("Current hour (0-23).")]
+    [Range(0, 23)] public int hours = 12;
+
+    [Tooltip("Current minute (0-59).")]
+    [Range(0, 59)] public float minutes = 0f;
+
+    [Header("Read-only Info")]
+    public float decimalTime;
+
+    [Header("Light Settings")]
+    public Light2D globalLight;
+    public Gradient lightColor;
+
+    [Header("Camera Settings")]
+    [Tooltip("If true, the script will also change the camera background color.")]
+    public bool updateCameraBackground = true;
+    public Camera targetCamera;
+    
+    [Header("UI Settings")]
+    [Tooltip("If empty, it will search in children on Awake.")]
+    public TextMeshProUGUI clockText;
+
+    private void Awake()
+    {
+        // 1. Search for the Global Light 2D in children
+        if (globalLight == null)
+        {
+            globalLight = GetComponentInChildren<Light2D>();
+            if (globalLight == null)
+            {
+                Debug.LogWarning("DayNightCycle2D: No Global Light 2D found on " + gameObject.name + " or its children!");
+            }
+        }
+
+        // 2. Search for the TextMeshProUGUI in children
+        if (clockText == null)
+        {
+            clockText = GetComponentInChildren<TextMeshProUGUI>();
+            if (clockText == null)
+            {
+                Debug.LogWarning("DayNightCycle2D: No TextMeshProUGUI found on " + gameObject.name + " or its children!");
+            }
+        }
+
+        // 3. Find the main camera
+        if (targetCamera == null)
+        {
+            targetCamera = Camera.main;
+        }
+    }
+
+    void Update()
+    {
+        AdvanceTime();
+        UpdateLightingAndCamera();
+        UpdateUI();
+    }
+
+    private void AdvanceTime()
+    {
+        minutes += Time.deltaTime * timeMultiplier;
+
+        if (minutes >= 60f)
+        {
+            minutes -= 60f; 
+            hours++;
+        }
+
+        if (hours >= 24)
+            hours = 0;
+
+        decimalTime = hours + (minutes / 60f);
+    }
+
+    private void UpdateLightingAndCamera()
+    {
+        float timePercent = decimalTime / 24f;
+        Color currentColor = lightColor.Evaluate(timePercent);
+
+        // Update Global Light
+        if (globalLight != null)
+        {
+            globalLight.color = currentColor;
+        }
+
+        // Update Camera Background
+        if (updateCameraBackground && targetCamera != null)
+        {
+            targetCamera.backgroundColor = currentColor;
+        }
+    }
+    
+    private void UpdateUI()
+    {
+        if (clockText != null)
+        {
+            clockText.text = hours.ToString("00") + ":" + Mathf.FloorToInt(minutes).ToString("00");
+        }
+    }
+}

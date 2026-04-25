@@ -116,9 +116,10 @@ class BT_KickOutDrunkards : BehaviourTree
                         // fails (false) if all drunkards are gone. Then sequence fails and decorator succeeds
                         return ((LANDLADY_Blackboard)blackboard).sleepingDrunkards != 0;
                     }),
-                    new ACTION_Quiet(),
-                    new ACTION_WaitForSeconds("0.5"),
+                    // new ACTION_Quiet(),
                     new ACTION_Speak("Out!"),
+                    new ACTION_WaitForSeconds("0.5"),
+                    new ACTION_Quiet(),
                     new LambdaAction(() =>
                     {
                         ((LANDLADY_Blackboard)blackboard).decSleepingDrunkards();
