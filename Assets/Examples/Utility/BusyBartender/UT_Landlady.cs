@@ -39,7 +39,6 @@ public class UT_Landlady : UtilityActionSet
 
         Action refill = ScriptableObject.CreateInstance<BT_Refill>();
         Scorer refillScorer = new Scorer("RefillScorer", AggregationPolicy.MULTIPLY);
-        // having the barrel full is important to keep the business going
         refillScorer.AddConsideration(new Consideration("tankardsInBarrel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "tankardsInBarrel"));
         // A quarrel makes any other activity impossible (veto)
         refillScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
