@@ -14,8 +14,12 @@ public class DayNightCycle2D : MonoBehaviour
     [Tooltip("Current minute (0-59).")]
     [Range(0, 59)] public float minutes = 0f;
 
-    [Header("Read-only Info")]
-    public float decimalTime;
+    [Tooltip("Current time in decimal format (0-24).")]
+    [Range(0, 24)] public float decimalTime;
+    
+    [Tooltip("Time deltas for calculations.")]
+    public float deltaMinutes;  // how many minutes have passed since last update
+    public float deltaHours; // how many hours have passed since last update
 
     [Header("Light Settings")]
     public Light2D globalLight;
@@ -80,6 +84,10 @@ public class DayNightCycle2D : MonoBehaviour
             hours = 0;
 
         decimalTime = hours + (minutes / 60f);
+        
+        // deltas
+        deltaMinutes = Time.deltaTime * timeMultiplier;
+        deltaHours = deltaMinutes / 60f;
     }
 
     private void UpdateLightingAndCamera()
