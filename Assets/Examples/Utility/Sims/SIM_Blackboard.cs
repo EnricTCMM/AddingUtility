@@ -12,19 +12,27 @@ public class SIM_Blackboard : DynamicBlackboard
     [Range(0, 24)]  public float timeOfDay = 12f; // value comes from DayNightCycler
 
     public GameObject dayNightCycler;
+    private DayNightCycle2D dayNightCycle;
 
     private float deltaHours
     {
-        get { return dayNightCycler.GetComponent<DayNightCycle2D>().deltaHours; }
+        get { return dayNightCycle.deltaHours; }
     }
 
     private float deltaMinutes
     {
-        get { return dayNightCycler.GetComponent<DayNightCycle2D>().deltaMinutes; }
+        get { return dayNightCycle.deltaMinutes; }
+    }
+
+    void Awake()
+    {
+        // retrieve the cycler script from the cycler game object
+        dayNightCycle = dayNightCycler.GetComponent<DayNightCycle2D>();
     }
     
     void Update()
     {
+        timeOfDay = dayNightCycle.decimalTime;
         UpdateSleepiness();
         UpdateHunger();
         UpdateBoredom();
