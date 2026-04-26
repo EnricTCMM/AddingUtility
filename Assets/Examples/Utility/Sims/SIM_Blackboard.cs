@@ -40,18 +40,18 @@ public class SIM_Blackboard : DynamicBlackboard
     public void UpdateBoredom()
     {
         // two days (48 hours) to full boredom
-        boredom += deltaHours / 48;
+        boredom += (deltaHours / 48)*100;
     }
 
     public void UpdateHunger()
     {
         // it takes 12 hours to be fully hungry
-        hunger += deltaHours / 12;
+        hunger += (deltaHours / 12)*100;
     }
 
     public void UpdateBladder()
     {
         // it takes 6 hours to have a full bladder
-        bladder += deltaHours / 6;
+        bladder += (deltaHours / 6)*100;
     }
 }

@@ -8,6 +8,12 @@ public class DayNightCycle2D : MonoBehaviour
     [Tooltip("How many in-game minutes pass per real-life second.")]
     public float timeMultiplier = 60f; 
     
+    [Tooltip("Current day of the week.")]
+    public DayOfWeek currentDay = DayOfWeek.Monday;
+    [Range(1, 7)]
+    public int dayOfWeekNumber = 1;
+    public bool showDayOfWeek = true;
+    
     [Tooltip("Current hour (0-23).")]
     [Range(0, 23)] public int hours = 12;
 
@@ -81,7 +87,10 @@ public class DayNightCycle2D : MonoBehaviour
         }
 
         if (hours >= 24)
+        {
             hours = 0;
+            AdvanceDay();
+        }
 
         decimalTime = hours + (minutes / 60f);
         
@@ -89,6 +98,23 @@ public class DayNightCycle2D : MonoBehaviour
         deltaMinutes = Time.deltaTime * timeMultiplier;
         deltaHours = deltaMinutes / 60f;
     }
+    
+    private void AdvanceDay()
+    {
+        // Cast the current day to an integer, add 1, and loop back if it exceeds Sunday (6)
+        int nextDayIndex = (int)currentDay + 1;
+        
+        if (nextDayIndex > 6)
+        {
+            nextDayIndex = 0; // Back to Monday
+        }
+        
+        dayOfWeekNumber = nextDayIndex+1;
+        
+        // Cast the integer back to the DayOfWeek enum
+        currentDay = (DayOfWeek)nextDayIndex;
+    }
+    
 
     private void UpdateLightingAndCamera()
     {
@@ -112,7 +138,28 @@ public class DayNightCycle2D : MonoBehaviour
     {
         if (clockText != null)
         {
-            clockText.text = hours.ToString("00") + ":" + Mathf.FloorToInt(minutes).ToString("00");
+            if (showDayOfWeek)
+            {
+                string timeString = hours.ToString("00") + ":" + Mathf.FloorToInt(minutes).ToString("00");
+                clockText.text = currentDay.ToString() + " - " + timeString;
+            }
+            else
+            {
+                clockText.text = hours.ToString("00") + ":" + Mathf.FloorToInt(minutes).ToString("00");
+            }
         }
+    }
+    
+    //------
+    
+    public enum DayOfWeek 
+    { 
+        Monday, 
+        Tuesday, 
+        Wednesday, 
+        Thursday, 
+        Friday, 
+        Saturday, 
+        Sunday 
     }
 }
