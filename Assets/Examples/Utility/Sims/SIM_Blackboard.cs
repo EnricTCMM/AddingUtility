@@ -10,6 +10,7 @@ public class SIM_Blackboard : DynamicBlackboard
 
     [Header(" Environmental Factors ")] 
     [Range(0, 24)]  public float timeOfDay = 12f; // value comes from DayNightCycler
+    [Range(1, 7)] public int dayOfWeek = 1; // value comes from DayNightCycler
 
     public GameObject dayNightCycler;
     private DayNightCycle2D dayNightCycle;
@@ -33,6 +34,7 @@ public class SIM_Blackboard : DynamicBlackboard
     void Update()
     {
         timeOfDay = dayNightCycle.decimalTime;
+        dayOfWeek = dayNightCycle.dayOfWeekNumber;
         UpdateSleepiness();
         UpdateHunger();
         UpdateBoredom();
