@@ -1,6 +1,7 @@
 using UnityEngine;
 using Utility;
 using BTs;
+using UnityEditor.ShaderGraph.Internal;
 
 [CreateAssetMenu(fileName = "UT_Sim", menuName = "Utility/UT_Sim", order = 1)]
 public class UT_Sim : UtilityActionSet
@@ -83,7 +84,19 @@ public class UT_Sim : UtilityActionSet
     {
         override public void OnConstruction()
         {
-            root = new Sequence();
+            root = new Sequence(
+                // Sleeping should take place at home...
+                new ACTION_Quiet(),
+                new ACTION_Speak("...Zzz..."),
+                new RepeatUntilSuccessDecorator(
+                    new LambdaAction(() => {
+                        SIM_Blackboard bl = (SIM_Blackboard)blackboard;
+                        bl.Sleep();
+                        if (bl.sleepiness <= 0) return Status.SUCCEEDED;
+                        else return Status.FAILED;
+                    })
+                )
+            );
         }
     }
     

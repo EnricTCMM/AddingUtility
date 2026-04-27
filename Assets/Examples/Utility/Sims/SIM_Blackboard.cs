@@ -15,6 +15,9 @@ public class SIM_Blackboard : DynamicBlackboard
     public GameObject dayNightCycler;
     private DayNightCycle2D dayNightCycle;
 
+    [Header("Effects")]
+    public float sleepRestorePerHour = 100 / 8;  // sleeping an hour restores 1/8 (full restoration takes 8 hours)
+
     private float deltaHours
     {
         get { return dayNightCycle.deltaHours; }
@@ -63,5 +66,12 @@ public class SIM_Blackboard : DynamicBlackboard
     {
         // it takes 6 hours to have a full bladder
         bladder += (deltaHours / 6)*100;
+    }
+
+    // ------------------- ACTION RELATED
+
+    public void Sleep () { 
+        // sleeping decreases sleepiness 
+        sleepiness -= deltaHours*sleepRestorePerHour;
     }
 }
