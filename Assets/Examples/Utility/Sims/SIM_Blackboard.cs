@@ -20,7 +20,7 @@ public class SIM_Blackboard : DynamicBlackboard
     [Header("Durations and effects")] 
     public float hoursToFullBladder = 6;
     public float hoursToFullBoredom = 48;
-    public float hoursToFullSleepiness = 12;
+    public float hoursToFullSleepiness = 16;
     public float hoursToFullHunger = 8;
     public float hoursToZeroSleepiness = 8;  // it takes 8 hours to restore sleepiness to 0
     

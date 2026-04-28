@@ -51,11 +51,15 @@ namespace BTs
 
 
         // -------------------------
-        // this is the one and only method that subclasses must implement.
+        // this is the one and only method that subclasses MUST implement.
         // -------------------------
         public abstract void OnConstruction();
-
-
+        
+        // -------------------------
+        // implement (redefine) this method if aborting the root is not enough for a "full cleanup"
+        // -------------------------
+        public virtual void OnAbort() { }
+        
         // ------------------------------------------
         // implementation of the INode interface
         // ------------------------------------------
@@ -68,7 +72,10 @@ namespace BTs
 
         public void Abort()
         {
+            // first abort the root ...
             root.Abort();
+            // then perform the specific abortion procedures specific to this BT
+            OnAbort();
         }
 
         public void Clear()

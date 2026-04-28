@@ -125,6 +125,12 @@ public class UT_Sim : UtilityActionSet
                 })
             );
         }
+
+        public override void OnAbort()
+        {
+            // if the BT is aborted, no matter where, sleeping ends.
+            ((SIM_Blackboard)blackboard).EndSleeping();
+        }
     }
 
     class BT_Work : BehaviourTree

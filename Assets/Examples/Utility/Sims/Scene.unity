@@ -734,7 +734,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3613996177280423916, guid: b9f16d79adde0f947a862b2a50f9c031, type: 3}
       propertyPath: timeMultiplier
-      value: 5
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 7522945457438378387, guid: b9f16d79adde0f947a862b2a50f9c031, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1141,14 +1141,15 @@ MonoBehaviour:
   dayNightCycler: {fileID: 1988702483}
   hoursToFullBladder: 6
   hoursToFullBoredom: 48
-  hoursToFullSleepiness: 12
+  hoursToFullSleepiness: 16
   hoursToFullHunger: 8
-  sleepRestorePerHour: 12
+  hoursToZeroSleepiness: 8
   home: {fileID: 1280256695}
   office: {fileID: 1007263827}
   supermarket: {fileID: 1288037634}
   restaurant: {fileID: 322780764}
   cinema: {fileID: 61381191}
+  sleeping: 0
 --- !u!4 &835906200
 Transform:
   m_ObjectHideFlags: 0
@@ -1239,7 +1240,7 @@ MonoBehaviour:
   actionName: 
   currentScore: 0
   status: 0
-  scoringInterval: 1
+  scoringInterval: 0.33
   debugInfoText: 
   onScreenInfo: {fileID: 988439158}
 --- !u!114 &835906203
@@ -1268,8 +1269,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fadfb23a909584e8ff82b91a0977c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Steerings.SteeringContext
-  maxAcceleration: 40
-  maxSpeed: 10
+  maxAcceleration: 400
+  maxSpeed: 50
   clipVelocity: 1
   maxAngularAcceleration: 360
   maxAngularSpeed: 90
