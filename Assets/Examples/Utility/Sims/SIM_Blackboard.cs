@@ -18,6 +18,14 @@ public class SIM_Blackboard : DynamicBlackboard
     [Header("Effects")]
     public float sleepRestorePerHour = 100 / 8;  // sleeping an hour restores 1/8 (full restoration takes 8 hours)
 
+
+    [Header("Locations")] 
+    public GameObject home;
+    public GameObject office;
+    public GameObject supermarket;
+    public GameObject restaurant;
+    public GameObject cinema;
+
     private float deltaHours
     {
         get { return dayNightCycle.deltaHours; }
