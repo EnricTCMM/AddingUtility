@@ -107,15 +107,22 @@ public class UT_Sim : UtilityActionSet
                 new ACTION_DebugLog("Sleeping at home..."),
                 // new ACTION_Quiet(),
                 // new ACTION_Speak("...Zzz..."),
+                new LambdaAction(() =>
+                {
+                    ((SIM_Blackboard)blackboard).StartSleeping();
+                    return Status.SUCCEEDED;
+                }),
                 new RepeatUntilSuccessDecorator(
-                    new LambdaAction(() =>
+                    new LambdaCondition(() =>
                     {
-                        SIM_Blackboard bl = (SIM_Blackboard)blackboard;
-                        bl.Sleep();
-                        if (bl.sleepiness <= 0) return Status.SUCCEEDED;
-                        else return Status.FAILED;
+                        return ((SIM_Blackboard)blackboard).sleepiness <= 0;
                     })
-                )
+                ),
+                new LambdaAction(() =>
+                {
+                    ((SIM_Blackboard)blackboard).EndSleeping();
+                    return Status.SUCCEEDED;
+                })
             );
         }
     }

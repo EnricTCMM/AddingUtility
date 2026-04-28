@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SIM_Blackboard : DynamicBlackboard
@@ -21,9 +22,8 @@ public class SIM_Blackboard : DynamicBlackboard
     public float hoursToFullBoredom = 48;
     public float hoursToFullSleepiness = 12;
     public float hoursToFullHunger = 8;
-    public float sleepRestorePerHour = 100 / 8;  // sleeping an hour restores 1/8 (full restoration takes 8 hours)
-
-
+    public float hoursToZeroSleepiness = 8;  // it takes 8 hours to restore sleepiness to 0
+    
     [Header("Locations")] 
     public GameObject home;
     public GameObject office;
@@ -31,6 +31,9 @@ public class SIM_Blackboard : DynamicBlackboard
     public GameObject restaurant;
     public GameObject cinema;
 
+    [Header("Other")]
+    public bool sleeping = false;
+    
     private float deltaHours
     {
         get { return dayNightCycle.deltaHours; }
@@ -62,7 +65,10 @@ public class SIM_Blackboard : DynamicBlackboard
     public void UpdateSleepiness()
     {
         // it takes hoursToFullSleepiness be fully sleepy
-        sleepiness += (deltaHours / hoursToFullSleepiness)*100; 
+
+        if (sleeping) sleepiness -= (deltaHours / hoursToZeroSleepiness) * 100;  
+        else sleepiness += (deltaHours / hoursToFullSleepiness)*100;
+        
         sleepiness = Mathf.Clamp(sleepiness, 0f, 100f);
     }
 
@@ -89,8 +95,20 @@ public class SIM_Blackboard : DynamicBlackboard
 
     // ------------------- ACTION RELATED
 
+    public void StartSleeping()
+    {
+        sleeping = true;
+    }
+
+    public void EndSleeping()
+    {
+        sleeping = false;
+    }
+
+    /*
     public void Sleep () { 
         // sleeping decreases sleepiness 
         sleepiness -= deltaHours*sleepRestorePerHour;
     }
+    */
 }
