@@ -22,21 +22,28 @@ namespace Utility
         private float propertyMin;
         private float propertyMax;
         
-        private bool explicitRangeProvided = false;
+        // private bool explicitRangeProvided = false; // range or fallback to [0, 100]
 
+        private bool normalize; // if true, the property value is normalized to [0, 1]
+                                // before applying the response curve. Normalization uses propertyMin and propertyMax.
+                                // Normalization is required almost always.
+                                // An exception is [0,24] time properties submitted to custom curves.
+        
         private float lastScore; // for debugging purposes
         private float lastValue; // id
 
         // Beware: at construction time the consideration is not yet contextualized.
         // This is the "normal" constructor. A Consideration out of a "blackboarded" property. 
-        public Consideration(string key, Func<float, float> responseCurve, string name = null) 
+        public Consideration(string key, Func<float, float> responseCurve, string name = null, bool normalize = true) 
         {
             this.propertyKey = key;
             this.responseCurve = responseCurve;
-            this.explicitRangeProvided = false;
+            // this.explicitRangeProvided = false;
+            this.normalize = normalize;
             Name = name == null ? "Consideration("+key+")" : name + "("+key+")";
         }
 
+        /* 
         // this is an extra constructor for non-ranged blackboarded properties
         public Consideration(string key, Func<float, float> responseCurve, float min, float max, string name = null)
         {
@@ -47,6 +54,7 @@ namespace Utility
             propertyMax = max;
             Name = name == null ? "Consideration("+key+")" : name + "("+key+")";
         }
+        */
         
         //  this constructor is specific for synthetic properties.
         public Consideration(Func<float> syntheticProperty,  
@@ -56,7 +64,7 @@ namespace Utility
         {
             this.syntheticProperty = syntheticProperty;
             this.responseCurve = responseCurve;
-            this.explicitRangeProvided = true;
+            // this.explicitRangeProvided = true;
             propertyMin = min;
             propertyMax = max;
             Name = name == null ? "Synth. Consideration" : name;
@@ -68,12 +76,12 @@ namespace Utility
             blackboard = gameObject.GetComponent<DynamicBlackboard>();
             
             // contextualization time is when getting min and max makes sense
-            if (!explicitRangeProvided)
-            {
+            //if (!explicitRangeProvided)
+            //{
                 bool hasRange = blackboard.TryGetRange(propertyKey, out propertyMin, out propertyMax);
                 // remember that TryGetRange defaults to [0, 100] if property is not ranged
                 if(!hasRange) Debug.LogWarning("In "+Name+" " + propertyKey + " is not ranged. Using [0, 100] as default range"); 
-            }
+            //}
             if (propertyMin==propertyMax)
                 Debug.LogError("In "+Name+" " + propertyKey + " has zero range. This is not allowed");
         }
@@ -83,10 +91,13 @@ namespace Utility
             float propertyValue;
             propertyValue = syntheticProperty!=null ? 
                             syntheticProperty() : blackboard.Get<float>(propertyKey);
-            // values in [min, max] must be mapped to [0, 1]
-            propertyValue = (propertyValue - propertyMin) / (propertyMax - propertyMin);
             
-            propertyValue = Mathf.Clamp01(propertyValue);
+            // values in [min, max] must be mapped to [0, 1] if not otherwise specified
+            if (normalize)
+            {
+                propertyValue = (propertyValue - propertyMin) / (propertyMax - propertyMin);
+                propertyValue = Mathf.Clamp01(propertyValue);
+            }
             lastValue = propertyValue;
             
             lastScore =  Mathf.Clamp01(responseCurve(propertyValue));

@@ -3,19 +3,24 @@ using UnityEngine;
 public class SIM_Blackboard : DynamicBlackboard
 {
     [Header("Needs")] 
-    [Range(0, 100)] public float sleepiness = 0f;   //
-    [Range(0, 100)] public float hunger = 0f;       //
-    [Range(0, 100)] public float boredom = 0f;      //
-    [Range(0f, 100f)] public float bladder = 0f;    //  
+    // needs set to values appropriate for Monday 8 in the morning
+    [Range(0, 100)] public float sleepiness = 4.1f;   //
+    [Range(0, 100)] public float hunger = 95f;       //
+    [Range(0, 100)] public float boredom = 2f;      //
+    [Range(0f, 100f)] public float bladder = 99f;    //  
 
     [Header(" Environmental Factors ")] 
-    [Range(0, 24)]  public float timeOfDay = 12f; // value comes from DayNightCycler
-    [Range(1, 7)] public int dayOfWeek = 1; // value comes from DayNightCycler
+    [Range(0, 24)]  public float timeOfDay; // value comes from DayNightCycler
+    [Range(1, 7)] public int dayOfWeek; // value comes from DayNightCycler
 
     public GameObject dayNightCycler;
     private DayNightCycle2D dayNightCycle;
 
-    [Header("Effects")]
+    [Header("Durations and effects")] 
+    public float hoursToFullBladder = 6;
+    public float hoursToFullBoredom = 48;
+    public float hoursToFullSleepiness = 12;
+    public float hoursToFullHunger = 8;
     public float sleepRestorePerHour = 100 / 8;  // sleeping an hour restores 1/8 (full restoration takes 8 hours)
 
 
@@ -40,6 +45,8 @@ public class SIM_Blackboard : DynamicBlackboard
     {
         // retrieve the cycler script from the cycler game object
         dayNightCycle = dayNightCycler.GetComponent<DayNightCycle2D>();
+        timeOfDay = dayNightCycle.decimalTime;
+        dayOfWeek = dayNightCycle.dayOfWeekNumber;
     }
     
     void Update()
@@ -54,26 +61,30 @@ public class SIM_Blackboard : DynamicBlackboard
 
     public void UpdateSleepiness()
     {
-        // it takes half day (12 hours) to be fully sleepy
-        sleepiness += (deltaHours / 12)*100; 
+        // it takes hoursToFullSleepiness be fully sleepy
+        sleepiness += (deltaHours / hoursToFullSleepiness)*100; 
+        sleepiness = Mathf.Clamp(sleepiness, 0f, 100f);
     }
 
     public void UpdateBoredom()
     {
-        // two days (48 hours) to full boredom
-        boredom += (deltaHours / 48)*100;
+        // hoursToFullBoredom to full boredom
+        boredom += (deltaHours / hoursToFullBoredom)*100;
+        boredom = Mathf.Clamp(boredom, 0f, 100f);
     }
 
     public void UpdateHunger()
     {
-        // it takes 12 hours to be fully hungry
-        hunger += (deltaHours / 12)*100;
+        // it takes hoursToFullHunger to be fully hungry
+        hunger += (deltaHours / hoursToFullHunger)*100;
+        hunger = Mathf.Clamp(hunger, 0f, 100f);
     }
 
     public void UpdateBladder()
     {
-        // it takes 6 hours to have a full bladder
-        bladder += (deltaHours / 6)*100;
+        // it takes hoursToFullBladder have a full bladder
+        bladder += (deltaHours / hoursToFullBladder)*100;
+        bladder = Mathf.Clamp(bladder, 0f, 100f);
     }
 
     // ------------------- ACTION RELATED
