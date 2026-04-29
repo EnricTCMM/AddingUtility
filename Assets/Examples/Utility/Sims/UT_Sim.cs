@@ -104,6 +104,7 @@ public class UT_Sim : UtilityActionSet
             root = new Sequence(
                 new ACTION_DebugLog("Going home to sleep..."),
                 new ACTION_Arrive("home"),
+                new ACTION_UpdateKey<string>("currentLocationName", "HOME"),
                 new ACTION_DebugLog("Sleeping at home..."),
                 // new ACTION_Quiet(),
                 // new ACTION_Speak("...Zzz..."),
@@ -141,6 +142,7 @@ public class UT_Sim : UtilityActionSet
                 // this SIM always works in the office. 
                 new ACTION_DebugLog("Going to the office..."),
                 new ACTION_Arrive("office"),
+                new ACTION_UpdateKey<string>("currentLocationName", "OFFICE"),
                 new ACTION_DebugLog("WORKING hard, very hard!"),
                 // once there it proceeds non stop
                 new ACTION_RunForever()
@@ -148,6 +150,92 @@ public class UT_Sim : UtilityActionSet
         }
     }
 
+
+    class BT_Eat : BehaviourTree
+    {
+        public override void OnConstruction()
+        {
+            Sequence snackAtHome = new Sequence(
+                new ACTION_DebugLog("Having a snack at home ..."),
+                new ACTION_WaitRealTime("10"), 
+                new LambdaAction(() =>
+                {
+                    ((SIM_Blackboard)blackboard).EatSnack();
+                    return Status.SUCCEEDED;
+                })
+            );
+            Sequence snackAtWork = new Sequence(
+                new ACTION_DebugLog("Having a snack at the office..."),
+                new ACTION_WaitRealTime("10"),
+                new LambdaAction(() =>
+                {
+                    ((SIM_Blackboard)blackboard).EatSnack();
+                    return Status.SUCCEEDED;
+                })
+            );
+            Sequence fullMealAtRestaurant = new Sequence(
+                new ACTION_DebugLog("Going to the restaurant..."),
+                new ACTION_Arrive("restaurant"),
+                new ACTION_UpdateKey<string>("currentLocationName", "RESTAURANT"),
+                new ACTION_DebugLog("EATING at the restaurant..."),
+                new ACTION_WaitRealTime("60f"),
+                new LambdaAction(() =>
+                {
+                    ((SIM_Blackboard)blackboard).EatFullMeal();
+                    return Status.SUCCEEDED;
+                })
+            );
+            Sequence fullMealAtHome = new Sequence(
+                new Selector(
+                    new CONDITION_CheckKeyValue("currentLocationName", "HOME"),
+                    new ACTION_DebugLog("Going home..."),
+                    new ACTION_Arrive("home"),
+                    new ACTION_UpdateKey<string>("currentLocationName", "HOME")
+                ),
+                new ACTION_DebugLog("Preparing meal at home..."),
+                new ACTION_WaitRealTime("30f"),
+                new ACTION_DebugLog("EATING at home..."),
+                new ACTION_WaitRealTime("30f"),
+                new LambdaAction(() =>
+                {
+                    ((SIM_Blackboard)blackboard).EatFullMeal();
+                    return Status.SUCCEEDED;
+                })
+            ) ;
+
+            root = new Selector(
+                // first branch: SIM is at the office
+                new Sequence(
+                    new CONDITION_CheckKeyValue("currentLocationName", "OFFICE"),
+                    // can't leave the office to eat somewhere else. 
+                    snackAtWork
+                ),
+                // second branch: SIM is elsewhere (fallback)
+                new Sequence(
+                        new CONDITION_CheckKeyValue("currentLocationName", "HOME"),
+                        // decide whether to eat at home or at the restaurant
+                        new Selector(
+                            // first branch: it's restaurant opening hours
+                            new Sequence(
+                                new LambdaCondition(() =>
+                                {
+                                    float time = ((SIM_Blackboard)blackboard).Get<float>("timeOfDay");
+                                    return (time >= 12f && time <= 15f) || (time >= 18f && time <= 21f);
+                                }),
+                                new RandomSelector(
+                                    fullMealAtRestaurant,
+                                    fullMealAtHome
+                                )
+                            ),
+                            // second branch: it's not restaurant opening hours.
+                            fullMealAtHome
+                        )
+                )
+            ); // root ends here
+        }
+    }
+    
+    /*
     class BT_Eat : BehaviourTree
     {
         override public void OnConstruction()
@@ -168,6 +256,7 @@ public class UT_Sim : UtilityActionSet
             );
         }
     }
+    */
 
     class BT_Entertain : BehaviourTree
     {
@@ -176,6 +265,7 @@ public class UT_Sim : UtilityActionSet
             root = new Sequence(
                 new ACTION_DebugLog("Going to the cinema..."),
                 new ACTION_Arrive("cinema"),
+                new ACTION_UpdateKey<string>("currentLocationName", "CINEMA"),
                 new ACTION_DebugLog("Enjoying the movie..."),
                 new ACTION_WaitRealTime("90f"),
                 new LambdaAction(() => {          
@@ -190,8 +280,9 @@ public class UT_Sim : UtilityActionSet
         override public void OnConstruction()
         {
             root = new Sequence(
-                new ACTION_DebugLog("Going home..."),
+                new ACTION_DebugLog("Going home to the bathroom..."),
                 new ACTION_Arrive("Home"),
+                new ACTION_UpdateKey<string>("currentLocationName", "HOME"),
                 new ACTION_DebugLog("taking a leak..."),
                 new ACTION_WaitRealTime("10f"),
                 new LambdaAction(() =>

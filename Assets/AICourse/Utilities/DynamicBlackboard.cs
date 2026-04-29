@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
@@ -175,6 +176,23 @@ public class DynamicBlackboard : MonoBehaviour
         return map.ContainsKey(key) || fields.ContainsKey(key);
     }
 
+    // added April 2026 for the benefit of ACTION_UpdateKey
+    public Type GetCurrentType(string key)
+    {
+        object value = null;
+        
+        key = key.ToUpper();
+        if (fields.ContainsKey(key)) // name refers to a field 
+            value = fields[key].GetValue(this);
+        else if (properties.ContainsKey(key))
+            value = properties[key].GetValue(this);
+        else if (map.ContainsKey(key))
+            value = map[key];
+
+        if (value == null) return null;
+        else return value.GetType();
+    }
+
     public bool TryGetRange(string key, out float min, out float max)
     {
         (float min, float max) range; 
@@ -196,10 +214,6 @@ public class DynamicBlackboard : MonoBehaviour
         
     }
     
-
-    // -- required by IUtilityTarget interface
-    public object targetObject => this.gameObject;
-
     //--------------------------------------- 
 
     public void Dump ()

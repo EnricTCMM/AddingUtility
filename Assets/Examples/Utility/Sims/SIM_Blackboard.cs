@@ -4,7 +4,7 @@ using UnityEngine;
 public class SIM_Blackboard : DynamicBlackboard
 {
     [Header("Needs")] 
-    // needs set to values appropriate for Monday 8 in the morning
+    // needs set to values appropriate for Monday at 8 in the morning
     [Range(0, 100)] public float sleepiness = 4.1f;   //
     [Range(0, 100)] public float hunger = 95f;       //
     [Range(0, 100)] public float boredom = 2f;      //
@@ -24,13 +24,16 @@ public class SIM_Blackboard : DynamicBlackboard
     public float hoursToFullHunger = 8;
     public float hoursToZeroSleepiness = 8;  // it takes 8 hours to restore sleepiness to 0
     
-    [Header("Locations")] 
+    [Header("Known Locations")] 
     public GameObject home;
     public GameObject office;
     public GameObject supermarket;
     public GameObject restaurant;
     public GameObject cinema;
 
+    [Header("Current Location")] 
+    public string currentLocationName = "HOME"; // externally set after going somewhere
+    
     [Header("Other")]
     public bool sleeping = false;
     
@@ -105,10 +108,16 @@ public class SIM_Blackboard : DynamicBlackboard
         sleeping = false;
     }
 
-    /*
-    public void Sleep () { 
-        // sleeping decreases sleepiness 
-        sleepiness -= deltaHours*sleepRestorePerHour;
+    public void EatFullMeal()
+    {
+        hunger = 0;
     }
-    */
+
+    public void EatSnack()
+    {
+        hunger = hunger - 33;
+        hunger = Mathf.Clamp(hunger, 0, 100);
+    }
+    
+    
 }
