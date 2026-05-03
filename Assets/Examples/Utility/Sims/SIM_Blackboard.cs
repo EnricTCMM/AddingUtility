@@ -20,7 +20,7 @@ public class SIM_Blackboard : DynamicBlackboard
     [Header("Durations and effects")] 
     public float hoursToFullBladder = 6;
     public float hoursToFullBoredom = 48;
-    public float hoursToFullSleepiness = 16;
+    public float hoursToFullSleepiness = 20;
     public float hoursToFullHunger = 8;
     public float hoursToZeroSleepiness = 8;  // it takes 8 hours to restore sleepiness to 0
     
@@ -65,7 +65,7 @@ public class SIM_Blackboard : DynamicBlackboard
         UpdateSleepiness();
         UpdateHunger();
         UpdateBoredom();
-        UpdateBladder();
+        //UpdateBladder();
     }
 
     public void UpdateSleepiness()
@@ -117,16 +117,41 @@ public class SIM_Blackboard : DynamicBlackboard
         sleeping = false;
     }
 
-    public void EatFullMeal()
+    public void EatFullMealEffect()
     {
         hunger = 0;
     }
 
-    public void EatSnack()
+    public void EatSnackEffect()
     {
         hunger = hunger - 33;
         hunger = Mathf.Clamp(hunger, 0, 100);
     }
-    
-    
+
+    public void ReadChapterEffect()
+    {
+      // decreases the equivalent of two hours of boredom
+      boredom -= (2f / hoursToFullBoredom) * 100;
+      boredom = Mathf.Clamp(boredom, 0f, 100f);
+      
+    }
+    public void PlayCasualGameEffect()
+    {
+        // decreases the equivalent of two hours of boredom
+        boredom -= (2f / hoursToFullBoredom) * 100;
+        boredom = Mathf.Clamp(boredom, 0f, 100f);
+    }
+
+    public void WatchFilmCinemaEffect()
+    {
+        // best against boredom
+        boredom = 0;
+    }
+
+    public void WatchNetflixEffect()
+    {
+        // decreases the equivalent of one day of boredom
+        boredom -= (24f / hoursToFullBoredom) * 100;
+        boredom = Mathf.Clamp(boredom, 0f, 100f);
+    }
 }
