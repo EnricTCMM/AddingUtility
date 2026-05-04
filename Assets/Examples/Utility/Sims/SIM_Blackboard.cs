@@ -65,7 +65,7 @@ public class SIM_Blackboard : DynamicBlackboard
         UpdateSleepiness();
         UpdateHunger();
         UpdateBoredom();
-        //UpdateBladder();
+        UpdateBladder();
     }
 
     public void UpdateSleepiness()
