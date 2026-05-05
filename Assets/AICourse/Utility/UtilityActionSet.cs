@@ -10,6 +10,9 @@ namespace Utility
     {
         public List<ActionConsiderationPair> list = new List<ActionConsiderationPair>();
         private List<ActionScorePair> scores = new List<ActionScorePair>();
+        
+        // May 2026. Access to the blackboard may come handy.
+        public DynamicBlackboard blackboard;
 
         public void Contextualize(GameObject go)
         {
@@ -18,6 +21,8 @@ namespace Utility
                 pair.action.Contextualize(go);
                 pair.consideration.Contextualize(go);
             }
+            
+            blackboard = go.GetComponent<DynamicBlackboard>();
         }
 
         private ActionConsiderationPair GetPair(Action action)

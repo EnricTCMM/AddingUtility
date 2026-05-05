@@ -1,3 +1,5 @@
+using System.Runtime.ConstrainedExecution;
+using System.Threading;
 using UnityEngine;
 using Utility;
 using BTs;
@@ -9,15 +11,27 @@ public class UT_Sim : UtilityActionSet
     {
         Action ACTION_Sleep = ScriptableObject.CreateInstance<BT_Sleep>();
         Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
-        // is AGGRESSIVE_EXPONENTIAL too aggresive?
-        sleepScorer.AddConsideration(new Consideration("sleepiness", 
-            Curves.AGGRESSIVE_EXPONENTIAL, "sleepiness"));
+        
         // better sleep at night, from 22 to 7 (do not normalize)
+        // this is a "cultural" soft veto
         Consideration conTimeOfDay = new Consideration("timeOfDay",
             (t) => { return t >= 22 || t <= 7 ? 1 : 0.5f; }, 
             "timeOfDay", false);
+
+        Consideration sleepinessConsideration = new Consideration("sleepiness", 
+            (t) =>
+            {
+                // at night sleepiness behaves different than at day.
+                SIM_Blackboard bl = (SIM_Blackboard)blackboard;
+                if (bl.timeOfDay >= 22 || bl.timeOfDay <= 7)
+                    return Curves.MILD_EXPONENTIAL(t); //Curves.Linear(t); // at night linear
+                else return Curves.AGGRESSIVE_EXPONENTIAL(t); // at day exponential
+            },
+            "sleepiness"
+        );
         
         sleepScorer.AddConsideration(conTimeOfDay);
+        sleepScorer.AddConsideration(sleepinessConsideration);
         Bind(ACTION_Sleep, sleepScorer);
         SetInertia(ACTION_Sleep, 0.5f); // very high inertia for sleeping
 
@@ -28,12 +42,13 @@ public class UT_Sim : UtilityActionSet
             "dayOfWeek", false);
         // work from 9 to 17 (do not normalize)
         Consideration timeOfDayConsideration = new Consideration("timeOfDay",
-            (t) => { return t >= 9 && t <= 17 ? 0.8f : 0f; }, 
+            (t) => { return t >= 9 && t <= 17 ? 0.9f : 0f; }, 
             "timeOfDay", false);
         Scorer workScorer = new Scorer("WorkScorer", AggregationPolicy.MULTIPLY);
         workScorer.AddConsideration(dayOfWeekConsideration);
         workScorer.AddConsideration(timeOfDayConsideration);
         Bind(ACTION_Work, workScorer);
+        // no inertia for working. It's 0 or 0.9. 0.9 makes it hard to interrupt.
         
         Action ACTION_UseBathroom = ScriptableObject.CreateInstance<UT_Sim.BT_UseBathroom>();
         Consideration bladderConsideration = new Consideration("bladder", 
@@ -44,7 +59,8 @@ public class UT_Sim : UtilityActionSet
         Action ACTION_Eat = ScriptableObject.CreateInstance<UT_Sim.BT_Eat>();
         Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
         eatScorer.AddConsideration(new Consideration("hunger", 
-            Curves.MILD_SIGMOID, "hunger"));
+            Curves.Sigmoid(12, 0.75f), "hunger") // shifted sigmoid. 
+        );
         Bind(ACTION_Eat, eatScorer);
         SetInertia(ACTION_Eat, 1f); // max inertia. Nothing can interrupt eating.
 
@@ -54,7 +70,8 @@ public class UT_Sim : UtilityActionSet
             (v) =>
             {
                 return Mathf.Max(0.2f, Curves.MILD_EXPONENTIAL(v));
-            }
+            }, 
+            "boredom"
         );
         Bind(ACTION_Entertainment, entertainmentConsideration);
         SetInertia(ACTION_Entertainment, 0.25f);
@@ -69,13 +86,20 @@ public class UT_Sim : UtilityActionSet
         override public void OnConstruction()
         {
             root = new Sequence(
-                new ACTION_DebugLog("Going home to sleep..."),
-                new ACTION_InfoWrap("Going home to sleep..."),
-                new ACTION_Arrive("home"),
-                new ACTION_UpdateKey<string>("currentLocationName", "HOME"),
-                new ACTION_DebugLog("Sleeping at home..."),
-                // new ACTION_Quiet(),
-                // new ACTION_Speak("...Zzz..."),
+                // this SIM always sleeps at home. 
+                // first decide if it's necessary to go home.
+                new Selector(
+                    new CONDITION_CheckKeyValue("currentLocationName", "HOME"),
+                    new Sequence(
+                        new ACTION_DebugLog("Going home to sleep..."),
+                        new ACTION_InfoWrap("Going home to sleep..."),
+                        new ACTION_Arrive("home"),
+                        new ACTION_UpdateKey<string>("currentLocationName", "HOME")
+                    ) 
+                ),
+                
+                new ACTION_DebugLog("Sleeping..."),
+                new ACTION_InfoWrap("Sleeping..."),
                 new LambdaAction(() =>
                 {
                     ((SIM_Blackboard)blackboard).StartSleeping();
@@ -97,7 +121,7 @@ public class UT_Sim : UtilityActionSet
 
         public override void OnAbort()
         {
-            // if the BT is aborted, no matter where, sleeping ends.
+            // if the BT is aborted, sleeping ends.
             ((SIM_Blackboard)blackboard).EndSleeping();
         }
     }
@@ -118,13 +142,10 @@ public class UT_Sim : UtilityActionSet
                         new ACTION_UpdateKey<string>("currentLocationName", "OFFICE")
                     )
                 ),
-                // once there work very hard
-                new Sequence(
-                    new ACTION_DebugLog("WORKING hard, very hard!"),
-                    new ACTION_InfoWrap("WORKING hard, very hard!"),
-                    new ACTION_RunForever()
-                )
-                
+                // once there work very hard until it's time to go home.
+                new ACTION_DebugLog("Working hard, very hard..."),
+                new ACTION_InfoWrap("Working hard, very hard..."),
+                new ACTION_RunForever()
             );
         }
     }
@@ -183,7 +204,7 @@ public class UT_Sim : UtilityActionSet
             ); // fullMealAtHome ends here
             
             root = new Selector(
-                // first branch: SIM is at the office
+                // first branch: SIM is in the office
                 new Sequence(
                     new CONDITION_CheckKeyValue("currentLocationName", "OFFICE"),
                     // can't leave the office to eat somewhere else. Only a snack is allowed. 
@@ -195,7 +216,7 @@ public class UT_Sim : UtilityActionSet
                     new Sequence(
                         new LambdaCondition(() =>
                         {
-                            return ((SIM_Blackboard)blackboard).hunger <= 60f;
+                            return ((SIM_Blackboard)blackboard).hunger <= 50f;
                         }),
                         haveASnack
                     ) ,
@@ -205,7 +226,7 @@ public class UT_Sim : UtilityActionSet
                             // restaurant opening hours? Restaurant or home. 
                             new LambdaCondition(() =>
                             {
-                                float time = ((SIM_Blackboard)blackboard).Get<float>("timeOfDay");
+                                float time = blackboard.Get<float>("timeOfDay");
                                 return (time >= 12f && time <= 15f) || (time >= 18f && time <= 21f);
                             }),
                             new RandomSelector(fullMealAtHome, fullMealAtRestaurant)
@@ -262,16 +283,6 @@ public class UT_Sim : UtilityActionSet
            );
            
            Sequence watchNetflix = new Sequence(
-               new Selector(
-                   new CONDITION_CheckKeyValue("currentLocationName", "HOME"),
-                   new Sequence(
-                       new ACTION_DebugLog("Going home to watch Netflix..."),
-                       new ACTION_InfoWrap("Going home to watch Netflix..."),
-                       new ACTION_Arrive("home"),
-                       new ACTION_UpdateKey<string>("currentLocationName", "HOME")
-                   )
-               ), // end of selector
-               // when this point is reached, the SIM is at home
                new ACTION_DebugLog("Enjoying Netflix..."),
                new ACTION_InfoWrap("Enjoying Netflix..."),
                new ACTION_WaitRealTime("60f"),
@@ -282,19 +293,40 @@ public class UT_Sim : UtilityActionSet
                 })
            );
 
-           root = new Selector(
-               new Sequence(
-                   new LambdaCondition(() =>
-                   {
-                       return ((SIM_Blackboard)blackboard).boredom <= 30;
-                   }), 
-                   new RandomSelector(
-                       readChapter, playCasualGame
-                   )
+
+           root = new Sequence(
+               // entertainment always starts at home
+               new Selector(
+                   new CONDITION_CheckKeyValue("currentLocationName", "HOME"),
+                   new Sequence(
+                       new ACTION_DebugLog("Going home..."),
+                       new ACTION_InfoWrap("Going home..."),
+                       new ACTION_Arrive("home"),
+                       new ACTION_UpdateKey<string>("currentLocationName", "HOME")
+                   ) 
                ),
-               // if here, boredom is quite high. 
-               new RandomSelector(
-                       goCinema, watchNetflix) 
+               // now decide what to do.
+               new Selector(
+                   new Sequence(
+                       new LambdaCondition(() =>
+                       {
+                           return ((SIM_Blackboard)blackboard).boredom <= 30;
+                       }), 
+                       new RandomSelector(readChapter, playCasualGame) // low boredom options
+                   ),
+                   // if here, boredom is quite high. 
+                   // during cinema opening hours, cinema is an option but not the only one
+                   new Selector(
+                       new Sequence(new LambdaCondition(() =>
+                           {
+                               float time = blackboard.Get<float>("timeOfDay");
+                               return (time >= 10 && time <= 23.99f); // cinema opens from 10 to 24.
+                           }),
+                           new RandomSelector(goCinema, goCinema, goCinema,watchNetflix, watchNetflix, readChapter, playCasualGame)
+                       ),
+                       new RandomSelector(watchNetflix, watchNetflix, readChapter, playCasualGame) // cinema is not an option.
+                   )
+               )
            );
         }
     }

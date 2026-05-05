@@ -71,9 +71,12 @@ public class SIM_Blackboard : DynamicBlackboard
     public void UpdateSleepiness()
     {
         // it takes hoursToFullSleepiness be fully sleepy
+        // and it takes hoursToZeroSleepiness to restore sleepiness to 0
 
-        if (sleeping) sleepiness -= (deltaHours / hoursToZeroSleepiness) * 100;  
-        else sleepiness += (deltaHours / hoursToFullSleepiness)*100;
+        if (sleeping) 
+            sleepiness -= (deltaHours / hoursToZeroSleepiness) * 100;  
+        else 
+            sleepiness += (deltaHours / hoursToFullSleepiness)*100;
         
         sleepiness = Mathf.Clamp(sleepiness, 0f, 100f);
     }
@@ -92,15 +95,14 @@ public class SIM_Blackboard : DynamicBlackboard
         if(timeOfDay>7 && timeOfDay<22)
             hunger += (deltaHours / hoursToFullHunger)*100;
         else 
-            hunger += (deltaHours / hoursToFullHunger)*50;
-        
+            hunger += (deltaHours / hoursToFullHunger)*40;
         
         hunger = Mathf.Clamp(hunger, 0f, 100f);
     }
 
     public void UpdateBladder()
     {
-        // it takes hoursToFullBladder have a full bladder
+        // it takes hoursToFullBladder to have a full bladder
         bladder += (deltaHours / hoursToFullBladder)*100;
         bladder = Mathf.Clamp(bladder, 0f, 100f);
     }
@@ -130,16 +132,15 @@ public class SIM_Blackboard : DynamicBlackboard
 
     public void ReadChapterEffect()
     {
-      // decreases the equivalent of two hours of boredom
-      boredom -= (2f / hoursToFullBoredom) * 100;
+      // decreases the equivalent of fifteen minutes of boredom (0.25 hours = 15 minutes)
+      boredom -= (0.25f / hoursToFullBoredom) * 100;
       boredom = Mathf.Clamp(boredom, 0f, 100f);
-      
     }
     public void PlayCasualGameEffect()
     {
-        // decreases the equivalent of two hours of boredom
-        boredom -= (2f / hoursToFullBoredom) * 100;
-        boredom = Mathf.Clamp(boredom, 0f, 100f);
+        // decreases the equivalent of fifteen minutes of boredom
+    boredom -= (0.25f / hoursToFullBoredom) * 100;
+    boredom = Mathf.Clamp(boredom, 0f, 100f);
     }
 
     public void WatchFilmCinemaEffect()
@@ -150,8 +151,8 @@ public class SIM_Blackboard : DynamicBlackboard
 
     public void WatchNetflixEffect()
     {
-        // decreases the equivalent of one day of boredom
-        boredom -= (24f / hoursToFullBoredom) * 100;
+        // decreases the equivalent of one hour of boredom
+        boredom -= (1f / hoursToFullBoredom) * 100;
         boredom = Mathf.Clamp(boredom, 0f, 100f);
     }
 }
