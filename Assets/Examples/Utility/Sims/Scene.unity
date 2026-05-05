@@ -1141,12 +1141,14 @@ MonoBehaviour:
   bladder: 99
   timeOfDay: 12
   dayOfWeek: 1
-  dayNightCycler: {fileID: 1988702483}
+  dayNightCycler: {fileID: 1988702487}
   hoursToFullBladder: 6
   hoursToFullBoredom: 48
   hoursToFullSleepiness: 20
   hoursToFullHunger: 8
   hoursToZeroSleepiness: 8
+  snackThreshold: 50
+  boredomTolerance: 30
   home: {fileID: 1280256695}
   office: {fileID: 1007263827}
   supermarket: {fileID: 1288037634}
@@ -1164,7 +1166,7 @@ Transform:
   m_GameObject: {fileID: 835906197}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.56773, y: 0.22744, z: 0}
+  m_LocalPosition: {x: -11.3, y: 38.4, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2955,6 +2957,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b4045c24e47f8e4eb7ce61d48a61681, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartStopController
+--- !u!114 &1988702487 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3613996177280423916, guid: b9f16d79adde0f947a862b2a50f9c031, type: 3}
+  m_PrefabInstance: {fileID: 533881177}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1988702483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efb7f0bff7af4f60b9f39dab98958672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DayNightCycle2D
 --- !u!1 &1990338877
 GameObject:
   m_ObjectHideFlags: 0

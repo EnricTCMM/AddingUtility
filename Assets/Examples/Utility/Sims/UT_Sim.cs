@@ -1,5 +1,4 @@
-using System.Runtime.ConstrainedExecution;
-using System.Threading;
+
 using UnityEngine;
 using Utility;
 using BTs;
@@ -11,20 +10,18 @@ public class UT_Sim : UtilityActionSet
     {
         Action ACTION_Sleep = ScriptableObject.CreateInstance<BT_Sleep>();
         Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
-        
         // better sleep at night, from 22 to 7 (do not normalize)
         // this is a "cultural" soft veto
         Consideration conTimeOfDay = new Consideration("timeOfDay",
             (t) => { return t >= 22 || t <= 7 ? 1 : 0.5f; }, 
             "timeOfDay", false);
-
         Consideration sleepinessConsideration = new Consideration("sleepiness", 
             (t) =>
             {
                 // at night sleepiness behaves different than at day.
                 SIM_Blackboard bl = (SIM_Blackboard)blackboard;
                 if (bl.timeOfDay >= 22 || bl.timeOfDay <= 7)
-                    return Curves.MILD_EXPONENTIAL(t); //Curves.Linear(t); // at night linear
+                    return Curves.MILD_EXPONENTIAL(t); // at night almost linear
                 else return Curves.AGGRESSIVE_EXPONENTIAL(t); // at day exponential
             },
             "sleepiness"
@@ -54,7 +51,7 @@ public class UT_Sim : UtilityActionSet
         Consideration bladderConsideration = new Consideration("bladder", 
             Curves.AGGRESSIVE_EXPONENTIAL, "bladder");
         Bind(ACTION_UseBathroom, bladderConsideration);
-        SetInertia(ACTION_UseBathroom, 0.15f); // mid o or low inertia. Using the bathroom does not take long.
+        SetInertia(ACTION_UseBathroom, 1); // this makes it uninterruptible.
 
         Action ACTION_Eat = ScriptableObject.CreateInstance<UT_Sim.BT_Eat>();
         Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
@@ -69,17 +66,17 @@ public class UT_Sim : UtilityActionSet
         Consideration entertainmentConsideration = new Consideration( "boredom",
             (v) =>
             {
-                return Mathf.Max(0.2f, Curves.MILD_EXPONENTIAL(v));
+                return Mathf.Max(0.2f, Curves.MILD_EXPONENTIAL(v)); 
             }, 
             "boredom"
         );
         Bind(ACTION_Entertainment, entertainmentConsideration);
-        SetInertia(ACTION_Entertainment, 0.25f);
+        SetInertia(ACTION_Entertainment, 0.25f); // moderate inertia. 
     }
 
 
-    // placing actions here (inside the UT class) avoids name clashes with other actions that might be used elsewhere
-    // and have the same name.
+    // placing actions here (inside the UT class) avoids name clashes with other actions
+    // that might be used elsewhere and have the same name.
 
     class BT_Sleep : BehaviourTree
     {
@@ -92,14 +89,14 @@ public class UT_Sim : UtilityActionSet
                     new CONDITION_CheckKeyValue("currentLocationName", "HOME"),
                     new Sequence(
                         new ACTION_DebugLog("Going home to sleep..."),
-                        new ACTION_InfoWrap("Going home to sleep..."),
+                        new ACTION_ShowInfo("Going home to sleep..."),
                         new ACTION_Arrive("home"),
                         new ACTION_UpdateKey<string>("currentLocationName", "HOME")
                     ) 
                 ),
                 
                 new ACTION_DebugLog("Sleeping..."),
-                new ACTION_InfoWrap("Sleeping..."),
+                new ACTION_ShowInfo("Sleeping..."),
                 new LambdaAction(() =>
                 {
                     ((SIM_Blackboard)blackboard).StartSleeping();
@@ -137,14 +134,14 @@ public class UT_Sim : UtilityActionSet
                     new CONDITION_CheckKeyValue("currentLocationName", "OFFICE"),
                     new Sequence(
                         new ACTION_DebugLog("Going to the office..."),
-                        new ACTION_InfoWrap("Going to the office..."),
+                        new ACTION_ShowInfo("Going to the office..."),
                         new ACTION_Arrive("office"),
                         new ACTION_UpdateKey<string>("currentLocationName", "OFFICE")
                     )
                 ),
-                // once there work very hard until it's time to go home.
+                // once there work very hard until ...  (until the executor says so)
                 new ACTION_DebugLog("Working hard, very hard..."),
-                new ACTION_InfoWrap("Working hard, very hard..."),
+                new ACTION_ShowInfo("Working hard, very hard..."),
                 new ACTION_RunForever()
             );
         }
@@ -157,7 +154,7 @@ public class UT_Sim : UtilityActionSet
         {
             Sequence haveASnack = new Sequence(
                 new ACTION_DebugLog("Having a snack..."),
-                new ACTION_InfoWrap("Having a snack..."),
+                new ACTION_ShowInfo("Having a snack..."),
                 new ACTION_WaitRealTime("10"),
                 new LambdaAction(() =>
                 {
@@ -167,11 +164,11 @@ public class UT_Sim : UtilityActionSet
             );
             Sequence fullMealAtRestaurant = new Sequence(
                 new ACTION_DebugLog("Going to the restaurant..."),
-                new ACTION_InfoWrap("Going to the restaurant..."),
+                new ACTION_ShowInfo("Going to the restaurant..."),
                 new ACTION_Arrive("restaurant"),
                 new ACTION_UpdateKey<string>("currentLocationName", "RESTAURANT"),
                 new ACTION_DebugLog("EATING at the restaurant..."),
-                new ACTION_InfoWrap("EATING at the restaurant..."),
+                new ACTION_ShowInfo("EATING at the restaurant..."),
                 new ACTION_WaitRealTime("60f"),
                 new LambdaAction(() =>
                 {
@@ -185,16 +182,16 @@ public class UT_Sim : UtilityActionSet
                     // if previous condition was false, sequence is executed.
                     new Sequence(
                         new ACTION_DebugLog("Going home..."),
-                        new ACTION_InfoWrap("Going home..."),
+                        new ACTION_ShowInfo("Going home..."),
                         new ACTION_Arrive("home"),
                         new ACTION_UpdateKey<string>("currentLocationName", "HOME")
                     )
                 ),
                 new ACTION_DebugLog("Preparing meal at home..."),
-                new ACTION_InfoWrap("Preparing meal at home..."),
+                new ACTION_ShowInfo("Preparing meal at home..."),
                 new ACTION_WaitRealTime("30f"),
                 new ACTION_DebugLog("EATING at home..."),
-                new ACTION_InfoWrap("EATING at home..."),
+                new ACTION_ShowInfo("EATING at home..."),
                 new ACTION_WaitRealTime("30f"),
                 new LambdaAction(() =>
                 {
@@ -216,7 +213,8 @@ public class UT_Sim : UtilityActionSet
                     new Sequence(
                         new LambdaCondition(() =>
                         {
-                            return ((SIM_Blackboard)blackboard).hunger <= 50f;
+                            SIM_Blackboard bl = (SIM_Blackboard)blackboard;
+                            return bl.hunger <= bl.snackThreshold;
                         }),
                         haveASnack
                     ) ,
@@ -247,7 +245,7 @@ public class UT_Sim : UtilityActionSet
            // low boredom asks for short, activities that can be safely interrupted...
            Sequence readChapter = new Sequence(
                 new ACTION_DebugLog("Reading a chapter..."),
-                new ACTION_InfoWrap("Reading a chapter..."),
+                new ACTION_ShowInfo("Reading a chapter..."),
                 new ACTION_WaitRealTime("20f"),
                 new LambdaAction(() =>
                 {
@@ -258,7 +256,7 @@ public class UT_Sim : UtilityActionSet
 
            Sequence playCasualGame = new Sequence(
                new ACTION_DebugLog("Playing a casual game..."),
-               new ACTION_InfoWrap("Playing a casual game..."),
+               new ACTION_ShowInfo("Playing a casual game..."),
                new ACTION_WaitRealTime("20f"),
                new LambdaAction(() =>
                {
@@ -269,11 +267,11 @@ public class UT_Sim : UtilityActionSet
 
            Sequence goCinema = new Sequence(
                new ACTION_DebugLog("Going to the cinema..."),
-               new ACTION_InfoWrap("Going to the cinema..."),
+               new ACTION_ShowInfo("Going to the cinema..."),
                new ACTION_Arrive("cinema"),
                new ACTION_UpdateKey<string>("currentLocationName", "CINEMA"),
                new ACTION_DebugLog("Enjoying the movie..."),
-               new ACTION_InfoWrap("Enjoying the movie..."),
+               new ACTION_ShowInfo("Enjoying the movie..."),
                new ACTION_WaitRealTime("90f"),
                new LambdaAction(() =>
                {
@@ -284,7 +282,7 @@ public class UT_Sim : UtilityActionSet
            
            Sequence watchNetflix = new Sequence(
                new ACTION_DebugLog("Enjoying Netflix..."),
-               new ACTION_InfoWrap("Enjoying Netflix..."),
+               new ACTION_ShowInfo("Enjoying Netflix..."),
                new ACTION_WaitRealTime("60f"),
                new LambdaAction(() =>
                    {
@@ -300,7 +298,7 @@ public class UT_Sim : UtilityActionSet
                    new CONDITION_CheckKeyValue("currentLocationName", "HOME"),
                    new Sequence(
                        new ACTION_DebugLog("Going home..."),
-                       new ACTION_InfoWrap("Going home..."),
+                       new ACTION_ShowInfo("Going home..."),
                        new ACTION_Arrive("home"),
                        new ACTION_UpdateKey<string>("currentLocationName", "HOME")
                    ) 
@@ -310,7 +308,8 @@ public class UT_Sim : UtilityActionSet
                    new Sequence(
                        new LambdaCondition(() =>
                        {
-                           return ((SIM_Blackboard)blackboard).boredom <= 30;
+                           SIM_Blackboard bl = (SIM_Blackboard)blackboard;
+                           return bl.boredom <= bl.boredomTolerance;
                        }), 
                        new RandomSelector(readChapter, playCasualGame) // low boredom options
                    ),
@@ -337,7 +336,7 @@ public class UT_Sim : UtilityActionSet
         {
             root = new Sequence(
                 new ACTION_DebugLog("taking a leak..."),
-                new ACTION_InfoWrap("taking a leak..."),
+                new ACTION_ShowInfo("taking a leak..."),
                 new ACTION_WaitRealTime("10f"),
                 new LambdaAction(() =>
                 {
@@ -372,16 +371,16 @@ public class UT_Sim : UtilityActionSet
         
         public override Status OnTick()
         {
-            minutesElapsed += bl.dayNightCycler.GetComponent<DayNightCycle2D>().deltaMinutes;
+            minutesElapsed += bl.deltaMinutes;
             if (minutesElapsed >= time) return Status.SUCCEEDED;
             else return Status.RUNNING;
         }
     }
 
-    private class ACTION_InfoWrap : Action
+    private class ACTION_ShowInfo : Action
     {
         private string message;
-        public ACTION_InfoWrap(string message)
+        public ACTION_ShowInfo(string message)
         {
             this.message = message;
         }
@@ -390,10 +389,12 @@ public class UT_Sim : UtilityActionSet
         {
             SIM_Blackboard bl = (SIM_Blackboard)blackboard;
             OnScreenInfo panel = bl.onScreenInfo;
-            DayNightCycle2D dayNightCycle = bl.dayNightCycler.GetComponent<DayNightCycle2D>();
-            int hours = dayNightCycle.hours;
-            int minutes = (int)dayNightCycle.minutes;
-            panel.InjectInfo(hours.ToString("D2") + ":" + minutes.ToString("D2") + "  " + message + "\n", true);
+            // DayNightCycle2D dayNightCycle = bl.dayNightCycler.GetComponent<DayNightCycle2D>();
+            DayNightCycle2D dayNightCycler = bl.dayNightCycler;
+            int hours = dayNightCycler.hours;
+            int minutes = (int)dayNightCycler.minutes;
+            string day = dayNightCycler.currentDay.ToString();
+            panel.InjectInfo("["+day+" "+hours.ToString("D2") + ":" + minutes.ToString("D2") + "] " + message + "\n", true);
             return Status.SUCCEEDED;
         }
     }

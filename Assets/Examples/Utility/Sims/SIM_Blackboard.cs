@@ -14,8 +14,8 @@ public class SIM_Blackboard : DynamicBlackboard
     [Range(0, 24)]  public float timeOfDay; // value comes from DayNightCycler
     [Range(1, 7)] public int dayOfWeek; // value comes from DayNightCycler
 
-    public GameObject dayNightCycler;
-    private DayNightCycle2D dayNightCycle;
+    // public GameObject dayNightCycler;
+    public DayNightCycle2D dayNightCycler;  // in the inspector set it to the game object containing the DayNightCycle2D script
 
     [Header("Durations and effects")] 
     public float hoursToFullBladder = 6;
@@ -23,6 +23,12 @@ public class SIM_Blackboard : DynamicBlackboard
     public float hoursToFullSleepiness = 20;
     public float hoursToFullHunger = 8;
     public float hoursToZeroSleepiness = 8;  // it takes 8 hours to restore sleepiness to 0
+    
+    [Header("Thresholds")]
+    [Tooltip("If hunger is below this value, the Sim will only eat a snack.")]
+    public float snackThreshold = 50f;
+    [Tooltip("If boredom is below this value, the Sim will choose short activities.")]
+    public float boredomTolerance = 30f;
     
     [Header("Known Locations")] 
     public GameObject home;
@@ -40,28 +46,26 @@ public class SIM_Blackboard : DynamicBlackboard
     [Header("Other")]
     public bool sleeping = false;
     
-    private float deltaHours
+    // simplify access to deltas 
+    public float deltaHours
     {
-        get { return dayNightCycle.deltaHours; }
+        get { return dayNightCycler.deltaHours; }
     }
-
-    private float deltaMinutes
+    public float deltaMinutes
     {
-        get { return dayNightCycle.deltaMinutes; }
+        get { return dayNightCycler.deltaMinutes; }
     }
 
     void Awake()
     {
-        // retrieve the cycler script from the cycler game object
-        dayNightCycle = dayNightCycler.GetComponent<DayNightCycle2D>();
-        timeOfDay = dayNightCycle.decimalTime;
-        dayOfWeek = dayNightCycle.dayOfWeekNumber;
+        timeOfDay = dayNightCycler.decimalTime;
+        dayOfWeek = dayNightCycler.dayOfWeekNumber;
     }
     
     void Update()
     {
-        timeOfDay = dayNightCycle.decimalTime;
-        dayOfWeek = dayNightCycle.dayOfWeekNumber;
+        timeOfDay = dayNightCycler.decimalTime;
+        dayOfWeek = dayNightCycler.dayOfWeekNumber;
         UpdateSleepiness();
         UpdateHunger();
         UpdateBoredom();

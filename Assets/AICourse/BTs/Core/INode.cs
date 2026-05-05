@@ -1,11 +1,15 @@
 ﻿using System;
 using UnityEngine;
 
-
 // all code by ESN
 
 namespace BTs
 {
+    
+    // May 2026 In the future interface INode should be replaced (or renamed) IAction 
+    // Tickable/Abortable/Clearable/Contextualizable stuff should be considered an action
+    // This includes the BTs, the FSMs,... and what today is known as an Action
+    
     // the methods and stuff that all nodes in a BT must have
     // even BTs must implement this interface for they can be nodes in other BTs
     public interface INode
