@@ -10,7 +10,8 @@ public class UT_Sim : UtilityActionSet
     {
         Action ACTION_Sleep = ScriptableObject.CreateInstance<BT_Sleep>();
         Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
-        // better sleep at night, from 22 to 7 (do not normalize)
+        // better sleep at night, from 22 to 7
+        // (do not normalize attribute [0,24) is ok in this case since curve is ad-hoc)
         // this is a "cultural" soft veto
         Consideration conTimeOfDay = new Consideration("timeOfDay",
             (t) => { return t >= 22 || t <= 7 ? 1 : 0.5f; }, 
@@ -22,7 +23,7 @@ public class UT_Sim : UtilityActionSet
                 SIM_Blackboard bl = (SIM_Blackboard)blackboard;
                 if (bl.timeOfDay >= 22 || bl.timeOfDay <= 7)
                     return Curves.MILD_EXPONENTIAL(t); // at night almost linear
-                else return Curves.AGGRESSIVE_EXPONENTIAL(t); // at day exponential
+                else return Curves.AGGRESSIVE_EXPONENTIAL(t); // at day more aggressive
             },
             "sleepiness"
         );

@@ -39,6 +39,11 @@ namespace BTs
 
             // remember that if OnTick is invoked the node has been initialized since only Tick() calls OnTick() 
             // and Tick initializes any non-initialized node
+            
+            // TODO TOTHINK if executor gives support to atomicity, then conditions
+            // should only be checked if current mode is not atomic. But... 
+            // what happens if the selector is inside an atomic decorator? 
+            // so... at which level does atomicity makes sense? 
 
             // check conditions in an orderly way
             for (int child = 0; child<children.Count; child++)
