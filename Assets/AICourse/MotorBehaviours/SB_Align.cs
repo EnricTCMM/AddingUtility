@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 namespace MotorBehaviours
 {
-    [RequireComponent(typeof(MotorManager))]
     public class SB_Align : AngularMotorBehaviour
     {
         [Header("Align/Face Settings")]
@@ -24,7 +23,12 @@ namespace MotorBehaviours
         
         public override float GetTorque(MotorManager me)
         {
-            if (target == null) return 0f;
+            if (target == null)
+            {
+                Debug.LogError($"[MotorBehaviours] Critical error: No target in {GetType().Name} in GameObject '{gameObject.name}'.");
+                Debug.Break(); // immediate pause. 
+                return 0f;
+            }
 
             // 1. Get current and target rotations (assuming 2D Z-axis rotation)
             float currentRotation = me.transform.eulerAngles.z;

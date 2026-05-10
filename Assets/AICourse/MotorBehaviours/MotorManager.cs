@@ -16,11 +16,14 @@ namespace MotorBehaviours
         public float maxTorque = 360f;  // torque is the angular equivalent of force (angular force, so to speak)
         public float maxAngularSpeed = 90f;
 
-        [Header("Rotational Policy")]
+        [Header("Rotational Policy Settings")]
         public RotationalPolicy rotationalPolicy = RotationalPolicy.NONE;
         // Used only if the policy requires a target (like Face Target - FT)
-        public GameObject angularTarget; 
-
+        public GameObject rotationalPolicyTarget; 
+        public float policyToleranceRadius = 2f;
+        public float policySlowdownRadius = 30f;
+        public float policyTimeToDesiredSpeed = 0.1f;
+        
         // Internal state tracking (public so behaviours can read it, but hidden from inspector)
         [HideInInspector] public Vector3 currentVelocity = Vector3.zero;
         [HideInInspector] public float currentAngularVelocity = 0f;
@@ -220,11 +223,11 @@ namespace MotorBehaviours
 
             if (rotationalPolicy == RotationalPolicy.LWYG)
             {
-                // TODO: Calculate the torque needed to align with currentVelocity
+                finalTorque = CalculateLWYGTorque();
             }
             else if (rotationalPolicy == RotationalPolicy.FT)
             {
-                // TODO: Calculate the torque needed to face the angularTarget
+                finalTorque = CalculateFTTorque();
             }
             else if (rotationalPolicy == RotationalPolicy.NONE)
             {
@@ -292,9 +295,9 @@ namespace MotorBehaviours
 
         private void ApplyFTI()
         {
-            if (angularTarget == null) return;
+            if (rotationalPolicyTarget == null) return;
 
-            Vector3 direction = angularTarget.transform.position - transform.position;
+            Vector3 direction = rotationalPolicyTarget.transform.position - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
             if (rb2D != null)
@@ -307,6 +310,58 @@ namespace MotorBehaviours
                 transform.rotation = Quaternion.Euler(0, 0, angle);
             }
         }
+        
+        private float CalculateLWYGTorque()
+        {
+            // If we are not moving, we don't change our rotation
+            if (currentVelocity.magnitude < 0.001f) return 0f;
 
+            // Target angle is where we are currently heading
+            float targetAngle = Mathf.Atan2(currentVelocity.y, currentVelocity.x) * Mathf.Rad2Deg;
+            return InternalSmoothAlign(targetAngle);
+        }
+        
+        private float CalculateFTTorque()
+        {
+            // Fail Fast if target is missing
+            if (rotationalPolicyTarget == null)
+            {
+                Debug.LogError($"[MotorManager] Critical Error: In MotorManager 'Rotational Policy Target' is missing on GameObject '{gameObject.name}' but policy is set to FT.");
+                Debug.Break();
+                return 0f;
+            }
+
+            Vector3 direction = rotationalPolicyTarget.transform.position - transform.position;
+            if (direction.sqrMagnitude == 0f) return 0f;
+
+            float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            return InternalSmoothAlign(targetAngle);
+        }
+
+        // Shared logic for smooth rotation policies
+        private float InternalSmoothAlign(float targetAngle)
+        {
+            // this is an "internal" implementation of the ALIGN behaviour
+            float currentRotation = transform.eulerAngles.z;
+            float rotationDifference = Mathf.DeltaAngle(currentRotation, targetAngle);
+            float rotationSize = Mathf.Abs(rotationDifference);
+
+            if (rotationSize < policyToleranceRadius) return 0f;
+
+            float targetSpeed;
+            if (rotationSize > policySlowdownRadius)
+            {
+                targetSpeed = maxAngularSpeed;
+            }
+            else
+            {
+                targetSpeed = maxAngularSpeed * (rotationSize / policySlowdownRadius);
+            }
+
+            targetSpeed *= Mathf.Sign(rotationDifference);
+            
+            // Calculate torque needed to reach target speed
+            return (targetSpeed - currentAngularVelocity) / policyTimeToDesiredSpeed;
+        }
     }
 }

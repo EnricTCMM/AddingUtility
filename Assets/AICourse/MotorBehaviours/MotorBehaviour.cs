@@ -2,6 +2,7 @@
 
 namespace MotorBehaviours
 {
+    [RequireComponent(typeof(MotorManager))]
     public abstract class MotorBehaviour : MonoBehaviour
     {
         [Header("Base congfiguration")] [Range(0f, 1f)]
