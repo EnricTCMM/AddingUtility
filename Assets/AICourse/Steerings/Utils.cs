@@ -19,7 +19,7 @@ namespace Steerings
 		}
 
 		public static float VectorToOrientation (Vector3 vector) {
-
+			
 			Vector3 direction = vector.normalized;
 
 			float sin = direction.y;
