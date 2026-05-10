@@ -12,7 +12,7 @@ namespace MotorBehaviours
         public float maxForce = 40f;
         public float maxSpeed = 10f;
         
-        [Header("Angular Movement Limits")]
+        [Header("Angular Movement Limits (in degrees)")]
         public float maxTorque = 360f;  // torque is the angular equivalent of force (angular force, so to speak)
         public float maxAngularSpeed = 90f;
 
@@ -232,11 +232,15 @@ namespace MotorBehaviours
                 finalTorque = CalculateTorque();
             }
             
+            /*
             // 4. APPLY THE TORQUE (if there is any)
             if (Mathf.Abs(finalTorque) > 0.001f)
             {
                 ApplyTorque(finalTorque);
-            }
+            } */
+            
+            // 4. APPLY THE TORQUE
+            ApplyTorque(finalTorque);
         }
 
         private void ApplyTorque(float torque)
@@ -246,13 +250,15 @@ namespace MotorBehaviours
             {
                 // In a 3D context playing a 2D game, rotation happens around the Z axis
                 rb3D.AddTorque(new Vector3(0, 0, torque)); 
-                rb3D.angularVelocity = Vector3.ClampMagnitude(rb3D.angularVelocity, maxAngularSpeed);
+                // In 3D Unity uses radians for angular velocity, so we convert to degrees
+                rb3D.angularVelocity = Vector3.ClampMagnitude(rb3D.angularVelocity, maxAngularSpeed*Mathf.Deg2Rad);
             }
             // 2D PHYSICS
             else if (rb2D != null)
             {
                 rb2D.AddTorque(torque);
                 // In 2D, angular velocity is a simple float, so we clamp it normally
+                // In 2D Unity uses degrees. No conversion needed.
                 rb2D.angularVelocity = Mathf.Clamp(rb2D.angularVelocity, -maxAngularSpeed, maxAngularSpeed);
             }
             // NO PHYSICS (Kinematic fallback)
@@ -261,6 +267,7 @@ namespace MotorBehaviours
                 currentAngularVelocity += torque * Time.fixedDeltaTime;
                 currentAngularVelocity = Mathf.Clamp(currentAngularVelocity, -maxAngularSpeed, maxAngularSpeed);
                 // Rotate around the Z axis
+                // angles already in degrees.
                 transform.Rotate(0, 0, currentAngularVelocity * Time.fixedDeltaTime);
             }
         }
