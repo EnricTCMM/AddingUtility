@@ -1142,7 +1142,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &795753111
 SpriteRenderer:
   serializedVersion: 2
@@ -1232,8 +1232,8 @@ MonoBehaviour:
   blendingWeight: 1
   arbitrationPriority: 1
   target: {fileID: 1081276836}
-  toleranceRadius: 1
-  slowdownRadius: 20
+  toleranceRadius: 3
+  slowdownRadius: 25
   timeToDesiredSpeed: 0.1
 --- !u!114 &795753114
 MonoBehaviour:
@@ -1251,7 +1251,7 @@ MonoBehaviour:
   maxSpeed: 10
   maxTorque: 360
   maxAngularSpeed: 90
-  rotationalPolicy: 0
+  rotationalPolicy: 2
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
@@ -2753,7 +2753,7 @@ Transform:
   m_GameObject: {fileID: 1437201835}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -50, y: -29, z: 0}
+  m_LocalPosition: {x: 50, y: -29, z: 0}
   m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4852,7 +4852,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &2103772999
 SpriteRenderer:
   serializedVersion: 2
@@ -4942,8 +4942,8 @@ MonoBehaviour:
   blendingWeight: 1
   arbitrationPriority: 1
   target: {fileID: 1081276836}
-  toleranceRadius: 1
-  slowdownRadius: 20
+  toleranceRadius: 3
+  slowdownRadius: 25
   timeToDesiredSpeed: 0.1
 --- !u!114 &2103773002
 MonoBehaviour:
@@ -4961,7 +4961,7 @@ MonoBehaviour:
   maxSpeed: 10
   maxTorque: 360
   maxAngularSpeed: 90
-  rotationalPolicy: 0
+  rotationalPolicy: 2
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
