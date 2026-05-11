@@ -43,6 +43,8 @@ namespace MotorBehaviours
             {
                 // [Gemini proposal] Optional: You could return a torque that explicitly brakes the agent here
                 // return -me.currentAngularVelocity / timeToDesiredSpeed;
+                
+                me.StopRotationsCompletely(); // [Gemini Pun] PULL THE ROTATIONAL PARACHUTE!
                 return 0f; 
             }
 

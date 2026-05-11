@@ -25,7 +25,7 @@ namespace MotorBehaviours
         public float policyTimeToDesiredSpeed = 0.1f;
         
         // Internal state tracking (public so behaviours can read it, but hidden from inspector)
-        [HideInInspector] public Vector3 currentVelocity = Vector3.zero;
+         public Vector3 currentVelocity = Vector3.zero;
         [HideInInspector] public float currentAngularVelocity = 0f;
         
         // Ens preparem tant per a escenaris 2D com 3D. Lamentablement Unity no
@@ -39,6 +39,28 @@ namespace MotorBehaviours
             rb2D = GetComponent<Rigidbody2D>();
             rb3D = GetComponent<Rigidbody>();
             // no passa res si no tenim Rigidbody. És quelcom que ja contemplem
+        }
+        
+        /// <summary>
+        /// Immediate stop of the agent. Kills any inertia
+        /// </summary>
+        public void StopCompletely()
+        {
+            currentVelocity = Vector3.zero;
+            
+            if (rb3D != null && !rb3D.isKinematic) rb3D.linearVelocity = Vector3.zero;
+            else if (rb2D != null && rb2D.bodyType==RigidbodyType2D.Dynamic) rb2D.linearVelocity = Vector3.zero;
+        }
+        
+        /// <summary>
+        /// Instantly stops the agent from rotating, killing any angular inertia.
+        /// </summary>
+        public void StopRotationsCompletely()
+        {
+            currentAngularVelocity = 0f;
+            
+            if (rb3D != null && !rb3D.isKinematic) rb3D.angularVelocity = Vector3.zero;
+            else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Dynamic) rb2D.angularVelocity = 0f; // Note: In 2D, angularVelocity is a float!
         }
         
         void FixedUpdate()
@@ -171,7 +193,7 @@ namespace MotorBehaviours
         private void ApplyLinearForce(Vector3 force)
         {
             // 3D PHYSICS
-            if (rb3D != null)
+            if (rb3D != null && !rb3D.isKinematic)
             {
                 rb3D.AddForce(force); 
                 rb3D.linearVelocity = Vector3.ClampMagnitude(rb3D.linearVelocity, maxSpeed);
@@ -184,7 +206,7 @@ namespace MotorBehaviours
                 currentVelocity = rb3D.linearVelocity;
             }
             // 2D PHYSICS
-            else if (rb2D != null)
+            else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Dynamic)
             {
                 rb2D.AddForce(force); 
                 rb2D.linearVelocity = Vector3.ClampMagnitude(rb2D.linearVelocity, maxSpeed);
@@ -199,7 +221,21 @@ namespace MotorBehaviours
                 // x = x0 + v0t + 1/2at^2 sinó que ens estalviem 1/2at^2 (molt petit)
                 // substituint v0t per vt (velocitat actualitzada) 
                 // (Semi-implicit Euler o Symplectic Euler)
-                transform.position += currentVelocity * Time.fixedDeltaTime;
+                
+                if (rb3D != null && rb3D.isKinematic)
+                {
+                    rb3D.MovePosition(rb3D.position + currentVelocity * Time.fixedDeltaTime);
+                }
+                // Si és 2D Kinematic
+                else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Kinematic)
+                {
+                    rb2D.MovePosition(rb2D.position + (Vector2)currentVelocity * Time.fixedDeltaTime);
+                }
+                // Si no hi ha cap Rigidbody en absolut
+                else
+                {
+                    transform.position += currentVelocity * Time.fixedDeltaTime;
+                }
             }
         } // end ApplyLinearForce()
         
@@ -249,20 +285,22 @@ namespace MotorBehaviours
         private void ApplyTorque(float torque)
         {
             // 3D PHYSICS
-            if (rb3D != null)
+            if (rb3D != null && !rb3D.isKinematic)
             {
                 // In a 3D context playing a 2D game, rotation happens around the Z axis
                 rb3D.AddTorque(new Vector3(0, 0, torque)); 
                 // In 3D Unity uses radians for angular velocity, so we convert to degrees
                 rb3D.angularVelocity = Vector3.ClampMagnitude(rb3D.angularVelocity, maxAngularSpeed*Mathf.Deg2Rad);
+                currentAngularVelocity = rb3D.angularVelocity.z * Mathf.Rad2Deg;
             }
             // 2D PHYSICS
-            else if (rb2D != null)
+            else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Dynamic)
             {
                 rb2D.AddTorque(torque);
                 // In 2D, angular velocity is a simple float, so we clamp it normally
                 // In 2D Unity uses degrees. No conversion needed.
                 rb2D.angularVelocity = Mathf.Clamp(rb2D.angularVelocity, -maxAngularSpeed, maxAngularSpeed);
+                currentAngularVelocity = rb2D.angularVelocity;
             }
             // NO PHYSICS (Kinematic fallback)
             else
@@ -271,7 +309,24 @@ namespace MotorBehaviours
                 currentAngularVelocity = Mathf.Clamp(currentAngularVelocity, -maxAngularSpeed, maxAngularSpeed);
                 // Rotate around the Z axis
                 // angles already in degrees.
-                transform.Rotate(0, 0, currentAngularVelocity * Time.fixedDeltaTime);
+                // Si és 3D Kinematic
+                if (rb3D != null && rb3D.isKinematic)
+                {
+                    // Al 3D hem de multiplicar la rotació actual per una nova rotació a l'eix Z
+                    Quaternion deltaRotation = Quaternion.Euler(0, 0, currentAngularVelocity * Time.fixedDeltaTime);
+                    rb3D.MoveRotation(rb3D.rotation * deltaRotation);
+                }
+                
+                // Si és 2D Kinematic
+                else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Kinematic)
+                {
+                    rb2D.MoveRotation(rb2D.rotation + currentAngularVelocity * Time.fixedDeltaTime);
+                }
+                // Si no hi ha cap Rigidbody en absolut
+                else
+                {
+                    transform.Rotate(0, 0, currentAngularVelocity * Time.fixedDeltaTime);
+                }
             }
         }
 
@@ -346,7 +401,11 @@ namespace MotorBehaviours
             float rotationDifference = Mathf.DeltaAngle(currentRotation, targetAngle);
             float rotationSize = Mathf.Abs(rotationDifference);
 
-            if (rotationSize < policyToleranceRadius) return 0f;
+            if (rotationSize < policyToleranceRadius)
+            {
+                StopRotationsCompletely(); // [Gemini Pun!!!] PULL THE ROTATIONAL PARACHUTE!
+                return 0f;
+            }
 
             float targetSpeed;
             if (rotationSize > policySlowdownRadius)
