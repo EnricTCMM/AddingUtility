@@ -1255,9 +1255,12 @@ MonoBehaviour:
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
-  policyTimeToDesiredSpeed: 0.1
+  forcePolicy: 0
+  timeToDesiredSpeed: 0.1
+  torquePolicy: 0
+  timeToDesiredAngularSpeed: 0.1
   currentVelocity: {x: 0, y: 0, z: 0}
-  currentAngularVelocity: 0
+  currentAngularSpeed: 0
 --- !u!1 &880248478
 GameObject:
   m_ObjectHideFlags: 0
@@ -1747,9 +1750,12 @@ MonoBehaviour:
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
-  policyTimeToDesiredSpeed: 0.1
+  forcePolicy: 0
+  timeToDesiredSpeed: 0.1
+  torquePolicy: 1
+  timeToDesiredAngularSpeed: 0.1
   currentVelocity: {x: 0, y: 0, z: 0}
-  currentAngularVelocity: 0
+  currentAngularSpeed: 0
 --- !u!1 &1081276836
 GameObject:
   m_ObjectHideFlags: 0
@@ -2797,9 +2803,12 @@ MonoBehaviour:
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
-  policyTimeToDesiredSpeed: 0.1
+  forcePolicy: 0
+  timeToDesiredSpeed: 0.1
+  torquePolicy: 0
+  timeToDesiredAngularSpeed: 0.1
   currentVelocity: {x: 0, y: 0, z: 0}
-  currentAngularVelocity: 0
+  currentAngularSpeed: 0
 --- !u!50 &1437201842
 Rigidbody2D:
   serializedVersion: 5
@@ -4965,9 +4974,12 @@ MonoBehaviour:
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
-  policyTimeToDesiredSpeed: 0.1
+  forcePolicy: 0
+  timeToDesiredSpeed: 0.1
+  torquePolicy: 0
+  timeToDesiredAngularSpeed: 0.1
   currentVelocity: {x: 0, y: 0, z: 0}
-  currentAngularVelocity: 0
+  currentAngularSpeed: 0
 --- !u!1 &2121516136
 GameObject:
   m_ObjectHideFlags: 0

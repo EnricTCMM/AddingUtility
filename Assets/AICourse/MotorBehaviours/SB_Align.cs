@@ -8,60 +8,55 @@ namespace MotorBehaviours
         
         // The angle threshold (tolerance) to completely stop (in degrees)
         public float toleranceRadius = 2f; 
-        
         // The angle threshold to start slowing down (in degrees)
         public float slowdownRadius = 30f; 
         
-
-        protected virtual float GetDesiredAngle(MotorManager me)
-        {
-            // parameter not used here. But used in subclasse Face. 
-            return target.transform.eulerAngles.z;
-        }
         
         public override float GetDesiredAngularSpeed(MotorManager me)
         {
+            // If there's no target FAIL-FAST
             if (target == null)
             {
                 Debug.LogError($"[MotorBehaviours] Critical error: No target in {GetType().Name} in GameObject '{gameObject.name}'.");
                 Debug.Break(); // immediate pause. 
-                return 0f;
+                return 0;
             }
 
-            // 1. Get current and target rotations (assuming 2D Z-axis rotation)
-            float currentRotation = me.transform.eulerAngles.z;
-            float targetRotation = GetDesiredAngle(me);
+            // Delegation: We extract the Z angle of the target and pass it to the math function
+            return SB_Align.GetDesiredAngularSpeed(me, target.transform.eulerAngles.z, toleranceRadius, slowdownRadius);
+        }
 
-            // 2. Get the shortest distance to the target angle (-180 to 180)
+        // 2. Static method (Pure math, open for delegation from other behaviors like LWYG)
+        public static float GetDesiredAngularSpeed(MotorManager me, float targetRotation, float tolerance, float slowdown)
+        {
+            float currentRotation = me.transform.eulerAngles.z;
+            
+            // Calculates the shortest distance between the two angles (-180 to 180)
             float rotationDifference = Mathf.DeltaAngle(currentRotation, targetRotation);
             float rotationSize = Mathf.Abs(rotationDifference);
 
-            // 3. Check if we have arrived
-            if (rotationSize < toleranceRadius)
+            // A. Within tolerance: we want to stop rotating
+            if (rotationSize < tolerance)
             {
-                // [Gemini proposal] Optional: You could return a torque that explicitly brakes the agent here
-                // return -me.currentAngularSpeed / timeToDesiredSpeed;
-                
-                me.StopRotationsCompletely(); // [Gemini Pun] PULL THE ROTATIONAL PARACHUTE!
                 return 0f; 
             }
 
-            // 4. Calculate desired speed based on distance (angular distance, that is)
-            float desiredSpeed;
-            if (rotationSize > slowdownRadius)
+            // B. Calculate ideal speed based on slowdown radius
+            float targetSpeed;
+            if (rotationSize > slowdown)
             {
-                desiredSpeed = me.maxAngularSpeed;
+                targetSpeed = me.maxAngularSpeed;
             }
             else
             {
-                // Linear falloff inside the slow radius
-                desiredSpeed = me.maxAngularSpeed * (rotationSize / slowdownRadius);
+                targetSpeed = me.maxAngularSpeed * (rotationSize / slowdown);
             }
 
-            // Combine speed and direction (sign)
-            desiredSpeed *= Mathf.Sign(rotationDifference);
-
-            return desiredSpeed;
+            // C. Apply the correct sign (direction of rotation)
+            targetSpeed *= Mathf.Sign(rotationDifference);
+            
+            return targetSpeed;
         }
+    
     }
 }

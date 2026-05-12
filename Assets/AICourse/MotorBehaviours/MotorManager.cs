@@ -24,7 +24,7 @@ namespace MotorBehaviours
         public GameObject rotationalPolicyTarget; 
         public float policyToleranceRadius = 2f;
         public float policySlowdownRadius = 30f;
-        public float policyTimeToDesiredSpeed = 0.1f;
+        // public float policyTimeToDesiredSpeed = 0.1f;
         
         [Foldout("Advanced Linear Settings")]
         public LinearForcePolicy forcePolicy = LinearForcePolicy.PROPORTIONAL;
@@ -81,14 +81,30 @@ namespace MotorBehaviours
         /// </summary>
         public Vector3 GetAdjustedForceFromDesiredVelocity(Vector3 desiredVelocity)
         {
+            // avoid jittering: if we want to stop and we almost are, we stop immediately. 
+            if (desiredVelocity.sqrMagnitude == 0f && currentVelocity.magnitude < 0.05f)
+            {
+                StopCompletely(); 
+                return Vector3.zero;
+            }
+            
             Vector3 velocityDifference = desiredVelocity - currentVelocity;
-
+            
             // If we already have the perfect velocity, apply no force
             if (velocityDifference.sqrMagnitude < 0.001f) return Vector3.zero;
 
             if (forcePolicy == LinearForcePolicy.BANG_BANG)
             {
-                // Absolute maximum effort always (Bang-Bang Control)
+                // Calculate the exact force needed to reach the desired velocity in a single frame
+                Vector3 idealForce = velocityDifference / Time.fixedDeltaTime;
+                
+                // If the ideal force is within our limits, apply it to nail the speed without overshooting
+                if (idealForce.magnitude < maxForce)
+                {
+                    return idealForce;
+                }
+                
+                // Otherwise, apply maximum effort (Pure Bang-Bang aggressiveness)
                 return velocityDifference.normalized * maxForce;
             }
             else
@@ -106,6 +122,12 @@ namespace MotorBehaviours
         /// </summary>
         public float GetAdjustedTorqueFromDesiredAngularSpeed(float desiredAngularSpeed)
         {
+            if (desiredAngularSpeed == 0f && Mathf.Abs(currentAngularSpeed) < 0.5f)
+            {
+                StopRotationsCompletely();
+                return 0f;
+            }
+            
             float speedDifference = desiredAngularSpeed - currentAngularSpeed;
 
             // If we already have the perfect angular velocity, apply no torque
@@ -113,7 +135,16 @@ namespace MotorBehaviours
 
             if (torquePolicy == TorquePolicy.BANG_BANG)
             {
-                // Absolute maximum effort to turn (Bang-Bang Control)
+                // Calculate the exact torque needed to reach the desired angular velocity in a single frame
+                float idealTorque = speedDifference / Time.fixedDeltaTime;
+                
+                // If the ideal torque is within our limits, apply it to nail the rotation without overshooting
+                if (Mathf.Abs(idealTorque) < maxTorque)
+                {
+                    return idealTorque;
+                }
+                
+                // Otherwise, apply maximum rotational effort
                 return Mathf.Sign(speedDifference) * maxTorque;
             }
             else

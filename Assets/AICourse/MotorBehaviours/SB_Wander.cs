@@ -53,13 +53,8 @@ namespace MotorBehaviours
             Vector3 targetOffset = new Vector3(Mathf.Cos(targetRotRad), Mathf.Sin(targetRotRad), 0f) * wanderRadius;
             surrogateTargetPosition = circleCenter + targetOffset;
 
-            // move towards the surrogate target at max speed (seek, actually)
-            Vector3 direction = surrogateTargetPosition - agentPosition;
-            
-            // Safety check to avoid normalizing a zero vector
-            if (direction.sqrMagnitude == 0f) return Vector3.zero;
-
-            return direction.normalized * me.maxSpeed;
+            // Seek the surrogate target. DELEGATE!
+            return SB_Seek.GetDesiredVelocity(me, surrogateTargetPosition);
         }
 
         // Native Unity method to draw debug shapes in the Scene view

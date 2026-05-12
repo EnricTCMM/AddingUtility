@@ -695,7 +695,6 @@ MonoBehaviour:
   target: {fileID: 1923444783}
   toleranceRadius: 2
   slowdownRadius: 30
-  timeToDesiredSpeed: 0.1
 --- !u!114 &442607172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -713,9 +712,15 @@ MonoBehaviour:
   maxTorque: 360
   maxAngularSpeed: 90
   rotationalPolicy: 0
-  angularTarget: {fileID: 0}
+  rotationalPolicyTarget: {fileID: 0}
+  policyToleranceRadius: 2
+  policySlowdownRadius: 30
+  forcePolicy: 0
+  timeToDesiredSpeed: 0.1
+  torquePolicy: 1
+  timeToDesiredAngularSpeed: 0.1
   currentVelocity: {x: 0, y: 0, z: 0}
-  currentAngularVelocity: 0
+  currentAngularSpeed: 0
 --- !u!1 &494308878
 GameObject:
   m_ObjectHideFlags: 0

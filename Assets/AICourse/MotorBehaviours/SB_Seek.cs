@@ -16,16 +16,19 @@ namespace MotorBehaviours
                 return Vector3.zero;
             }
             
-            // 1. Direction towards the target
-            Vector3 direction = target.transform.position - me.transform.position;
+            return SB_Seek.GetDesiredVelocity(me, target.transform.position);
+        }
+        
+        // Math is done in this method
+        public static Vector3 GetDesiredVelocity(MotorManager me, Vector3 targetPosition)
+        {
+            Vector3 directionToTarget = targetPosition - me.transform.position;
             
-            // Safety check to avoid normalizing a zero vector
-            if (direction.sqrMagnitude == 0f) return Vector3.zero;
+            // Safety check. Don't try to normalize a zero vector (not strictly necessary
+            // since Unity returns Vector3.zero for zero vectors) 
+            if (directionToTarget.sqrMagnitude == 0f) return Vector3.zero;
 
-            // 2. The desired velocity is reaching the target at maximum speed
-            Vector3 desiredVelocity = direction.normalized * me.maxSpeed;
-
-            return desiredVelocity;
+            return directionToTarget.normalized * me.maxSpeed;
         }
     }
 }

@@ -16,52 +16,38 @@ namespace MotorBehaviours
 
         public override Vector3 GetDesiredVelocity(MotorManager me)
         {
-            // 1. Fail Fast: Check if target is missing
+            // Fail Fast: Check if target is missing
             if (target == null)
             {
                 Debug.LogError($"[MotorBehaviours] Critical Error: Missing Target on {GetType().Name} component of GameObject '{gameObject.name}'.");
                 Debug.Break();
                 return Vector3.zero;
             }
-
-            // 2. Calculate the direction vector and the distance to the target
-            Vector3 direction = target.transform.position - me.transform.position;
+            return SB_Arrive.GetDesiredVelocity(me, target.transform.position, toleranceRadius, slowdownRadius);
+        }
+        
+        public static Vector3 GetDesiredVelocity(MotorManager me, Vector3 targetPosition, float tolerance, float slowdown)
+        {
+            Vector3 direction = targetPosition - me.transform.position;
             float distance = direction.magnitude;
-            
-            float targetSpeed;
-            
-            // 3. Check if we have arrived within the tolerance radius
-            if (distance < toleranceRadius)
+
+            // A. If we are within the tolerance zone our desired velocity is zero
+            if (distance < tolerance)
             {
-                me.StopCompletely(); // off-physics, but ensures no jittering
                 return Vector3.zero;
             }
 
-            // 4. Calculate desired speed based on distance
-            
-            else if (distance > slowdownRadius)
+            // B. DELEGATION: If we are outside the slowdown zone, we behave exactly like Seek
+            if (distance > slowdown)
             {
-                // Outside the slowdown radius, we go at maximum speed
-                targetSpeed = me.maxSpeed;
-            }
-            else
-            {
-                // Linear falloff inside the slowdown radius
-                targetSpeed = me.maxSpeed * (distance / slowdownRadius);
+                return SB_Seek.GetDesiredVelocity(me, targetPosition);
             }
 
-            // 5. Calculate desired velocity
-            // Optimization: (direction / distance) is mathematically identical to direction.normalized
-            // but saves the CPU from calculating the square root twice.
-            Vector3 desiredVelocity = Vector3.zero;
-            // avoid division by zero
-            if (distance > 0) 
-                desiredVelocity = (direction / distance) * targetSpeed;
+            // C. Inside slowdown zone: calculate the proportional speed
+            float targetSpeed = me.maxSpeed * (distance / slowdown);
 
-            // 6. The steering force is the difference between desired and current velocity
-            Vector3 force = (desiredVelocity - me.currentVelocity) / timeToDesiredSpeed;
-
-            return force;
+            // Return the desired velocity vector
+            return direction.normalized * targetSpeed;
         }
     }
 }
