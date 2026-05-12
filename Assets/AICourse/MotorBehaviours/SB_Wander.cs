@@ -10,9 +10,6 @@ namespace MotorBehaviours
         
         // How much the target angle can change per frame (in degrees)
         public float wanderRate = 30f; 
-        
-        // Reaction time to adjust the velocity towards the target
-        public float timeToDesiredSpeed = 0.1f;
 
         [Header("Debug Settings")]
         public bool showWanderGizmos = true;
@@ -24,7 +21,7 @@ namespace MotorBehaviours
         private Vector3 circleCenter;
         private Vector3 surrogateTargetPosition;
 
-        public override Vector3 GetForce(MotorManager me)
+        public override Vector3 GetDesiredVelocity(MotorManager me)
         {
             // 1. Change the target orientation using a Binomial distribution
             // (Random.value - Random.value) produces a number between -1 and 1, 
@@ -56,11 +53,13 @@ namespace MotorBehaviours
             Vector3 targetOffset = new Vector3(Mathf.Cos(targetRotRad), Mathf.Sin(targetRotRad), 0f) * wanderRadius;
             surrogateTargetPosition = circleCenter + targetOffset;
 
-            // 5. Seek the surrogate target (Manual implementation of Seek math)
+            // move towards the surrogate target at max speed (seek, actually)
             Vector3 direction = surrogateTargetPosition - agentPosition;
-            Vector3 desiredVelocity = direction.normalized * me.maxSpeed;
             
-            return (desiredVelocity - me.currentVelocity) / timeToDesiredSpeed;
+            // Safety check to avoid normalizing a zero vector
+            if (direction.sqrMagnitude == 0f) return Vector3.zero;
+
+            return direction.normalized * me.maxSpeed;
         }
 
         // Native Unity method to draw debug shapes in the Scene view
@@ -87,9 +86,9 @@ namespace MotorBehaviours
                 prevPoint = nextPoint;
             }
             
-            // 3. Creueta negra: El Surrogate Target (Ara el doble de gran)
+            // 3. Creueta negra: El Surrogate Target
             Gizmos.color = Color.black;
-            float crossSize = 2f; // Mida dels braços (abans era 0.3f)
+            float crossSize = 3f; // Mida dels braços
             
             // Línia horitzontal de la creu
             Gizmos.DrawLine(surrogateTargetPosition + new Vector3(-crossSize, 0, 0), 

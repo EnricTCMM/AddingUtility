@@ -12,8 +12,6 @@ namespace MotorBehaviours
         // The angle threshold to start slowing down (in degrees)
         public float slowdownRadius = 30f; 
         
-        // How fast we want to reach the target (desired) speed
-        public float timeToDesiredSpeed = 0.1f;
 
         protected virtual float GetDesiredAngle(MotorManager me)
         {
@@ -21,7 +19,7 @@ namespace MotorBehaviours
             return target.transform.eulerAngles.z;
         }
         
-        public override float GetTorque(MotorManager me)
+        public override float GetDesiredAngularSpeed(MotorManager me)
         {
             if (target == null)
             {
@@ -42,31 +40,28 @@ namespace MotorBehaviours
             if (rotationSize < toleranceRadius)
             {
                 // [Gemini proposal] Optional: You could return a torque that explicitly brakes the agent here
-                // return -me.currentAngularVelocity / timeToDesiredSpeed;
+                // return -me.currentAngularSpeed / timeToDesiredSpeed;
                 
                 me.StopRotationsCompletely(); // [Gemini Pun] PULL THE ROTATIONAL PARACHUTE!
                 return 0f; 
             }
 
-            // 4. Calculate desired speed based on distance
-            float targetSpeed;
+            // 4. Calculate desired speed based on distance (angular distance, that is)
+            float desiredSpeed;
             if (rotationSize > slowdownRadius)
             {
-                targetSpeed = me.maxAngularSpeed;
+                desiredSpeed = me.maxAngularSpeed;
             }
             else
             {
                 // Linear falloff inside the slow radius
-                targetSpeed = me.maxAngularSpeed * (rotationSize / slowdownRadius);
+                desiredSpeed = me.maxAngularSpeed * (rotationSize / slowdownRadius);
             }
 
             // Combine speed and direction (sign)
-            targetSpeed *= Mathf.Sign(rotationDifference);
+            desiredSpeed *= Mathf.Sign(rotationDifference);
 
-            // 5. Calculate Torque needed to reach that target speed
-            float torque = (targetSpeed - me.currentAngularVelocity)/timeToDesiredSpeed;
-
-            return torque;
+            return desiredSpeed;
         }
     }
 }

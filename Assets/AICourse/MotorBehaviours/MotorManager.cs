@@ -7,6 +7,8 @@ namespace MotorBehaviours
     public class MotorManager : MonoBehaviour
     {
         public enum RotationalPolicy { NONE, LWYG, LWYGI, FT, FTI }
+        public enum LinearForcePolicy { PROPORTIONAL, BANG_BANG}
+        public enum TorquePolicy {PROPORTIONAL, BANG_BANG}
         
         [Header("Linear Movement Limits")]
         public float maxForce = 40f;
@@ -24,9 +26,19 @@ namespace MotorBehaviours
         public float policySlowdownRadius = 30f;
         public float policyTimeToDesiredSpeed = 0.1f;
         
+        [Foldout("Advanced Linear Settings")]
+        public LinearForcePolicy forcePolicy = LinearForcePolicy.PROPORTIONAL;
+        [Tooltip("Only used under PROPORTIONAL POLICY. 1.0 is Reynolds implementation")]
+        public float timeToDesiredSpeed = 0.1f;
+        
+        [Foldout("Advanced Angular Settings")]
+        public TorquePolicy torquePolicy = TorquePolicy.PROPORTIONAL;
+        [Tooltip("Only used under PROPORTIONAL POLICY. 1.0 is Reynolds implementation")]
+        public float timeToDesiredAngularSpeed = 0.1f;
+        
         // Internal state tracking (public so behaviours can read it, but hidden from inspector)
-         public Vector3 currentVelocity = Vector3.zero;
-        [HideInInspector] public float currentAngularVelocity = 0f;
+        [HideInInspector] public Vector3 currentVelocity = Vector3.zero;
+        [HideInInspector] public float currentAngularSpeed = 0f;
         
         // Ens preparem tant per a escenaris 2D com 3D. Lamentablement Unity no
         // considera que Rigidbody2D sigui un cas especial de Rigidbody (3D)
@@ -57,10 +69,58 @@ namespace MotorBehaviours
         /// </summary>
         public void StopRotationsCompletely()
         {
-            currentAngularVelocity = 0f;
+            currentAngularSpeed = 0f;
             
             if (rb3D != null && !rb3D.isKinematic) rb3D.angularVelocity = Vector3.zero;
             else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Dynamic) rb2D.angularVelocity = 0f; // Note: In 2D, angularVelocity is a float!
+        }
+        
+        /// <summary>
+        /// Converts a desired velocity into the final application force 
+        /// based on the Manager's advanced linear policies.
+        /// </summary>
+        public Vector3 GetAdjustedForceFromDesiredVelocity(Vector3 desiredVelocity)
+        {
+            Vector3 velocityDifference = desiredVelocity - currentVelocity;
+
+            // If we already have the perfect velocity, apply no force
+            if (velocityDifference.sqrMagnitude < 0.001f) return Vector3.zero;
+
+            if (forcePolicy == LinearForcePolicy.BANG_BANG)
+            {
+                // Absolute maximum effort always (Bang-Bang Control)
+                return velocityDifference.normalized * maxForce;
+            }
+            else
+            {
+                // Proportional effort 
+                // (If timeToDesiredSpeed is 1, it behaves as the classic Reynolds algorithm)
+                return velocityDifference / timeToDesiredSpeed;
+                // should result have a magnitude higher than maxForce, subsequent clamping will fix it. 
+            }
+        }
+        
+        /// <summary>
+        /// Converts a desired angular velocity into the final application torque 
+        /// based on the Manager's advanced angular policies.
+        /// </summary>
+        public float GetAdjustedTorqueFromDesiredAngularSpeed(float desiredAngularSpeed)
+        {
+            float speedDifference = desiredAngularSpeed - currentAngularSpeed;
+
+            // If we already have the perfect angular velocity, apply no torque
+            if (Mathf.Abs(speedDifference) < 0.001f) return 0f;
+
+            if (torquePolicy == TorquePolicy.BANG_BANG)
+            {
+                // Absolute maximum effort to turn (Bang-Bang Control)
+                return Mathf.Sign(speedDifference) * maxTorque;
+            }
+            else
+            {
+                // Proportional effort
+                return speedDifference / timeToDesiredAngularSpeed;
+            }
         }
         
         void FixedUpdate()
@@ -104,12 +164,12 @@ namespace MotorBehaviours
                 {
                     break; 
                 }
-
-                // Get the force from the current behaviour
-                Vector3 force = behaviour.GetForce(this);
+                
+                Vector3 desiredVelocity = behaviour.GetDesiredVelocity(this);
+                Vector3 force = GetAdjustedForceFromDesiredVelocity(desiredVelocity);
 
                 // BLENDING:
-                // If the behaviour returned a valid force, we blend it using its weight
+                // If we have a valid force, we blend it using its weight
                 if (force.magnitude > 0.001f)
                 {
                     finalForce += force * behaviour.blendingWeight;
@@ -164,7 +224,8 @@ namespace MotorBehaviours
                     break;
                 }
 
-                float torque = behaviour.GetTorque(this);
+                float desiredSpeed = behaviour.GetDesiredAngularSpeed(this);
+                float torque = GetAdjustedTorqueFromDesiredAngularSpeed(desiredSpeed);
 
                 // BLENDING
                 if (Mathf.Abs(torque) > 0.001f)
@@ -291,7 +352,7 @@ namespace MotorBehaviours
                 rb3D.AddTorque(new Vector3(0, 0, torque)); 
                 // In 3D Unity uses radians for angular velocity, so we convert to degrees
                 rb3D.angularVelocity = Vector3.ClampMagnitude(rb3D.angularVelocity, maxAngularSpeed*Mathf.Deg2Rad);
-                currentAngularVelocity = rb3D.angularVelocity.z * Mathf.Rad2Deg;
+                currentAngularSpeed = rb3D.angularVelocity.z * Mathf.Rad2Deg;
             }
             // 2D PHYSICS
             else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Dynamic)
@@ -300,32 +361,32 @@ namespace MotorBehaviours
                 // In 2D, angular velocity is a simple float, so we clamp it normally
                 // In 2D Unity uses degrees. No conversion needed.
                 rb2D.angularVelocity = Mathf.Clamp(rb2D.angularVelocity, -maxAngularSpeed, maxAngularSpeed);
-                currentAngularVelocity = rb2D.angularVelocity;
+                currentAngularSpeed = rb2D.angularVelocity;
             }
             // NO PHYSICS (Kinematic fallback)
             else
             {
-                currentAngularVelocity += torque * Time.fixedDeltaTime;
-                currentAngularVelocity = Mathf.Clamp(currentAngularVelocity, -maxAngularSpeed, maxAngularSpeed);
+                currentAngularSpeed += torque * Time.fixedDeltaTime;
+                currentAngularSpeed = Mathf.Clamp(currentAngularSpeed, -maxAngularSpeed, maxAngularSpeed);
                 // Rotate around the Z axis
                 // angles already in degrees.
                 // Si és 3D Kinematic
                 if (rb3D != null && rb3D.isKinematic)
                 {
                     // Al 3D hem de multiplicar la rotació actual per una nova rotació a l'eix Z
-                    Quaternion deltaRotation = Quaternion.Euler(0, 0, currentAngularVelocity * Time.fixedDeltaTime);
+                    Quaternion deltaRotation = Quaternion.Euler(0, 0, currentAngularSpeed * Time.fixedDeltaTime);
                     rb3D.MoveRotation(rb3D.rotation * deltaRotation);
                 }
                 
                 // Si és 2D Kinematic
                 else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Kinematic)
                 {
-                    rb2D.MoveRotation(rb2D.rotation + currentAngularVelocity * Time.fixedDeltaTime);
+                    rb2D.MoveRotation(rb2D.rotation + currentAngularSpeed * Time.fixedDeltaTime);
                 }
                 // Si no hi ha cap Rigidbody en absolut
                 else
                 {
-                    transform.Rotate(0, 0, currentAngularVelocity * Time.fixedDeltaTime);
+                    transform.Rotate(0, 0, currentAngularSpeed * Time.fixedDeltaTime);
                 }
             }
         }
@@ -407,20 +468,19 @@ namespace MotorBehaviours
                 return 0f;
             }
 
-            float targetSpeed;
+            float desiredSpeed;
             if (rotationSize > policySlowdownRadius)
             {
-                targetSpeed = maxAngularSpeed;
+                desiredSpeed = maxAngularSpeed;
             }
             else
             {
-                targetSpeed = maxAngularSpeed * (rotationSize / policySlowdownRadius);
+                desiredSpeed = maxAngularSpeed * (rotationSize / policySlowdownRadius);
             }
 
-            targetSpeed *= Mathf.Sign(rotationDifference);
-            
-            // Calculate torque needed to reach target speed
-            return (targetSpeed - currentAngularVelocity) / policyTimeToDesiredSpeed;
+            desiredSpeed *= Mathf.Sign(rotationDifference);
+
+            return GetAdjustedTorqueFromDesiredAngularSpeed(desiredSpeed);
         }
     }
 }

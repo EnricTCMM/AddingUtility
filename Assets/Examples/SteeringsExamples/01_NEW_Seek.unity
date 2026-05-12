@@ -706,8 +706,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
-  maxForce: 400
-  maxSpeed: 10
+  maxForce: 10
+  maxSpeed: 20
   maxTorque: 360
   maxAngularSpeed: 90
   rotationalPolicy: 4
@@ -715,8 +715,12 @@ MonoBehaviour:
   policyToleranceRadius: 2
   policySlowdownRadius: 30
   policyTimeToDesiredSpeed: 0.1
+  forcePolicy: 0
+  timeToDesiredSpeed: 0.1
+  torquePolicy: 0
+  timeToDesiredAngularSpeed: 0.1
   currentVelocity: {x: 0, y: 0, z: 0}
-  currentAngularVelocity: 0
+  currentAngularSpeed: 0
 --- !u!114 &442607175
 MonoBehaviour:
   m_ObjectHideFlags: 0

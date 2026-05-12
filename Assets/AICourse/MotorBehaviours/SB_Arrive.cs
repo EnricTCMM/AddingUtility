@@ -14,7 +14,7 @@ namespace MotorBehaviours
         // How fast we want to reach the desired speed
         public float timeToDesiredSpeed = 0.1f;
 
-        public override Vector3 GetForce(MotorManager me)
+        public override Vector3 GetDesiredVelocity(MotorManager me)
         {
             // 1. Fail Fast: Check if target is missing
             if (target == null)
