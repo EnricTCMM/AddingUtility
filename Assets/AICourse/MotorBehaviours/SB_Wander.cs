@@ -7,16 +7,21 @@ namespace MotorBehaviours
         [Header("Wander Settings")]
         public float wanderRadius = 2f;
         public float wanderOffset = 5f;
-        
         // How much the target angle can change per frame (in degrees)
         public float wanderRate = 30f; 
 
+        [Header("Attractor Settings (WanderAround)")]
+        [Tooltip("")]
+        public GameObject attractor;
+        [Range(0f, 1f)]
+        [Tooltip("0 = Pure wander, 1 = Pure seek towards the attractor ")]
+        public float attractionWeight = 0.2f;
+        
         [Header("Debug Settings")]
         public bool showWanderGizmos = true;
 
         // Internal state
         private float wanderTargetOrientation = 0f;
-        
         // Stored for Gizmo drawing
         private Vector3 circleCenter;
         private Vector3 surrogateTargetPosition;
@@ -53,8 +58,17 @@ namespace MotorBehaviours
             Vector3 targetOffset = new Vector3(Mathf.Cos(targetRotRad), Mathf.Sin(targetRotRad), 0f) * wanderRadius;
             surrogateTargetPosition = circleCenter + targetOffset;
 
-            // Seek the surrogate target. DELEGATE!
-            return SB_Seek.GetDesiredVelocity(me, surrogateTargetPosition);
+            // pure wander intention (just seek the surrogate target)
+            Vector3 wanderVelocity = SB_Seek.GetDesiredVelocity(me, surrogateTargetPosition);
+
+            if (attractor != null)
+            {
+                Vector3 attractorVelocity = SB_Seek.GetDesiredVelocity(me, attractor.transform.position);
+                //return Vector3.Lerp(wanderVelocity, attractorVelocity, attractionWeight);
+                // previous line equivalent to this:
+                return attractorVelocity * attractionWeight + wanderVelocity * (1 - attractionWeight);
+            }
+            else return wanderVelocity;
         }
 
         // Native Unity method to draw debug shapes in the Scene view
@@ -91,6 +105,13 @@ namespace MotorBehaviours
             // Línia vertical de la creu
             Gizmos.DrawLine(surrogateTargetPosition + new Vector3(0, -crossSize, 0), 
                 surrogateTargetPosition + new Vector3(0, crossSize, 0));
+            /*
+            if (attractor != null)
+            {
+                Gizmos.color = Color.blue; // Un color diferent per a l'atracció
+                Gizmos.DrawLine(transform.position, attractor.transform.position);
+            }
+            */
         }
     }
 }

@@ -11,8 +11,6 @@ namespace MotorBehaviours
         public float toleranceRadius = 1f; 
         // The distance threshold to start slowing down (in meters)
         public float slowdownRadius = 20f; 
-        // How fast we want to reach the desired speed
-        public float timeToDesiredSpeed = 0.1f;
 
         public override Vector3 GetDesiredVelocity(MotorManager me)
         {
