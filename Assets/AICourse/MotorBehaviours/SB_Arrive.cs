@@ -12,7 +12,7 @@ namespace MotorBehaviours
         // The distance threshold to start slowing down (in meters)
         public float slowdownRadius = 20f; 
 
-        public override Vector3 GetDesiredVelocity(MotorManager me)
+        public override Vector3? GetDesiredVelocity(MotorManager me)
         {
             // Fail Fast: Check if target is missing
             if (target == null)

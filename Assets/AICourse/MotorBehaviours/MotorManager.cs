@@ -172,7 +172,7 @@ namespace MotorBehaviours
             // Find all active Linear behaviours on this GameObject and sort them by highest priority first
             List<LinearMotorBehaviour> activeBehaviours = GetComponents<LinearMotorBehaviour>()
                 .Where(behaviour => behaviour.enabled)
-                .OrderByDescending(behaviour => behaviour.arbitrationPriority)
+                .OrderBy(behaviour => behaviour.arbitrationPriority)
                 .ToList();
 
             // If there are no active linear behaviours, we have nothing to do
@@ -191,13 +191,18 @@ namespace MotorBehaviours
                 // ARBITRATION: 
                 // If we drop to a lower priority level, and we already have accumulated force
                 // from a higher priority group, we STOP. We ignore lower priorities completely.
-                if (behaviour.arbitrationPriority < currentPriorityLevel && finalForce.magnitude > 0.001f)
+                if (behaviour.arbitrationPriority > currentPriorityLevel && finalForce.magnitude > 0.001f)
                 {
                     break; 
                 }
                 
-                Vector3 desiredVelocity = behaviour.GetDesiredVelocity(this);
-                Vector3 force = GetAdjustedForceFromDesiredVelocity(desiredVelocity);
+                Vector3?  desiredVelocity = behaviour.GetDesiredVelocity(this);
+                if (desiredVelocity == null)
+                {
+                    continue;
+                }
+                
+                Vector3 force = GetAdjustedForceFromDesiredVelocity(desiredVelocity.Value);
 
                 // BLENDING:
                 // If we have a valid force, we blend it using its weight
@@ -227,14 +232,14 @@ namespace MotorBehaviours
         {
             // en implementar aquest mètode deixo la mateixa aproximació d'arbitri i blending que
             // en el cas de les forces lineals bo i que en el moment d'escriure aquestes línies 
-            // no tinc exemples en què això realement sigui necessari (no hi ha comportaments motors
+            // no tinc exemples en què això realment sigui necessari (no hi ha comportaments motors
             // de naturalesa angular obtinguts per combinació -ni arbitrada ni ponderada-)
             float finalTorque = 0f;
 
             // 1. GATHER AND SORT
             List<AngularMotorBehaviour> activeBehaviours = GetComponents<AngularMotorBehaviour>()
                 .Where(behaviour => behaviour.enabled)
-                .OrderByDescending(behaviour => behaviour.arbitrationPriority)
+                .OrderBy(behaviour => behaviour.arbitrationPriority)
                 .ToList();
 
             if (activeBehaviours.Count == 0)
@@ -250,7 +255,7 @@ namespace MotorBehaviours
             {
                 // ARBITRATION
                 // Note: we use Mathf.Abs because torque can be negative (turning right/left)
-                if (behaviour.arbitrationPriority < currentPriorityLevel && Mathf.Abs(finalTorque) > 0.001f)
+                if (behaviour.arbitrationPriority > currentPriorityLevel && Mathf.Abs(finalTorque) > 0.001f)
                 {
                     break;
                 }

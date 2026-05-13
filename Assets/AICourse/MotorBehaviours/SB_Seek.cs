@@ -6,7 +6,7 @@ namespace MotorBehaviours
         [Header("Seek Settings")]
         public GameObject target;
 
-        public override Vector3 GetDesiredVelocity(MotorManager me)
+        public override Vector3? GetDesiredVelocity(MotorManager me)
         {
             // If there's no target FAIL-FAST
             if (target == null)

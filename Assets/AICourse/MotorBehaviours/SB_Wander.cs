@@ -26,7 +26,7 @@ namespace MotorBehaviours
         private Vector3 circleCenter;
         private Vector3 surrogateTargetPosition;
 
-        public override Vector3 GetDesiredVelocity(MotorManager me)
+        public override Vector3? GetDesiredVelocity(MotorManager me)
         {
             // 1. Change the target orientation using a Binomial distribution
             // (Random.value - Random.value) produces a number between -1 and 1, 
