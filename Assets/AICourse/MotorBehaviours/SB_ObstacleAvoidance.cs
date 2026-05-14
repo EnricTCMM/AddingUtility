@@ -113,6 +113,7 @@ namespace MotorBehaviours
                         minDistance = hit.distance;
                         closestHit = hit;
                         hitFound = true;
+						break; // new !!! 
                     }
                 }
             }

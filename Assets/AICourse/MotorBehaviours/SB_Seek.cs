@@ -28,6 +28,7 @@ namespace MotorBehaviours
             // since Unity returns Vector3.zero for zero vectors) 
             if (directionToTarget.sqrMagnitude == 0f) return Vector3.zero;
 
+			// intended velocity is full speed towards the target.
             return directionToTarget.normalized * me.maxSpeed;
         }
     }

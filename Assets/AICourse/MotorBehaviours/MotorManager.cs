@@ -84,13 +84,14 @@ namespace MotorBehaviours
             // avoid jittering: if we want to stop and we almost are, we stop immediately. 
             if (desiredVelocity.sqrMagnitude == 0f && currentVelocity.magnitude < 0.05f)
             {
-                StopCompletely(); 
-                return Vector3.zero;
+                StopCompletely(); // <--- sets current velocity to zero 
+                return Vector3.zero; // <--- no force applied
+				// zero velocity & no force ==> no movement. 
             }
             
             Vector3 velocityDifference = desiredVelocity - currentVelocity;
             
-            // If we already have the perfect velocity, apply no force
+            // If we already have the perfect velocity, apply no force (inertia will work ...)
             if (velocityDifference.sqrMagnitude < 0.001f) return Vector3.zero;
 
             if (forcePolicy == LinearForcePolicy.BANG_BANG)
@@ -104,7 +105,7 @@ namespace MotorBehaviours
                     return idealForce;
                 }
                 
-                // Otherwise, apply maximum effort (Pure Bang-Bang aggressiveness)
+                // Otherwise, apply maximum possible effort (Pure Bang-Bang aggressiveness)
                 return velocityDifference.normalized * maxForce;
             }
             else
@@ -175,7 +176,7 @@ namespace MotorBehaviours
                 .OrderBy(behaviour => behaviour.arbitrationPriority)
                 .ToList();
 
-            // If there are no active linear behaviours, we have nothing to do
+            // If there are no active linear behaviours, we have nothing to do (inertia will work...) 
             if (activeBehaviours.Count == 0)
             {
                 return finalForce;
@@ -205,7 +206,7 @@ namespace MotorBehaviours
                 Vector3 force = GetAdjustedForceFromDesiredVelocity(desiredVelocity.Value);
 
                 // BLENDING:
-                // If we have a valid force, we blend it using its weight
+                // If we have a valid (noticeable) force, we blend it using its weight
                 if (force.magnitude > 0.001f)
                 {
                     finalForce += force * behaviour.blendingWeight;
@@ -214,7 +215,8 @@ namespace MotorBehaviours
         
                 // Update the priority level (in case the next element is lower and the current force was zero)
                 currentPriorityLevel = behaviour.arbitrationPriority;
-            }
+            
+			} // end of iteration over linear motor behaviours 
             
             // 3. NORMALIZE WEIGHTS (Treating weights as relative proportions)
             // This safely scales the force back to normal whether the total weight is < 1 or > 1
@@ -315,7 +317,7 @@ namespace MotorBehaviours
                 currentVelocity += force * Time.fixedDeltaTime;  // we assume that mass is 1
                 currentVelocity = Vector3.ClampMagnitude(currentVelocity, maxSpeed);
                 // actualització de la posició. No fem servir
-                // x = x0 + v0t + 1/2at^2 sinó que ens estalviem 1/2at^2 (molt petit)
+                // x = x0 + v0·dt + 1/2a·dt^2 sinó que ens estalviem 1/2a·dt^2 (molt petit)
                 // substituint v0t per vt (velocitat actualitzada) 
                 // (Semi-implicit Euler o Symplectic Euler)
                 
@@ -447,7 +449,13 @@ namespace MotorBehaviours
 
         private void ApplyFTI()
         {
-            if (rotationalPolicyTarget == null) return;
+            // Fail Fast if target is missing
+            if (rotationalPolicyTarget == null)
+            {
+                Debug.LogError($"[MotorManager] Critical Error: In MotorManager 'Rotational Policy Target' is missing on GameObject '{gameObject.name}' but policy is set to FTI.");
+                Debug.Break();
+                return;
+            }
 
             Vector3 direction = rotationalPolicyTarget.transform.position - transform.position;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
