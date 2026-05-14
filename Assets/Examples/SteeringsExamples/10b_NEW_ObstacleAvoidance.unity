@@ -6852,11 +6852,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_ObstacleAvoidance
   blendingWeight: 1
   arbitrationPriority: 0
-  lookAheadLength: 30
+  lookAheadLength: 40
   secondaryWhiskerAngle: 50
-  secondaryWhiskerRatio: 0.6
-  avoidDistance: 15
-  perseveranceTime: 0
+  secondaryWhiskerRatio: 0.65
+  avoidDistance: 20
+  perseveranceTime: 0.35
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -6892,13 +6892,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
   maxForce: 120
   maxSpeed: 30
-  maxTorque: 180
-  maxAngularSpeed: 90
-  rotationalPolicy: 2
+  maxTorque: 1000
+  maxAngularSpeed: 360
+  rotationalPolicy: 1
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
-  forcePolicy: 1
+  forcePolicy: 0
   timeToDesiredSpeed: 0.1
   torquePolicy: 0
   timeToDesiredAngularSpeed: 0.1

@@ -1,5 +1,5 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
+using Steerings; // Needed to access your Utils class
 
 namespace MotorBehaviours
 {
@@ -13,7 +13,7 @@ namespace MotorBehaviours
         public float avoidDistance = 2f;
 
         [Header("Perseverance")]
-        [Tooltip("Time to maintain the evasion maneuver after losing 'sight' of the obstacle")]
+        [Tooltip("Time to maintain the evasion maneuver after losing sight of the obstacle")]
         public float perseveranceTime = 0.5f;
 
         [Header("Physics Settings")]
@@ -24,50 +24,52 @@ namespace MotorBehaviours
         public bool showWhiskers = true;
 
         // Internal State
-        private bool persevering = false;
+        private bool isPersevering = false;
+        private bool isCurrentlyHitting = false;
         private float perseveranceElapsed = 0f;
-        private Vector3 avoidanceVelocity; // Cached intention
+        private Vector3 avoidanceVelocity; 
+        private Vector3 currentEscapePoint; // Cached for Gizmos drawing
+        
+        // Tracks which whisker triggered the evasion: -1 (None), 0 (Main), 1 (Left), 2 (Right)
+        private int activeWhiskerIndex = -1; 
 
+        // Size of the debug cross
+        private  float crossSize = 2.5f; 
+        
         public override Vector3? GetDesiredVelocity(MotorManager me)
         {
+            isCurrentlyHitting = false;
+            
             // 1. Detect and get the pure evasion intention
-            Vector3 evasionIntent = Detection2D(me);
+            Vector3? evasionIntent = Detection2D(me);
 
-            // 2. If an obstacle is detected right now, we react and reset perseverance
-            if (evasionIntent != Vector3.zero)
+            // 2. If an obstacle is detected right now
+            if (evasionIntent != null)
             {
-                avoidanceVelocity = evasionIntent; // Cache the velocity for later
+                avoidanceVelocity = evasionIntent.Value; 
                 perseveranceElapsed = 0f;
-                persevering = true;
-                
-                return evasionIntent;
+                isPersevering = false;
+                isCurrentlyHitting = true;
+                return avoidanceVelocity;
             }
 
-            // 3. If no obstacle is detected, should we persevere? (ESN Inertia)
-            if (persevering)
+            // 3. No obstacle detected THIS frame, check for perseverance
+            if (activeWhiskerIndex != -1 && perseveranceElapsed < perseveranceTime)
             {
-                perseveranceElapsed += Time.fixedDeltaTime;
-                
-                if (perseveranceElapsed < perseveranceTime)
-                {
-                    // Continue returning the cached velocity to clear the corner
-                    return avoidanceVelocity; 
-                }
-                else
-                {
-                    // Perseverance time exhausted, go back to normal behaviors
-                    persevering = false;
-                }
+                isPersevering = true;
+                perseveranceElapsed += Time.deltaTime;
+                return avoidanceVelocity;
             }
 
-            // 4. No obstacle, no perseverance: no evasion needed
-            // return Vector3.zero;
-            return null;
+            // 4. Reset state when no evasion is needed
+            isPersevering = false;
+            activeWhiskerIndex = -1;
+            return null; 
         }
 
-        private Vector3 Detection2D(MotorManager me)
+        private Vector3? Detection2D(MotorManager me)
         {
-            // Calculate the current forward direction
+            // Calculate the main forward vector based on velocity (if moving) or rotation (if completely stopped)
             Vector3 forwardVector;
             if (me.currentVelocity.magnitude > 0.01f)
             {
@@ -75,60 +77,58 @@ namespace MotorBehaviours
             }
             else
             {
-                float currentRotRad = me.transform.eulerAngles.z * Mathf.Deg2Rad;
-                forwardVector = new Vector3(Mathf.Cos(currentRotRad), Mathf.Sin(currentRotRad), 0f);
+                // Replaced manual trigonometry with Utils wrapper
+                forwardVector = Utils.OrientationToVector(me.transform.eulerAngles.z);
             }
 
-            // Calculate the three whiskers 
+            // Main whisker is directly the forward vector
             Vector3 mainWhisker = forwardVector * lookAheadLength;
             
-            float leftAngleRad = (me.transform.eulerAngles.z + secondaryWhiskerAngle) * Mathf.Deg2Rad;
-            Vector3 leftWhisker = new Vector3(Mathf.Cos(leftAngleRad), Mathf.Sin(leftAngleRad), 0f) * (lookAheadLength * secondaryWhiskerRatio);
+            // Extract the base angle in degrees using Utils
+            float baseMovementAngleDeg = Utils.VectorToOrientation(forwardVector);
 
-            float rightAngleRad = (me.transform.eulerAngles.z - secondaryWhiskerAngle) * Mathf.Deg2Rad;
-            Vector3 rightWhisker = new Vector3(Mathf.Cos(rightAngleRad), Mathf.Sin(rightAngleRad), 0f) * (lookAheadLength * secondaryWhiskerRatio);
+            // Calculate lateral whiskers relative to the movement angle in degrees
+            float leftAngleDeg = baseMovementAngleDeg + secondaryWhiskerAngle;
+            Vector3 leftWhisker = Utils.OrientationToVector(leftAngleDeg) * (lookAheadLength * secondaryWhiskerRatio);
 
-            // Array to hold the rays for iteration
+            float rightAngleDeg = baseMovementAngleDeg - secondaryWhiskerAngle;
+            Vector3 rightWhisker = Utils.OrientationToVector(rightAngleDeg) * (lookAheadLength * secondaryWhiskerRatio);
+
             Vector3[] whiskers = { mainWhisker, leftWhisker, rightWhisker };
             
-            // Variables to track the closest hit
-            bool hitFound = false;
-            RaycastHit2D closestHit = new RaycastHit2D();
-            float minDistance = float.MaxValue;
-
-            // Cast the rays
+            bool isObstacleDetected = false;
+            RaycastHit2D validHit = new RaycastHit2D();
             Vector2 pos2D = new Vector2(me.transform.position.x, me.transform.position.y);
-            foreach (Vector3 whisker in whiskers)
-            {
-                Vector2 dir2D = new Vector2(whisker.x, whisker.y);
-                float length = whisker.magnitude;
 
-                // We use LayerMask instead of disabling the agent's collider (optimization)
+            // Forward bias evaluation using early exit
+            for (int i = 0; i < whiskers.Length; i++)
+            {
+                Vector2 dir2D = new Vector2(whiskers[i].x, whiskers[i].y);
+                float length = whiskers[i].magnitude;
+
                 RaycastHit2D hit = Physics2D.Raycast(pos2D, dir2D.normalized, length, obstacleLayer);
 
                 if (hit.collider != null)
                 {
-                    if (hit.distance < minDistance)
-                    {
-                        minDistance = hit.distance;
-                        closestHit = hit;
-                        hitFound = true;
-						break; // new !!! 
-                    }
+                    validHit = hit;
+                    isObstacleDetected = true;
+                    activeWhiskerIndex = i; 
+                    break; 
                 }
             }
 
-            // If an obstacle was hit, calculate the escape point and delegate to Seek
-            if (hitFound)
+            if (isObstacleDetected)
             {
-                Vector3 escapePoint = new Vector3(closestHit.point.x, closestHit.point.y, me.transform.position.z) 
-                                      + new Vector3(closestHit.normal.x, closestHit.normal.y, 0f) * avoidDistance;
+                // Calculate the surrogate target (escape point)
+                currentEscapePoint = new Vector3(validHit.point.x, validHit.point.y, me.transform.position.z) 
+                                      + new Vector3(validHit.normal.x, validHit.normal.y, 0f) * avoidDistance;
                 
-                // DELEGATION: We want to Seek the escape point!
-                return SB_Seek.GetDesiredVelocity(me, escapePoint);
+                // Calculate the velocity towards the escape point
+                Vector3 desiredVelocity = (currentEscapePoint - me.transform.position).normalized * me.maxSpeed;
+                return desiredVelocity;
             }
 
-            return Vector3.zero;
+            return null;
         }
 
         private void OnDrawGizmos()
@@ -138,6 +138,7 @@ namespace MotorBehaviours
             MotorManager me = GetComponent<MotorManager>();
             if (me == null) return;
 
+            // Re-calculating whiskers for drawing purposes using Utils
             Vector3 forwardVector;
             if (me.currentVelocity.magnitude > 0.01f)
             {
@@ -145,22 +146,44 @@ namespace MotorBehaviours
             }
             else
             {
-                float currentRotRad = me.transform.eulerAngles.z * Mathf.Deg2Rad;
-                forwardVector = new Vector3(Mathf.Cos(currentRotRad), Mathf.Sin(currentRotRad), 0f);
+                forwardVector = Utils.OrientationToVector(me.transform.eulerAngles.z);
             }
 
             Vector3 mainWhisker = forwardVector * lookAheadLength;
             
-            float leftAngleRad = (me.transform.eulerAngles.z + secondaryWhiskerAngle) * Mathf.Deg2Rad;
-            Vector3 leftWhisker = new Vector3(Mathf.Cos(leftAngleRad), Mathf.Sin(leftAngleRad), 0f) * (lookAheadLength * secondaryWhiskerRatio);
+            float baseMovementAngleDeg = Utils.VectorToOrientation(forwardVector);
 
-            float rightAngleRad = (me.transform.eulerAngles.z - secondaryWhiskerAngle) * Mathf.Deg2Rad;
-            Vector3 rightWhisker = new Vector3(Mathf.Cos(rightAngleRad), Mathf.Sin(rightAngleRad), 0f) * (lookAheadLength * secondaryWhiskerRatio);
+            float leftAngleDeg = baseMovementAngleDeg + secondaryWhiskerAngle;
+            Vector3 leftWhisker = Utils.OrientationToVector(leftAngleDeg) * (lookAheadLength * secondaryWhiskerRatio);
 
-            Gizmos.color = persevering ? Color.red : Color.yellow;
-            Gizmos.DrawRay(transform.position, mainWhisker);
-            Gizmos.DrawRay(transform.position, leftWhisker);
-            Gizmos.DrawRay(transform.position, rightWhisker);
+            float rightAngleDeg = baseMovementAngleDeg - secondaryWhiskerAngle;
+            Vector3 rightWhisker = Utils.OrientationToVector(rightAngleDeg) * (lookAheadLength * secondaryWhiskerRatio);
+
+            Vector3[] whiskers = { mainWhisker, leftWhisker, rightWhisker };
+
+            for (int i = 0; i < whiskers.Length; i++)
+            {
+                Color whiskerColor = Color.black;
+
+                if (i == activeWhiskerIndex)
+                {
+                    if (isCurrentlyHitting) whiskerColor = Color.red;
+                    else if (isPersevering) whiskerColor = new Color(1f, 0.5f, 0f); // Orange
+                }
+
+                Gizmos.color = whiskerColor;
+                Gizmos.DrawRay(transform.position, whiskers[i]);
+            }
+
+            // Draw the black cross at the Surrogate Target if evading
+            if (isCurrentlyHitting || isPersevering)
+            {
+                Gizmos.color = Color.black;
+                // Horizontal line of the cross
+                Gizmos.DrawLine(currentEscapePoint + Vector3.left * crossSize, currentEscapePoint + Vector3.right * crossSize);
+                // Vertical line of the cross
+                Gizmos.DrawLine(currentEscapePoint + Vector3.up * crossSize, currentEscapePoint + Vector3.down * crossSize);
+            }
         }
     }
 }
