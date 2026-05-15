@@ -10,7 +10,7 @@ namespace MotorBehaviours
         public float toleranceRadius = 2f;
         public float slowdownRadius = 30f;
         
-        public override float GetDesiredAngularSpeed(MotorManager me)
+        public override float? GetDesiredAngularSpeed(MotorManager me)
         {
             // If there's no target FAIL-FAST
             if (target == null)

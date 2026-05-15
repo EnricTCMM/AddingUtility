@@ -40,6 +40,8 @@ namespace MotorBehaviours
         [HideInInspector] public Vector3 currentVelocity = Vector3.zero;
         [HideInInspector] public float currentAngularSpeed = 0f;
         
+        private bool anyLinearBehaviourSpoke = false;
+        
         // Ens preparem tant per a escenaris 2D com 3D. Lamentablement Unity no
         // considera que Rigidbody2D sigui un cas especial de Rigidbody (3D)
         // (Els motors físics són diferents en cada cas)
@@ -165,70 +167,74 @@ namespace MotorBehaviours
             ApplyRotations();
         }
         
-        private Vector3 CalculateLinearForce()
+         private Vector3 CalculateLinearForce()
         {
             Vector3 finalForce = Vector3.zero;
 
             // 1. GATHER AND SORT
-            // Find all active Linear behaviours on this GameObject and sort them by highest priority first
             List<LinearMotorBehaviour> activeBehaviours = GetComponents<LinearMotorBehaviour>()
                 .Where(behaviour => behaviour.enabled)
                 .OrderBy(behaviour => behaviour.arbitrationPriority)
                 .ToList();
 
-            // If there are no active linear behaviours, we have nothing to do (inertia will work...) 
+            // An empty list is equivalent to total abstention. We must brake. ---
             if (activeBehaviours.Count == 0)
             {
-                return finalForce;
+                anyLinearBehaviourSpoke = false;
+                // brake != immediate stop. brake = request zero velocity.
+                return GetAdjustedForceFromDesiredVelocity(Vector3.zero);
             }
 
-            // Keep track of the highest priority level currently being processed
             int currentPriorityLevel = activeBehaviours[0].arbitrationPriority;
             float accumulatedWeight = 0f;
+            
+            // --- FLAG: Track if any behaviour returned a valid velocity ---
+            anyLinearBehaviourSpoke = false; // Reset before checking this frame
             
             // 2. ARBITRATION AND BLENDING LOOP
             foreach (LinearMotorBehaviour behaviour in activeBehaviours)
             {
-                // ARBITRATION: 
-                // If we drop to a lower priority level, and we already have accumulated force
-                // from a higher priority group, we STOP. We ignore lower priorities completely.
                 if (behaviour.arbitrationPriority > currentPriorityLevel && finalForce.magnitude > 0.001f)
                 {
                     break; 
                 }
                 
-                Vector3?  desiredVelocity = behaviour.GetDesiredVelocity(this);
+                Vector3? desiredVelocity = behaviour.GetDesiredVelocity(this);
                 if (desiredVelocity == null)
                 {
                     continue;
                 }
                 
+                // A behaviour has requested a velocity!
+                anyLinearBehaviourSpoke = true; // At least one behaviour is active!
+                
                 Vector3 force = GetAdjustedForceFromDesiredVelocity(desiredVelocity.Value);
 
-                // BLENDING:
-                // If we have a valid (noticeable) force, we blend it using its weight
                 if (force.magnitude > 0.001f)
                 {
                     finalForce += force * behaviour.blendingWeight;
                     accumulatedWeight += behaviour.blendingWeight;
                 }
         
-                // Update the priority level (in case the next element is lower and the current force was zero)
                 currentPriorityLevel = behaviour.arbitrationPriority;
+            } 
             
-			} // end of iteration over linear motor behaviours 
-            
-            // 3. NORMALIZE WEIGHTS (Treating weights as relative proportions)
-            // This safely scales the force back to normal whether the total weight is < 1 or > 1
+            // --- BRAKING LOGIC ---
+            // If ALL behaviours abstained (returned null), the manager must actively brake
+            if (!anyLinearBehaviourSpoke)
+            {
+                // brake != immediate stop. brake = request zero velocity.
+                return GetAdjustedForceFromDesiredVelocity(Vector3.zero);
+            }
+
+            // 3. NORMALIZE WEIGHTS
             if (accumulatedWeight > 0.001f)
             {
                 finalForce = finalForce / accumulatedWeight;
             }
 
-            // Ensure we never exceed the physical limits of the agent
             return Vector3.ClampMagnitude(finalForce, maxForce);
-            
-        } // end CalculateLinearForce()
+        }// end CalculateLinearForce()
 
         private float CalculateTorque()
         {
@@ -244,14 +250,22 @@ namespace MotorBehaviours
                 .OrderBy(behaviour => behaviour.arbitrationPriority)
                 .ToList();
 
-            if (activeBehaviours.Count == 0)
+            // 2. CHECK COHERENCE WITH LINEAR STATE
+            // Si les polítiques rotacionals (LWYG, FT) depenen del moviment,
+            // i no hi ha moviment lineal ni comportaments angulars, hem de frenar.
+            bool anyAngularBehaviourSpoke = false;
+            
+            // Si no hi ha comportaments angulars explícits i ningú es mou linealment,
+            // matem les polítiques automàtiques (LWYG, FT) i frenem el gir.
+            if (activeBehaviours.Count == 0 && !anyLinearBehaviourSpoke)
             {
-                return finalTorque;
+                // Demanem el torque necessari per portar la velocitat angular a zero
+                return GetAdjustedTorqueFromDesiredAngularSpeed(0f);
             }
 
             int currentPriorityLevel = activeBehaviours[0].arbitrationPriority;
             float accumulatedWeight = 0f;
-
+            
             // 2. ARBITRATION AND BLENDING LOOP
             foreach (AngularMotorBehaviour behaviour in activeBehaviours)
             {
@@ -262,8 +276,17 @@ namespace MotorBehaviours
                     break;
                 }
 
-                float desiredSpeed = behaviour.GetDesiredAngularSpeed(this);
-                float torque = GetAdjustedTorqueFromDesiredAngularSpeed(desiredSpeed);
+                float? desiredSpeed = behaviour.GetDesiredAngularSpeed(this);
+                if (desiredSpeed == null)
+                {
+                    // with null behaviour abstained (refused to propose an ang. speed)
+                    continue;
+                }
+                
+                // A behaviour has requested an angular speed!
+                anyAngularBehaviourSpoke = true;
+                
+                float torque = GetAdjustedTorqueFromDesiredAngularSpeed(desiredSpeed.Value);
 
                 // BLENDING
                 if (Mathf.Abs(torque) > 0.001f)
@@ -275,15 +298,21 @@ namespace MotorBehaviours
                 currentPriorityLevel = behaviour.arbitrationPriority;
             }
 
+            // --- SMOOTH BRAKING LOGIC ---
+            // If ALL behaviours abstained (returned null), the manager must actively brake softly
+            if (!anyAngularBehaviourSpoke && !anyLinearBehaviourSpoke)
+            {
+                return GetAdjustedTorqueFromDesiredAngularSpeed(0f);
+            }
+
             // 3. NORMALIZE WEIGHTS
-            // same policy as for linear forces
             if (accumulatedWeight > 0.001f)
             {
                 finalTorque = finalTorque / accumulatedWeight;
             }
 
             // Ensure we never exceed the physical limits of the agent
-            // Torque can be negative, so we clamp between -maxTorque and maxTorque
+            // not strictly necessary since appluRotation() will clamp it anyway.
             return Mathf.Clamp(finalTorque, -maxTorque, maxTorque);
             
         }   // end CalculateTorque()
@@ -340,8 +369,23 @@ namespace MotorBehaviours
         
         private void ApplyRotations()
         {
+            // 0. ABSTENTION DEPENDENCY
+            // If there is an active automatic policy but the agent is abstaining from 
+            // linear movement, the rotational policies must be suspended.
+            if (rotationalPolicy != RotationalPolicy.NONE && !anyLinearBehaviourSpoke)
+            {
+                if (rotationalPolicy == RotationalPolicy.LWYG || rotationalPolicy == RotationalPolicy.FT)
+                {
+                    ApplyTorque(GetAdjustedTorqueFromDesiredAngularSpeed(0f));
+                }
+                return; 
+            }
+            
+            // If this point is reached, it means the rotation is authorized:
+            // Either the agent is actively moving (so automatic policies are allowed to execute),
+            // or the policy is set to NONE (so we evaluate independent angular behaviours).
+
             // 1. IMMEDIATE POLICIES (Bypass physics completely)
-            // They snap the rotation instantly without calculating torque
             if (rotationalPolicy == RotationalPolicy.LWYGI)
             {
                 ApplyLWYGI();
@@ -352,7 +396,7 @@ namespace MotorBehaviours
                 ApplyFTI();
                 return;
             }
-            
+
             // 2. SMOOTH POLICIES OR BEHAVIOURS
             float finalTorque = 0f;
 
@@ -366,17 +410,15 @@ namespace MotorBehaviours
             }
             else if (rotationalPolicy == RotationalPolicy.NONE)
             {
-                // 3. GATHER ANGULAR FORCES (Arbitration and Blending)
+                // CalculateTorque acts as the arbitrator for angular behaviours
                 finalTorque = CalculateTorque();
             }
-            
-            /*
-            // 4. APPLY THE TORQUE (if there is any)
-            if (Mathf.Abs(finalTorque) > 0.001f)
-            {
-                ApplyTorque(finalTorque);
-            } */
-            
+
+            // 3. THE ULTIMATE PHYSICAL CLAMP
+            // Ensure that no matter the source (Policy or Behaviour), 
+            // we NEVER exceed the physical limits of the agent.
+            finalTorque = Mathf.Clamp(finalTorque, -maxTorque, maxTorque);
+
             // 4. APPLY THE TORQUE
             ApplyTorque(finalTorque);
         }

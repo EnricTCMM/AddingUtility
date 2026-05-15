@@ -8,8 +8,8 @@ public class ShowRadiiPro : MonoBehaviour
     public string componentTypeName;
     public string innerFieldName;
     public string outerFieldName;
-
     public GameObject listenedObject;
+    
     private Component component;
     private Type type;
     private FieldInfo innerField, outerField;
@@ -21,16 +21,18 @@ public class ShowRadiiPro : MonoBehaviour
         if (listenedObject==null) listenedObject = gameObject;
 
         component = listenedObject.GetComponent(componentTypeName);
+
+        if (component == null)
+        {
+            Debug.LogWarning("No component named " + componentTypeName + " in " + gameObject.name);
+        }
+        
         type = component.GetType();
         innerField = type.GetField(innerFieldName);
         outerField = type.GetField(outerFieldName);
         
-        if (component == null) Debug.LogWarning("No component named " + componentTypeName + " in " + gameObject.name);
-        else
-        {
-            if (innerField == null) Debug.LogWarning("No field named " + innerFieldName + " in " + componentTypeName);
-            if (outerField == null) Debug.LogWarning("No field named " + outerFieldName + " in " + componentTypeName);
-        }
+        if (innerField == null) Debug.LogWarning("No field named " + innerFieldName + " in " + componentTypeName);
+        if (outerField == null) Debug.LogWarning("No field named " + outerFieldName + " in " + componentTypeName);
         
     }
 
