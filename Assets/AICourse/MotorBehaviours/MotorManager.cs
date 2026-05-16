@@ -250,22 +250,20 @@ namespace MotorBehaviours
                 .OrderBy(behaviour => behaviour.arbitrationPriority)
                 .ToList();
 
-            // 2. CHECK COHERENCE WITH LINEAR STATE
-            // Si les polítiques rotacionals (LWYG, FT) depenen del moviment,
-            // i no hi ha moviment lineal ni comportaments angulars, hem de frenar.
-            bool anyAngularBehaviourSpoke = false;
-            
-            // Si no hi ha comportaments angulars explícits i ningú es mou linealment,
-            // matem les polítiques automàtiques (LWYG, FT) i frenem el gir.
-            if (activeBehaviours.Count == 0 && !anyLinearBehaviourSpoke)
+            // --- FIXED GUARD CONDITION ---
+            // If the list is empty and policy is NONE, there are absolutely no angular inputs.
+            // We must exit immediately to prevent IndexOutOfRangeException and brake smoothly.
+            if (activeBehaviours.Count == 0)
             {
-                // Demanem el torque necessari per portar la velocitat angular a zero
                 return GetAdjustedTorqueFromDesiredAngularSpeed(0f);
             }
 
             int currentPriorityLevel = activeBehaviours[0].arbitrationPriority;
             float accumulatedWeight = 0f;
             
+            // --- FLAG: Track if any behaviour returned a valid angular speed ---
+            bool anyAngularBehaviourSpoke = false;
+
             // 2. ARBITRATION AND BLENDING LOOP
             foreach (AngularMotorBehaviour behaviour in activeBehaviours)
             {
@@ -279,7 +277,6 @@ namespace MotorBehaviours
                 float? desiredSpeed = behaviour.GetDesiredAngularSpeed(this);
                 if (desiredSpeed == null)
                 {
-                    // with null behaviour abstained (refused to propose an ang. speed)
                     continue;
                 }
                 
@@ -298,22 +295,21 @@ namespace MotorBehaviours
                 currentPriorityLevel = behaviour.arbitrationPriority;
             }
 
-            // --- SMOOTH BRAKING LOGIC ---
-            // If ALL behaviours abstained (returned null), the manager must actively brake softly
-            if (!anyAngularBehaviourSpoke && !anyLinearBehaviourSpoke)
+            // --- BRAKING LOGIC ---
+            // If ALL active angular behaviours abstained (returned null), we brake smoothly
+            if (!anyAngularBehaviourSpoke)
             {
                 return GetAdjustedTorqueFromDesiredAngularSpeed(0f);
             }
 
             // 3. NORMALIZE WEIGHTS
+            // same policy as for linear forces
             if (accumulatedWeight > 0.001f)
             {
                 finalTorque = finalTorque / accumulatedWeight;
             }
 
-            // Ensure we never exceed the physical limits of the agent
-            // not strictly necessary since appluRotation() will clamp it anyway.
-            return Mathf.Clamp(finalTorque, -maxTorque, maxTorque);
+            return finalTorque;
             
         }   // end CalculateTorque()
         

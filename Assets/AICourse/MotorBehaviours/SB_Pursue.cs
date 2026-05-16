@@ -79,6 +79,9 @@ namespace MotorBehaviours
             // CALCULATE FUTURE POSITION
             Vector3 futurePositionOfTarget = targetPosition + (targetVelocity * predictedTimeToTarget);
             
+            // Dibuixa una línia des de l'agent fins a on creu que serà l'objectiu
+            Debug.DrawLine(me.transform.position, futurePositionOfTarget, Color.red);
+            
             // EXPLICIT DELEGATION TO SEEK
             // We mathematically delegate the actual steering calculation to SB_Seek
             return SB_Seek.GetDesiredVelocity(me, futurePositionOfTarget);
