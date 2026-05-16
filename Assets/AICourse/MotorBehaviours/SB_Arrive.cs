@@ -24,6 +24,7 @@ namespace MotorBehaviours
             return SB_Arrive.GetDesiredVelocity(me, target.transform.position, toleranceRadius, slowdownRadius);
         }
         
+        // Math is done in this method. Also available for external calls (delegation)
         public static Vector3 GetDesiredVelocity(MotorManager me, Vector3 targetPosition, float tolerance, float slowdown)
         {
             Vector3 direction = targetPosition - me.transform.position;
