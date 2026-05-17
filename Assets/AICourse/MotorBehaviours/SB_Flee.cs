@@ -49,7 +49,6 @@ namespace MotorBehaviours
             //We abstain if the target is too far away
             if (maxFleeDistance > 0 && distanceFromTarget > maxFleeDistance)
             {
-                Debug.Log("Estic massa lluny! M'abstinc de fugirx.");
                 return null; // we are too far away
             }
             

@@ -584,8 +584,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
-  maxForce: 10
-  maxSpeed: 15
+  maxForce: 15
+  maxSpeed: 20
   maxTorque: 720
   maxAngularSpeed: 360
   rotationalPolicy: 2
@@ -832,7 +832,8 @@ MonoBehaviour:
   blendingWeight: 1
   arbitrationPriority: 1
   target: {fileID: 720064385}
-  maxPredictionTime: 2.5
+  maxPredictionTime: 3
+  showGizmos: 1
 --- !u!114 &620654039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -845,8 +846,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
-  maxForce: 10
-  maxSpeed: 15
+  maxForce: 15
+  maxSpeed: 20
   maxTorque: 720
   maxAngularSpeed: 360
   rotationalPolicy: 2
@@ -908,7 +909,7 @@ TrailRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Time: 50000
+  m_Time: 5000
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -1257,8 +1258,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
-  maxForce: 20
-  maxSpeed: 8
+  maxForce: 40
+  maxSpeed: 15
   maxTorque: 360
   maxAngularSpeed: 90
   rotationalPolicy: 0
@@ -2319,8 +2320,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1600792799}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.1, y: 0}
-  m_AnchorMax: {x: 0.1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3060,7 +3061,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1998685774
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3100,7 +3101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   listenerObject: {fileID: 620654032}
-  componentType: 
+  componentType: SB_Pursue
   fieldName: maxPredictionTime
 --- !u!114 &1998685776
 MonoBehaviour:
@@ -3394,7 +3395,7 @@ RectTransform:
   m_Father: {fileID: 1005034553}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

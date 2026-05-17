@@ -3,15 +3,20 @@ using UnityEngine;
 
 namespace MotorBehaviours
 {
-    public class SB_Pursue : LinearMotorBehaviour
+    public class SB_Evade : LinearMotorBehaviour
     {
-        [Header("Pursue Settings")]
+        [Header("Evade Settings")]
         public GameObject target;
         public float maxPredictionTime = 3f;
         
-        [Header("Debug Settings")]
-        [Tooltip("If true, a red cross will appear at the predicted future position.")]
-        public bool showGizmos = true;
+        [Tooltip("If >0, the agent will not evade if the current target position is too far away")]
+        public float maxEvadeDistance = 0f;
+        
+        [Tooltip("If true, it will log an error when no target is assigned.")]
+        public bool signalErrorIfNoTarget = true;
+        
+        [Header("Debug")]
+        public bool showGizmos = false;
         
         // --- State variables for Gizmo drawing ---
         private Vector3 futurePositionForGizmo;
@@ -23,24 +28,32 @@ namespace MotorBehaviours
             // Reset gizmo state every frame
             shouldDrawGizmo = false;
 
-            // Fail Fast: Check if target is missing
+            // Fail Fast & Abstention: Mimicking SB_Flee logic
             if (target == null)
             {
-                Debug.LogError($"[MotorBehaviours] Critical Error: Missing Target on {GetType().Name} component of GameObject '{gameObject.name}'.");
-                Debug.Break();
-                return Vector3.zero;
+                // no-target means no-menace, so the behaviour abstains and returns null
+                if (!signalErrorIfNoTarget) 
+                {
+                    return null; 
+                }
+                else
+                {
+                    Debug.LogError($"[MotorBehaviours] Critical Error: No target in {GetType().Name} in GameObject '{gameObject.name}'.");
+                    return null; 
+                }
             }
-            // Fail Fast: Check if target lacks a  MotorManager
+            
+            // Fail Fast: Check if target lacks a MotorManager
             MotorManager targetManager = target.GetComponent<MotorManager>();
             if (targetManager == null)
             {
                 Debug.LogError($"[MotorBehaviours] Critical Error: target '{target.name}' lacks a MotorManager in {GetType().Name} component of GameObject '{gameObject.name}'.");
                 Debug.Break();
-                return Vector3.zero;
+                return Vector3.zero; 
             }
 
             // We use the out parameter to extract the calculated future position
-            Vector3? desiredVelocity = SB_Pursue.GetDesiredVelocity(me, target, maxPredictionTime, out futurePositionForGizmo);
+            Vector3? desiredVelocity = SB_Evade.GetDesiredVelocity(me, target, maxPredictionTime, maxEvadeDistance, out futurePositionForGizmo);
             
             // If the calculation was successful, authorize the Gizmo drawing
             if (desiredVelocity != null)
@@ -51,44 +64,48 @@ namespace MotorBehaviours
             return desiredVelocity;
         }
 
-        // Intermediate method. Retrives target's info
-        // Modified to include an 'out' parameter to bubble up the future position
-        public static Vector3? GetDesiredVelocity(MotorManager me, GameObject target, float maxPredictionTime, out Vector3 futurePosition)
+        // Intermediate method. Retrieves target's info
+        public static Vector3? GetDesiredVelocity(MotorManager me, GameObject target, float maxPredictionTime, float maxFleeDistance, out Vector3 futurePosition)
         {
             futurePosition = Vector3.zero;
 
-            // Fail Fast: Check if target is missing
+            // Safe exit to prevent NullReferenceException if called dynamically without a valid target
             if (target == null)
             {
-                Debug.LogError($"[MotorBehaviours] Critical Error: Missing Target in Pursue");
-                Debug.Break();
-                return Vector3.zero;
+                Debug.LogWarning($"[MotorBehaviours] Warning: evading from null target in {nameof(SB_Evade)}");
+                return null; // Abstention
             }
-            // Fail Fast: Check if target lacks a  MotorManager
+            
             MotorManager targetManager = target.GetComponent<MotorManager>();
             if (targetManager == null)
             {
-                Debug.LogError($"[MotorBehaviours] Critical Error: Target '{target.name}' in Pursue contains no MotorManager.");
+                Debug.LogError($"[MotorBehaviours] Critical Error: Target '{target.name}' in Evade contains no MotorManager.");
                 Debug.Break();
                 return Vector3.zero;
             }
 
-            // target's velocity is provided by the target's MotorManager.
+            // Target's velocity is provided by the target's MotorManager.
             Vector3 targetVelocity = targetManager.currentVelocity;
             
-            return SB_Pursue.GetDesiredVelocity(me, target.transform.position, targetVelocity, maxPredictionTime, out futurePosition);
+            return SB_Evade.GetDesiredVelocity(me, target.transform.position, targetVelocity, maxPredictionTime, maxFleeDistance, out futurePosition);
         }
 
         // Math is done in this method. Also available for external calls (delegation)
-        // Modified to include an 'out' parameter to bubble up the future position
-        public static Vector3? GetDesiredVelocity(MotorManager me, Vector3 targetPosition, Vector3 targetVelocity, float maxPredictionTime, out Vector3 futurePosition)
+        public static Vector3? GetDesiredVelocity(MotorManager me, Vector3 targetPosition, Vector3 targetVelocity, float maxPredictionTime, float maxFleeDistance, out Vector3 futurePosition)
         {
             Vector3 directionToTarget = targetPosition - me.transform.position;
             float distanceToTarget = directionToTarget.magnitude;
 
+            // --- CLASSIC PRESENT PANIC ---
+            // We evaluate the distance against the CURRENT position of the threat.
+            // If the threat is currently outside our panic radius, we abstain.
+            if (maxFleeDistance > 0 && distanceToTarget > maxFleeDistance)
+            {
+                futurePosition = Vector3.zero;
+                return null; 
+            }
+
             // PREDICT TIME TO TARGET
-            // We use me.maxSpeed instead of current velocity to avoid division by zero
-            // and to ensure a stable prediction even if the agent is currently stopped.
             float predictedTimeToTarget = 0f;
             if (me.maxSpeed > 0.001f)
             {
@@ -104,9 +121,16 @@ namespace MotorBehaviours
             // CALCULATE FUTURE POSITION
             futurePosition = targetPosition + (targetVelocity * predictedTimeToTarget);
             
-            // EXPLICIT DELEGATION TO SEEK
-            // We mathematically delegate the actual steering calculation to SB_Seek
-            return SB_Seek.GetDesiredVelocity(me, futurePosition);
+            // EDGE CASE PREVENTION: "Fleeing from myself"
+            if ((futurePosition - me.transform.position).sqrMagnitude < 0.01f)
+            {
+                // We pass 0f as maxEvadeDistance because we already handled the abstention logic above
+                return SB_Flee.GetDesiredVelocity(me, targetPosition, 0f);
+            }
+
+            // EXPLICIT DELEGATION TO FLEE
+            // We pass 0f as maxEvadeDistance because we already handled the abstention logic above
+            return SB_Flee.GetDesiredVelocity(me, futurePosition, 0f);
         }
 
         // --- Gizmo Drawing ---
@@ -115,7 +139,7 @@ namespace MotorBehaviours
             // Only draw while playing, if the inspector checkbox is true, and we have a valid calculated position
             if (showGizmos && Application.isPlaying && shouldDrawGizmo)
             {
-                Gizmos.color = Color.red;
+                Gizmos.color = Color.blue; 
                 
                 // Adjust this value to make the cross bigger or smaller
                 float crossSize = 2f; 
