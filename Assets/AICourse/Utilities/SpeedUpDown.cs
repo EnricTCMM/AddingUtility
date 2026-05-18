@@ -1,10 +1,10 @@
 using UnityEngine;
-using Steerings;
+using MotorBehaviours;
 
 public class SpeedUpDown : MonoBehaviour
 {
 
-    private SteeringContext sc;
+    private MotorManager sc;
     public float min = 5;
     public float max = 50;
     public float inc = 5;
@@ -12,7 +12,7 @@ public class SpeedUpDown : MonoBehaviour
     void Start()
     {
         // get the steering context
-        sc = GetComponent<SteeringContext>();
+        sc = GetComponent<MotorManager>();
         if (sc != null) sc.maxSpeed = min;
     }
 
