@@ -68,5 +68,26 @@ namespace MotorBehaviours
         {
             return members;
         }
+        
+        // ------------ GENERAL SETTERS
+        // propagate to all members
+
+        public void SetRepulsionThreshold(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                SB_Separation separation = member.GetComponent<SB_Separation>();
+                if (separation!=null) separation.repulsionThreshold=value;
+            }
+        }
+        
+        public void SetCohesionThreshold(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                SB_Cohesion cohesion = member.GetComponent<SB_Cohesion>();
+                if (cohesion!=null) cohesion.cohesionThreshold=value;
+            }
+        }
     }
 }

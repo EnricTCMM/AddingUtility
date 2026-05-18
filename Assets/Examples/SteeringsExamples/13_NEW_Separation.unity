@@ -2124,8 +2124,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 407329149}
+  - component: {fileID: 407329150}
   m_Layer: 0
-  m_Name: ASTEROIDS
+  m_Name: ASTEROIDS(GroupRegistry)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2184,8 +2185,22 @@ Transform:
   - {fileID: 16000778}
   - {fileID: 888492996}
   - {fileID: 109778371}
+  - {fileID: 673028283}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &407329150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407329148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59edd826f21441d1a5ca8de309321234, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.GroupRegistry
+  members: []
 --- !u!1 &452100581
 GameObject:
   m_ObjectHideFlags: 0
@@ -2358,7 +2373,7 @@ RectTransform:
   m_Father: {fileID: 1183449700}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2904,11 +2919,11 @@ Transform:
   m_GameObject: {fileID: 673028279}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 31, y: -10, z: 0}
+  m_LocalPosition: {x: -546.74, y: -389.48618, z: 0}
   m_LocalScale: {x: 7, y: 7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 407329149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &673028284
 MonoBehaviour:
@@ -5078,7 +5093,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Separation
   blendingWeight: 1
   arbitrationPriority: 1
-  idTag: REPULSIVE
+  registry: {fileID: 407329150}
   repulsionThreshold: 44
   applyVision: 0
   coneOfVisionAngle: 90
@@ -6485,7 +6500,7 @@ RectTransform:
   m_Father: {fileID: 1814823077}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -8030,7 +8045,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2024935085
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8070,7 +8085,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   listenerObject: {fileID: 1210354255}
-  componentType: SteeringContext
+  componentType: SB_Separation
   fieldName: repulsionThreshold
 --- !u!114 &2024935087
 MonoBehaviour:
@@ -8543,4 +8558,3 @@ SceneRoots:
   - {fileID: 407329149}
   - {fileID: 861002492}
   - {fileID: 1210354259}
-  - {fileID: 673028283}

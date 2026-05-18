@@ -1,12 +1,15 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using Steerings; // Required for Utils.InCone
 
 namespace MotorBehaviours
 {
     public class SB_Separation : LinearMotorBehaviour
     {
+        [Header("Flock Registry")]
+        public GroupRegistry registry;
+
         [Header("Separation Settings")]
-        public string idTag = "Boid"; // Tag used to find neighbors
         public float repulsionThreshold = 2f;
         
         [Header("Vision Settings")]
@@ -16,17 +19,30 @@ namespace MotorBehaviours
         // The method that is called by the MotorManager
         public override Vector3? GetDesiredVelocity(MotorManager me)
         {
+            // Fail Fast: Check if registry is missing
+            if (registry == null)
+            {
+                Debug.LogError($"[MotorBehaviours] Critical Error: Missing GroupRegistry on {GetType().Name} component of GameObject '{gameObject.name}'.");
+                Debug.Break();
+                return Vector3.zero;
+            }
+
             // We pass the inspector variables to the static math method
-            return SB_Separation.GetDesiredVelocity(me, idTag, repulsionThreshold, applyVision, coneOfVisionAngle);
+            return SB_Separation.GetDesiredVelocity(me, registry, repulsionThreshold, applyVision, coneOfVisionAngle);
         }
 
         // Math is done in this method. Also available for external calls
-        public static Vector3? GetDesiredVelocity(MotorManager me, string targetTag, float threshold, bool useVision, float visionAngle)
+        public static Vector3? GetDesiredVelocity(MotorManager me, GroupRegistry groupRegistry, float threshold, bool useVision, float visionAngle)
         {
-            // WARNING: FindGameObjectsWithTag is mathematically correct but computationally expensive.
-            // In a full Flocking scenario with many agents, this should eventually be replaced 
-            // by a centralized "BoidSensor" that provides a pre-calculated list of neighbors.
-            GameObject[] targets = GameObject.FindGameObjectsWithTag(targetTag);
+            // Safe exit to prevent NullReferenceException if called dynamically without a valid registry
+            if (groupRegistry == null)
+            {
+                Debug.LogWarning($"[MotorBehaviours] Warning: Separation invoked with a null GroupRegistry.");
+                return null; // Abstention
+            }
+
+            // High-efficiency roster retrieval O(1)
+            List<GameObject> targets = groupRegistry.GetMembers();
             
             Vector3 totalDesiredVelocity = Vector3.zero;
             int neighborsCount = 0;
@@ -72,10 +88,9 @@ namespace MotorBehaviours
                 
                 neighborsCount++;
                 
-            } // End of iteration over all repulsive targets 
+            } // End of iteration over all registered group members
 
             // If there are no neighbors in our personal space, we abstain completely
-            // so we don't interfere with other behaviors like Alignment or Cohesion.
             if (neighborsCount == 0)
             {
                 return null;
