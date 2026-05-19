@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7933054375941237514}
   - component: {fileID: -8115841832475786243}
   - component: {fileID: 2586829939434212908}
+  - component: {fileID: 6834849514297290880}
   m_Layer: 0
   m_Name: NEW_Boid_Yellow
   m_TagString: BOID
@@ -140,9 +141,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
   maxForce: 100
   maxSpeed: 20
-  maxTorque: 180
-  maxAngularSpeed: 90
-  rotationalPolicy: 2
+  maxTorque: 720
+  maxAngularSpeed: 360
+  rotationalPolicy: 1
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
@@ -170,11 +171,11 @@ MonoBehaviour:
   secondaryWhiskerAngle: 30
   secondaryWhiskerRatio: 0.7
   avoidDistance: 22
-  perseveranceTime: 0.3
+  perseveranceTime: 0.15
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 8
-  showWhiskers: 1
+  showWhiskers: 0
 --- !u!114 &2586829939434212908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,13 +191,33 @@ MonoBehaviour:
   blendingWeight: 1
   arbitrationPriority: 1
   registry: {fileID: 0}
-  applyVision: 0
-  coneOfVisionAngle: 270
+  applyVision: 1
+  coneOfVisionAngle: 360
   separationWeight: 0.5
-  separationThreshold: 17
+  separationThreshold: 40
   cohesionWeight: 0.3
-  cohesionThreshold: 31
+  cohesionThreshold: 70
   alignmentWeight: 0.2
-  alignmentThreshold: 31
+  alignmentThreshold: 70
   attractor: {fileID: 0}
   attractionWeight: 0.1
+--- !u!114 &6834849514297290880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368880381347978208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adcc097a66ad4403b27b6510f6aff6c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Wander
+  blendingWeight: 1
+  arbitrationPriority: 2
+  wanderRadius: 20
+  wanderOffset: 40
+  wanderRate: 30
+  attractor: {fileID: 0}
+  attractionWeight: 0.2
+  showWanderGizmos: 0

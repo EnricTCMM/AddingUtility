@@ -31,8 +31,9 @@ public class SliderListener : MonoBehaviour
         maxText.text = slider.maxValue.ToString();
 
         // By default take SteeringContext as the component's type (retro compatibility)
-        if (componentType == null || componentType.Length == 0)
-            componentType = "SteeringContext";
+        //if (componentType == null || componentType.Length == 0)
+        //    componentType = "SteeringContext";
+        // SteeringContext is no longer a default anything
 
         Component component = listenerObject.GetComponent(componentType);
 
@@ -50,14 +51,13 @@ public class SliderListener : MonoBehaviour
         }
         else
         {
-           
             // if the field does not exit, use the slider's inital value
             value = slider.value;
             currVal.text = value.ToString("0.00");
         }
 
         // let's check if there's a setter for the field. If there's a setter the listener
-        // attached to the slider will give priority to  this setter
+        // attached to the slider will give priority to this setter
         string setterName = "Set" + ("" + fieldName[0]).ToUpper() + fieldName.Substring(1);
         MethodInfo method = type.GetMethod(setterName);
         // the listener will decide...

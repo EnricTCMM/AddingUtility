@@ -45,8 +45,9 @@ namespace MotorBehaviours
 
             // --- 1. SEPARATION INGREDIENT ---
             Vector3? separationVelocity = SB_Separation.GetDesiredVelocity(
-                me, registry, separationThreshold, applyVision, coneOfVisionAngle
+                me, registry, separationThreshold, false, 360f
             );
+            
             
             if (separationVelocity.HasValue && separationWeight > 0f)
             {
@@ -94,12 +95,9 @@ namespace MotorBehaviours
             // NORMALIZATION POLICY
             // Divide by the sum of applied weights to obtain a true weighted average
             blendedVelocity /= totalActiveWeight;
-
-            // Architectural safety clamp 
-            if (blendedVelocity.magnitude > me.maxSpeed)
-            {
-                blendedVelocity = blendedVelocity.normalized * me.maxSpeed;
-            }
+            // ESN 
+            // and then maxSpeed 
+            blendedVelocity = blendedVelocity.normalized * me.maxSpeed;
 
             return blendedVelocity;
         }

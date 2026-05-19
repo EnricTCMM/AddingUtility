@@ -1,14 +1,4 @@
-﻿/*
- * Component: GroupRegistry
- * Author: Dr. Enric Sesa i Nogueras
- * Notice: This code contains generative AI contributions.
- * Description: 
- * Centralized registry to keep track of a group of agents (boids).
- * Replaces expensive FindGameObjectsWithTag calls by providing a 
- * maintained list of active members.
- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MotorBehaviours
@@ -78,6 +68,8 @@ namespace MotorBehaviours
             {
                 SB_Separation separation = member.GetComponent<SB_Separation>();
                 if (separation!=null) separation.repulsionThreshold=value;
+                SB_Flocking flocking = member.GetComponent<SB_Flocking>();
+                if (flocking!=null) flocking.separationThreshold=value;
             }
         }
         
@@ -87,7 +79,36 @@ namespace MotorBehaviours
             {
                 SB_Cohesion cohesion = member.GetComponent<SB_Cohesion>();
                 if (cohesion!=null) cohesion.cohesionThreshold=value;
+                SB_Flocking flocking = member.GetComponent<SB_Flocking>();
+                if (flocking!=null) flocking.cohesionThreshold=value;
             }
+        }
+
+        public void SetMaxSpeed(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                MotorManager mb = member.GetComponent<MotorManager>();
+                if (mb != null) mb.maxSpeed = value;
+            }
+        }
+        
+        public void SetMaxForce(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                MotorManager mb = member.GetComponent<MotorManager>();
+                if (mb != null) mb.maxForce = value;
+            }
+        }
+
+        public void SetConeOfVisionAngle(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                SB_Flocking sb = member.GetComponent<SB_Flocking>();
+                if (sb != null) sb.coneOfVisionAngle = value;
+            } 
         }
     }
 }

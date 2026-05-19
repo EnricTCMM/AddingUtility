@@ -12,7 +12,7 @@ public class BoidSpawnerAndRegistry : GroupRegistry
     // the following attributes are specifically created to help listeners of UI
     // components get the initial values for the UI elements they're attached to
     [HideInInspector]
-    public float maxSpeed, maxAcceleration, cohesionThreshold, repulsionThreshold, alignmentThreshold, coneOfVisionAngle,
+    public float maxSpeed, maxForce, cohesionThreshold, repulsionThreshold, alignmentThreshold, coneOfVisionAngle,
         cohesionWeight, repulsionWeight, alignmentWeight, seekWeight;
     
     private int created = 0;
@@ -25,7 +25,7 @@ public class BoidSpawnerAndRegistry : GroupRegistry
         SB_Flocking flocking = dummy.GetComponent<SB_Flocking>();
         
         maxSpeed = motorManager.maxSpeed;
-        maxAcceleration = motorManager.maxForce;
+        maxForce = motorManager.maxForce;
         
         cohesionThreshold = flocking.cohesionThreshold;
         repulsionThreshold = flocking.separationThreshold;
