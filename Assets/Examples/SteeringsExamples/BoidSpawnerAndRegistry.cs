@@ -65,11 +65,16 @@ public class BoidSpawnerAndRegistry : GroupRegistry
         if (created==0)
         {
             // first one and only it
-            ShowRadiiPro shr = clone.GetComponent<ShowRadiiPro>();
+            /* ShowRadiiPro shr = clone.GetComponent<ShowRadiiPro>();
             shr.componentTypeName = "MotorBehaviours.SB_Flocking";
             shr.innerFieldName = "separationThreshold";
             shr.outerFieldName = "cohesionThreshold";
             shr.enabled = true;
+            */
+
+            clone.GetComponent<SB_Flocking>().showFlockingGizmos = true;
+            //clone.GetComponent<SB_Wander>().showWanderGizmos = true;
+            //clone.GetComponent<SB_ObstacleAvoidance>().showWhiskers = true;
 
             if (attractor!=null)
             {

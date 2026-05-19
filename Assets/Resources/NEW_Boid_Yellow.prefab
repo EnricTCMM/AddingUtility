@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1368880381347978209}
   - component: {fileID: 1368880381347978212}
-  - component: {fileID: -3894769920178590844}
   - component: {fileID: 1368880381347978219}
   - component: {fileID: 7933054375941237514}
   - component: {fileID: -8115841832475786243}
@@ -97,22 +96,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &-3894769920178590844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1368880381347978208}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4e97bc0cf1e5ba4a8354a489731be4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  componentTypeName: Steerings.GroupContext
-  innerFieldName: repulsionThreshold
-  outerFieldName: cohesionThreshold
-  listenedObject: {fileID: 0}
 --- !u!114 &1368880381347978219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,15 +175,17 @@ MonoBehaviour:
   arbitrationPriority: 1
   registry: {fileID: 0}
   applyVision: 1
-  coneOfVisionAngle: 360
-  separationWeight: 0.5
-  separationThreshold: 40
+  coneOfVisionAngle: 270
+  separationWeight: 0.9
+  separationThreshold: 30
   cohesionWeight: 0.3
-  cohesionThreshold: 70
-  alignmentWeight: 0.2
+  cohesionThreshold: 100
+  alignmentWeight: 0.5
   alignmentThreshold: 70
   attractor: {fileID: 0}
   attractionWeight: 0.1
+  showFlockingGizmos: 0
+  gizmoSegments: 24
 --- !u!114 &6834849514297290880
 MonoBehaviour:
   m_ObjectHideFlags: 0

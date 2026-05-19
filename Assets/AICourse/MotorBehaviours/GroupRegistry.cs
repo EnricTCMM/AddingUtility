@@ -110,5 +110,14 @@ namespace MotorBehaviours
                 if (sb != null) sb.coneOfVisionAngle = value;
             } 
         }
+        
+        public void SetAlignmentThreshold(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                SB_Flocking sb = member.GetComponent<SB_Flocking>();
+                sb.alignmentThreshold = value;
+            }
+        }
     }
 }
