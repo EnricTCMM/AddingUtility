@@ -119,5 +119,14 @@ namespace MotorBehaviours
                 sb.alignmentThreshold = value;
             }
         }
+
+        public void SetAttractionWeight(float val)
+        {
+            foreach (GameObject member in members )
+            {
+                SB_Flocking sb = member.GetComponent<SB_Flocking>();
+                sb.attractionWeight = val;  
+            }
+        }
     }
 }

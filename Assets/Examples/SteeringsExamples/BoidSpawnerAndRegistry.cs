@@ -13,7 +13,7 @@ public class BoidSpawnerAndRegistry : GroupRegistry
     // components get the initial values for the UI elements they're attached to
     [HideInInspector]
     public float maxSpeed, maxForce, cohesionThreshold, repulsionThreshold, alignmentThreshold, coneOfVisionAngle,
-        cohesionWeight, repulsionWeight, alignmentWeight, seekWeight;
+        cohesionWeight, repulsionWeight, alignmentWeight, attractionWeight;
     
     private int created = 0;
     private float elapsedTime = 0f;
@@ -34,7 +34,7 @@ public class BoidSpawnerAndRegistry : GroupRegistry
         cohesionWeight = flocking.cohesionWeight;
         repulsionWeight = flocking.separationWeight;
         alignmentWeight = flocking.alignmentWeight;
-        seekWeight = flocking.attractionWeight;
+        attractionWeight = flocking.attractionWeight;
         Destroy(dummy);
     }
     
@@ -74,7 +74,7 @@ public class BoidSpawnerAndRegistry : GroupRegistry
 
             clone.GetComponent<SB_Flocking>().showFlockingGizmos = true;
             //clone.GetComponent<SB_Wander>().showWanderGizmos = true;
-            //clone.GetComponent<SB_ObstacleAvoidance>().showWhiskers = true;
+            clone.GetComponent<SB_ObstacleAvoidance>().showWhiskers = true;
 
             if (attractor!=null)
             {
