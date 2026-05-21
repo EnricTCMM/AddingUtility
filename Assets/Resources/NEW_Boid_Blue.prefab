@@ -123,8 +123,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
-  maxForce: 100
-  maxSpeed: 20
+  maxForce: 200
+  maxSpeed: 40
   maxTorque: 720
   maxAngularSpeed: 360
   rotationalPolicy: 1
