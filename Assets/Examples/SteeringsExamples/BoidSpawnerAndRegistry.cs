@@ -12,13 +12,13 @@ public class BoidSpawnerAndRegistry : GroupRegistry
     // the following attributes are specifically created to help listeners of UI
     // components get the initial values for the UI elements they're attached to
     [HideInInspector]
-    public float maxSpeed, maxForce, cohesionThreshold, repulsionThreshold, alignmentThreshold, coneOfVisionAngle,
-        cohesionWeight, repulsionWeight, alignmentWeight, attractionWeight;
+    public float maxSpeed, maxForce, cohesionThreshold, separationThreshold, alignmentThreshold, coneOfVisionAngle,
+        cohesionWeight, separationWeight, alignmentWeight, attractionWeight;
     
     private int created = 0;
     private float elapsedTime = 0f;
 
-    void Start()
+    void Awake()
     {
         GameObject dummy = Instantiate(prefab);
         MotorManager motorManager = dummy.GetComponent<MotorManager>();
@@ -28,13 +28,16 @@ public class BoidSpawnerAndRegistry : GroupRegistry
         maxForce = motorManager.maxForce;
         
         cohesionThreshold = flocking.cohesionThreshold;
-        repulsionThreshold = flocking.separationThreshold;
+        separationThreshold = flocking.separationThreshold;
         alignmentThreshold = flocking.alignmentThreshold;
         coneOfVisionAngle = flocking.coneOfVisionAngle;
         cohesionWeight = flocking.cohesionWeight;
-        repulsionWeight = flocking.separationWeight;
+        separationWeight = flocking.separationWeight;
         alignmentWeight = flocking.alignmentWeight;
         attractionWeight = flocking.attractionWeight;
+
+        Debug.Log(separationWeight + " " + alignmentWeight + " "+ cohesionWeight);
+        
         Destroy(dummy);
     }
     

@@ -37,8 +37,13 @@ public class SliderListener : MonoBehaviour
 
         Component component = listenerObject.GetComponent(componentType);
 
+		Debug.Log("component is: "+component);
+
+
         Type type = component.GetType();
         FieldInfo field = type.GetField(fieldName);
+
+		Debug.Log("field is: " + field);
 
         // in some case the field may be null because its non-existent. Even so,
         // there could be a setter with an "equivalent" name (SetFieldName,,,) 
@@ -46,6 +51,7 @@ public class SliderListener : MonoBehaviour
         {
             // if the field exists, initialize slider with its value
             value = (float)field.GetValue(component);
+			Debug.Log("value is: "+value);
             currVal.text = value.ToString("0.00");
             slider.value = value;
         }

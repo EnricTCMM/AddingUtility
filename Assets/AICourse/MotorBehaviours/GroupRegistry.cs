@@ -62,8 +62,9 @@ namespace MotorBehaviours
         // ------------ GENERAL SETTERS
         // propagate to all members
 
-        public void SetRepulsionThreshold(float value)
+        public void SetSeparationThreshold(float value)
         {
+            Debug.Log("Invoking setSeparation");
             foreach (GameObject member in members)
             {
                 SB_Separation separation = member.GetComponent<SB_Separation>();
@@ -117,6 +118,33 @@ namespace MotorBehaviours
             {
                 SB_Flocking sb = member.GetComponent<SB_Flocking>();
                 sb.alignmentThreshold = value;
+            }
+        }
+        
+        public void SetAlignmentWeight(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                SB_Flocking sb = member.GetComponent<SB_Flocking>();
+                sb.alignmentWeight = value;
+            }
+        }
+        
+        public void SetSeparationWeight(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                SB_Flocking sb = member.GetComponent<SB_Flocking>();
+                sb.separationWeight = value;
+            }
+        }
+        
+        public void SetCohesionWeight(float value)
+        {
+            foreach (GameObject member in members)
+            {
+                SB_Flocking sb = member.GetComponent<SB_Flocking>();
+                sb.cohesionWeight = value;
             }
         }
 

@@ -122,8 +122,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
-  maxForce: 100
-  maxSpeed: 20
+  maxForce: 150
+  maxSpeed: 40
   maxTorque: 720
   maxAngularSpeed: 360
   rotationalPolicy: 1
@@ -150,8 +150,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_ObstacleAvoidance
   blendingWeight: 1
   arbitrationPriority: 0
-  lookAheadLength: 20
-  secondaryWhiskerAngle: 30
+  lookAheadLength: 30
+  secondaryWhiskerAngle: 45
   secondaryWhiskerRatio: 0.7
   avoidDistance: 22
   perseveranceTime: 0.15
