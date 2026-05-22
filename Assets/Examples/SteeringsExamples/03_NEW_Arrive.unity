@@ -1749,7 +1749,7 @@ MonoBehaviour:
   policyToleranceRadius: 2
   policySlowdownRadius: 30
   forcePolicy: 0
-  timeToDesiredSpeed: 0.5
+  timeToDesiredSpeed: 0.1
   torquePolicy: 1
   timeToDesiredAngularSpeed: 0.1
   currentVelocity: {x: 0, y: 0, z: 0}
