@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SoldierLines : MonoBehaviour
 {
-    public float length = 20;
+    public float length = 40;
     
     void OnDrawGizmos()
     {
@@ -19,7 +19,9 @@ public class SoldierLines : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawRay(transform.position, velocityDirection * length);
 
+        /* // No need. El rifle ja fa aquesta feina
         Gizmos.color = Color.limeGreen;
         Gizmos.DrawRay(transform.position, myLookDir * length);
+        */ 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class MoveToClick : MonoBehaviour {
 
@@ -14,7 +15,10 @@ public class MoveToClick : MonoBehaviour {
 
 
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
+
+		if (EventSystem.current.IsPointerOverGameObject()) return;
 		
         if (Input.GetMouseButtonDown(buttonNumber))
         {
