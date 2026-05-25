@@ -6,77 +6,112 @@ namespace MotorBehaviours
 {
     public class MotorManager : MonoBehaviour
     {
-        public enum RotationalPolicy { NONE, LWYG, LWYGI, FT, FTI }
-        public enum LinearForcePolicy { PROPORTIONAL, BANG_BANG}
-        public enum TorquePolicy {PROPORTIONAL, BANG_BANG}
-        
-        [Header("Linear Movement Limits")]
-        public float maxForce = 40f;
+        public enum RotationalPolicy
+        {
+            NONE,
+            LWYG,
+            LWYGI,
+            FT,
+            FTI
+        }
+
+        public enum LinearForcePolicy
+        {
+            PROPORTIONAL,
+            BANG_BANG
+        }
+
+        public enum TorquePolicy
+        {
+            PROPORTIONAL,
+            BANG_BANG
+        }
+
+        private bool isActive = true; // an active manager "polls" the motor behaviours. An inactive one does not.
+        // use SuspendMotion and ResumeMotion to change this.
+
+        [Header("Linear Movement Limits")] public float maxForce = 40f;
         public float maxSpeed = 10f;
-        
+
         [Header("Angular Movement Limits (in degrees)")]
-        public float maxTorque = 360f;  // torque is the angular equivalent of force (angular force, so to speak)
+        public float maxTorque = 360f; // torque is the angular equivalent of force (angular force, so to speak)
+
         public float maxAngularSpeed = 90f;
 
-        [Header("Rotational Policy Settings")]
-        public RotationalPolicy rotationalPolicy = RotationalPolicy.NONE;
+        [Header("Rotational Policy Settings")] public RotationalPolicy rotationalPolicy = RotationalPolicy.NONE;
+
         // Used only if the policy requires a target (like Face Target - FT)
-        public GameObject rotationalPolicyTarget; 
+        public GameObject rotationalPolicyTarget;
         public float policyToleranceRadius = 2f;
         public float policySlowdownRadius = 30f;
         // public float policyTimeToDesiredSpeed = 0.1f;
-        
-        [Foldout("Advanced Linear Settings")]
-        public LinearForcePolicy forcePolicy = LinearForcePolicy.PROPORTIONAL;
+
+        [Foldout("Advanced Linear Settings")] public LinearForcePolicy forcePolicy = LinearForcePolicy.PROPORTIONAL;
+
         [Tooltip("Only used under PROPORTIONAL POLICY. 1.0 is Reynolds implementation")]
         public float timeToDesiredSpeed = 0.1f;
-        
-        [Foldout("Advanced Angular Settings")]
-        public TorquePolicy torquePolicy = TorquePolicy.PROPORTIONAL;
+
+        [Foldout("Advanced Angular Settings")] public TorquePolicy torquePolicy = TorquePolicy.PROPORTIONAL;
+
         [Tooltip("Only used under PROPORTIONAL POLICY. 1.0 is Reynolds implementation")]
         public float timeToDesiredAngularSpeed = 0.1f;
-        
+
         // Internal state tracking (public so behaviours can read it, but hidden from inspector)
         [HideInInspector] public Vector3 currentVelocity = Vector3.zero;
         [HideInInspector] public float currentAngularSpeed = 0f;
-        
+
         private bool anyLinearBehaviourSpoke = false;
-        
+
         // Ens preparem tant per a escenaris 2D com 3D. Lamentablement Unity no
         // considera que Rigidbody2D sigui un cas especial de Rigidbody (3D)
         // (Els motors físics són diferents en cada cas)
         private Rigidbody2D rb2D;
         private Rigidbody rb3D;
-        
+
         void Awake()
         {
             rb2D = GetComponent<Rigidbody2D>();
             rb3D = GetComponent<Rigidbody>();
             // no passa res si no tenim Rigidbody. És quelcom que ja contemplem
         }
-        
+
         /// <summary>
         /// Immediate stop of the agent. Kills any inertia
         /// </summary>
         public void StopCompletely()
         {
             currentVelocity = Vector3.zero;
-            
+
             if (rb3D != null && !rb3D.isKinematic) rb3D.linearVelocity = Vector3.zero;
-            else if (rb2D != null && rb2D.bodyType==RigidbodyType2D.Dynamic) rb2D.linearVelocity = Vector3.zero;
+            else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Dynamic) rb2D.linearVelocity = Vector3.zero;
         }
-        
+
         /// <summary>
         /// Instantly stops the agent from rotating, killing any angular inertia.
         /// </summary>
         public void StopRotationsCompletely()
         {
             currentAngularSpeed = 0f;
-            
+
             if (rb3D != null && !rb3D.isKinematic) rb3D.angularVelocity = Vector3.zero;
-            else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Dynamic) rb2D.angularVelocity = 0f; // Note: In 2D, angularVelocity is a float!
+            else if (rb2D != null && rb2D.bodyType == RigidbodyType2D.Dynamic)
+                rb2D.angularVelocity = 0f; // Note: In 2D, angularVelocity is a float!
+        }
+
+        public void SuspendMotion()
+        {
+            isActive = false;
+            // following lines set linear velocity and angular speed to zero. This effectively stops the agent.
+            StopCompletely();
+            StopRotationsCompletely();
         }
         
+        public void ResumeMotion()
+        {
+            isActive = true;
+            // from now on the manager will poll the behaviours (in FixedUpdate)
+        }
+
         /// <summary>
         /// Converts a desired velocity into the final application force 
         /// based on the Manager's advanced linear policies.
@@ -159,6 +194,8 @@ namespace MotorBehaviours
         
         void FixedUpdate()
         {
+            if (!isActive) return;
+            
             // 1. GATHER LINEAR FORCES: Check active components, arbitrate and blend
             Vector3 finalLinearForce = CalculateLinearForce();
             // 2. APPLY LINEAR FORCE: Move the character

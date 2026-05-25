@@ -18,6 +18,7 @@ public class MoveToClick : MonoBehaviour {
 	void Update ()
 	{
 
+		// ignore clicks on UI elements
 		if (EventSystem.current.IsPointerOverGameObject()) return;
 		
         if (Input.GetMouseButtonDown(buttonNumber))

@@ -8,5 +8,18 @@ namespace MotorBehaviours
         [Header("Base congfiguration")] [Range(0f, 1f)]
         public float blendingWeight = 1f; // weight for blending
         public int arbitrationPriority = 1; // arbitration priority (2 is higher priority)
+        
+        // convenience methods to enable/disable the motor behaviour without having to resort 
+        // enabled = true/false in the code. 
+        public void Enable()
+        {
+            enabled = true;
+        }
+        
+        public void Disable()
+        {
+            enabled = false;
+        }
+
     }
 }

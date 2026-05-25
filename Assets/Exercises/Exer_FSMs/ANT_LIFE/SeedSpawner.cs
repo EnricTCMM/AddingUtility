@@ -1,4 +1,5 @@
 
+using AICourse.Utilities;
 using UnityEngine;
 
 public class SeedSpawner : MonoBehaviour
@@ -26,7 +27,7 @@ public class SeedSpawner : MonoBehaviour
 		{
 			// spawn creating an instance...
 			clone = Instantiate(sample);
-			clone.transform.position = new Vector3(maxX * Steerings.Utils.binomial(), maxY * Steerings.Utils.binomial(), 0);
+			clone.transform.position = new Vector3(maxX * Utils.binomial(), maxY * Utils.binomial(), 0);
 
 			elapsedTime = 0;
 		}

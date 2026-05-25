@@ -1,6 +1,7 @@
-using Steerings;
 using FSMs;
+using MotorBehaviours;
 using UnityEngine;
+using AICourse.Utilities;
 
 [CreateAssetMenu(fileName = "FSM_BatcatFeed", 
                  menuName = "Finite State Machines/FSM_BatcatFeed", order = 1)]
@@ -12,8 +13,8 @@ public class FSM_BatcatFeed : FiniteStateMachine
 
     private GameObject trashcan; // the trashcan being approached or rummaged
     private GameObject sardine; // the sardine being transported or eaten
-    private WanderAroundPlusAvoid wanderAround; // steering
-    private ArrivePlusOA arrive; // steering
+    private SB_Wander wanderAround; // steering
+    private SB_Arrive arrive; // steering
     private float elapsedTime; // time elapsed in EATING or RUMMAGING states
 
 
@@ -22,17 +23,19 @@ public class FSM_BatcatFeed : FiniteStateMachine
         // get the blackboard
         blackboard = GetComponent<BATCAT_Blackboard>();
 
-        // Get the steerings (they should be off at enter time)
-        wanderAround = GetComponent<WanderAroundPlusAvoid>();
-        arrive = GetComponent<ArrivePlusOA>();
-
+        // get the motor behaviours (they should be off -disabled-)
+        wanderAround = GetComponent<SB_Wander>();
+        arrive = GetComponent<SB_Arrive>();
+        
         base.OnEnter();
     }
 
     public override void OnExit()
     {
-        // Turn off all steerings. That's all.
-        base.DisableAllSteerings();
+        // Suspend motion and turn off all steerings. That's all.
+        // motorManager.SuspendMotion();
+        wanderAround.enabled = false;
+        arrive.enabled = false;
         base.OnExit();
     }
 
@@ -41,15 +44,16 @@ public class FSM_BatcatFeed : FiniteStateMachine
         // STAGE 1: create the states with their logic(s)
 
         State WANDERING = new State("WANDERING",
-            () => { wanderAround.enabled = true; },
+            () => { wanderAround.Enable(); },
             () => { /* do nothing in particular */ },
-            () => { wanderAround.enabled = false; }
+            () => { wanderAround.Disable(); }
         );
 
+        
         State REACHING_CAN = new State("REACHING TRASH CAN",
-            () => { arrive.target = trashcan; arrive.enabled = true; },
+            () => { arrive.target = trashcan; arrive.Enable();  },
             () => {/* do nothing in particular */ },
-            () => { arrive.enabled = false; }
+            () => { arrive.Disable();  }
         );
 
         State RUMMAGING = new State("RUMMAGING",
@@ -66,9 +70,9 @@ public class FSM_BatcatFeed : FiniteStateMachine
         );
 
         State REACHING_HIDEOUT = new State("REACHING HIDEOUT",
-            () => { arrive.target = blackboard.hideout; arrive.enabled = true; },
+            () => { arrive.target = blackboard.hideout; arrive.Enable(); },
             () => {/* do nothing in particular */ },
-            () => { arrive.enabled = false; }
+            () => { arrive.Disable();  }
         );
 
         State EATING = new State("EATING",

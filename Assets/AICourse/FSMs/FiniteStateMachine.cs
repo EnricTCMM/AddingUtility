@@ -177,7 +177,9 @@ namespace FSMs
                                    () => { });
         }
 
+        // this is a deprecated method since it has to do with the old steerings framework.
         // another convenience method 
+        [Obsolete("Only for the old steerings framework.")]
         protected void DisableAllSteerings ()
         {
             if (gameObject!=null)

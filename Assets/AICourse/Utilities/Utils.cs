@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Steerings
+namespace AICourse.Utilities
 {
 	public class Utils
 	{

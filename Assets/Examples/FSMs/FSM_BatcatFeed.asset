@@ -11,4 +11,4 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc8d0e8d8b6234c49be4b8ae3b7a27c7, type: 3}
   m_Name: FSM_BatcatFeed
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::FSM_BatcatFeed

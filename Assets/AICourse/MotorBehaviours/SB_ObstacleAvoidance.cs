@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using AICourse.Utilities;
+using UnityEngine;
 using Steerings; // Needed to access your Utils class
 
 namespace MotorBehaviours
@@ -43,7 +44,7 @@ namespace MotorBehaviours
             // 1. Detect and get the pure evasion intention
             Vector3? evasionIntent = Detection2D(me);
 
-            // 2. If an obstacle is detected right now
+            // 2. If an obstacle has been detected... return the avoidance velocity
             if (evasionIntent != null)
             {
                 avoidanceVelocity = evasionIntent.Value; 
@@ -61,7 +62,7 @@ namespace MotorBehaviours
                 return avoidanceVelocity;
             }
 
-            // 4. Reset state when no evasion is needed
+            // 4. Reset state when no evasion is needed. Return null (= abstain) 
             isPersevering = false;
             activeWhiskerIndex = -1;
             return null; 
