@@ -32,8 +32,7 @@ public class FSM_BatcatFeed : FiniteStateMachine
 
     public override void OnExit()
     {
-        // Suspend motion and turn off all steerings. That's all.
-        // motorManager.SuspendMotion();
+        // turn off motor behaviours that this machine may have turned on
         wanderAround.enabled = false;
         arrive.enabled = false;
         base.OnExit();

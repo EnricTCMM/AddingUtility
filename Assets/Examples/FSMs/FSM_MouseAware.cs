@@ -1,7 +1,6 @@
 using FSMs;
 using MotorBehaviours;
 using UnityEngine;
-using Steerings;
 
 [CreateAssetMenu(fileName = "FSM_MouseAware", menuName = "Finite State Machines/FSM_MouseAware", order = 1)]
 public class FSM_MouseAware : FiniteStateMachine

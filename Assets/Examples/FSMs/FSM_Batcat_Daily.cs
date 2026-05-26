@@ -1,6 +1,5 @@
 using FSMs;
 using UnityEngine;
-using Steerings;
 
 [CreateAssetMenu(fileName = "FSM_Batcat_Daily", menuName = "Finite State Machines/FSM_Batcat_Daily", order = 1)]
 public class FSM_Batcat_Daily : FiniteStateMachine

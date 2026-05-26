@@ -1,6 +1,6 @@
 using FSMs;
+using MotorBehaviours;
 using UnityEngine;
-using Steerings;
 
 [CreateAssetMenu(fileName = "FSM_MouseFinal", menuName = "Finite State Machines/FSM_MouseFinal", order = 1)]
 public class FSM_MouseFinal : FiniteStateMachine
@@ -36,7 +36,11 @@ public class FSM_MouseFinal : FiniteStateMachine
         NORMAL.Name = "FREE";
 
         State TRAPPED = new State("TRAPPED",
-            () => { }, // write on enter logic inside {}
+            () =>
+            {
+                // kill any inertia... (this does not disable the motor manager)
+                GetComponent<MotorManager>().StopCompletely();
+            }, // write on enter logic inside {}
             () => { }, // write in state logic inside {}
             () => { }  // write on exit logic inisde {}  
         );

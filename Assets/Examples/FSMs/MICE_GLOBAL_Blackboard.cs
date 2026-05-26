@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+// not a dynamic blackboard. 
 public class MICE_GLOBAL_Blackboard : MonoBehaviour
 {
 	public GameObject announcedCheese;		// the cheese some mouse has found

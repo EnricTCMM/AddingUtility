@@ -77,8 +77,18 @@ namespace MotorBehaviours
 
         /// <summary>
         /// Immediate stop of the agent. Kills any inertia
+        /// But does not prevent the manager from "polling" the behaviours."
         /// </summary>
         public void StopCompletely()
+        {
+            StopLinearMovementCompletely();
+            StopRotationsCompletely();
+        }
+        
+        /// <summary>
+        /// Immediate linear stop of the agent. Kills any linear inertia
+        /// </summary>
+        public void StopLinearMovementCompletely()
         {
             currentVelocity = Vector3.zero;
 
@@ -100,15 +110,18 @@ namespace MotorBehaviours
 
         public void SuspendMotion()
         {
-            isActive = false;
-            // following lines set linear velocity and angular speed to zero. This effectively stops the agent.
+            isActive = false; // no more updates will be processed by the manager
+            
+            // following line set linear velocity and angular speed to zero.
+            // This effectively stops the agent (kills Inertia)
             StopCompletely();
-            StopRotationsCompletely();
+            
         }
         
         public void ResumeMotion()
         {
             isActive = true;
+            // resume processing updates.
             // from now on the manager will poll the behaviours (in FixedUpdate)
         }
 
@@ -121,7 +134,7 @@ namespace MotorBehaviours
             // avoid jittering: if we want to stop and we almost are, we stop immediately. 
             if (desiredVelocity.sqrMagnitude == 0f && currentVelocity.magnitude < 0.05f)
             {
-                StopCompletely(); // <--- sets current velocity to zero 
+                StopLinearMovementCompletely(); // <--- sets current velocity to zero 
                 return Vector3.zero; // <--- no force applied
 				// zero velocity & no force ==> no movement. 
             }

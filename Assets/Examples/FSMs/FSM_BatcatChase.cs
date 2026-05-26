@@ -1,8 +1,6 @@
 using FSMs;
 using UnityEngine;
-using Steerings;
 using MotorBehaviours;
-using UnityEngine.Rendering.Universal;
 
 [CreateAssetMenu(fileName = "FSM_BatcatChase", menuName = "Finite State Machines/FSM_BatcatChase", order = 1)]
 public class FSM_BatcatChase : FiniteStateMachine
@@ -47,8 +45,7 @@ public class FSM_BatcatChase : FiniteStateMachine
     {
         /* STAGE 1: create the states with their logic(s)
          *-----------------------------------------------*/
-         
-       
+        
         State HIDING = new State("HIDING",
             () => { }, 
             () => { }, 
@@ -72,7 +69,6 @@ public class FSM_BatcatChase : FiniteStateMachine
 
         State TRANSPORTING = new State("TRANSPORTING",
             () => { mouse.transform.parent = transform;
-                    mouse.transform.position = transform.position;
                     mouse.tag = "TRAPPED_MOUSE"; 
                     arrive.target = blackboard.jail; arrive.Enable(); }, 
             () => { }, 
@@ -81,9 +77,7 @@ public class FSM_BatcatChase : FiniteStateMachine
 
         State RETURNING = new State("RETURNING",
             () => { 
-                Debug.Log("hideout is: "+blackboard.hideout);
                 arrive.target = blackboard.hideout; 
-                Debug.Log("target set to "+arrive.target);
                 arrive.Enable(); }, 
             () => { },
             () => { arrive.Disable(); }  

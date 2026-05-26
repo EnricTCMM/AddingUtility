@@ -7,9 +7,9 @@ namespace MotorBehaviours
         [Header("Arrive Settings")]
         public GameObject target;
 
-        // The distance threshold to completely stop (in meters)
+        // The distance threshold to completely stop
         public float toleranceRadius = 1f; 
-        // The distance threshold to start slowing down (in meters)
+        // The distance threshold to start slowing down
         public float slowdownRadius = 20f; 
 
         public override Vector3? GetDesiredVelocity(MotorManager me)
