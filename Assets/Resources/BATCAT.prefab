@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8710130789981108964}
   - component: {fileID: 3690945144647130458}
   - component: {fileID: 4969666634494053401}
+  - component: {fileID: 8753694747653522591}
   - component: {fileID: 3752751413773166482}
   m_Layer: 0
   m_Name: BATCAT
@@ -32,13 +33,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1090103913225115113}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071067}
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_LocalPosition: {x: -139, y: 55, z: 0}
   m_LocalScale: {x: 10, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!212 &6572052021080137
 SpriteRenderer:
   serializedVersion: 2
@@ -110,7 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823459bfcabf59e4bbb7d30c1033e0ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fsm: {fileID: 11400000, guid: 5e97dd836a3422a4c81a1beda17d3df0, type: 2}
+  fsm: {fileID: 11400000, guid: 655f789a81df1ee4aa8ab789a1eb8a36, type: 2}
   currentState: 
   textMesh: {fileID: 0}
 --- !u!114 &7306962230172259506
@@ -136,7 +137,7 @@ MonoBehaviour:
   hungerLowEnough: 10
   normalHungerIncrement: 0.5
   sardineHungerDecrement: 50
-  mouseReachedRadius: 10
+  mouseReachedRadius: 5
   mouseHasVanishedRadius: 200
   placeReachedRadius: 15
   hideout: {fileID: 0}
@@ -228,7 +229,24 @@ MonoBehaviour:
   wanderRate: 15
   attractor: {fileID: 0}
   attractionWeight: 0.15
-  showWanderGizmos: 1
+  showWanderGizmos: 0
+--- !u!114 &8753694747653522591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1090103913225115113}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23bab68961ac4094bf448051ff08fa97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Pursue
+  blendingWeight: 1
+  arbitrationPriority: 1
+  target: {fileID: 0}
+  maxPredictionTime: 3
+  showGizmos: 0
 --- !u!114 &3752751413773166482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,7 +254,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1090103913225115113}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4e97bc0cf1e5ba4a8354a489731be4f, type: 3}
   m_Name: 

@@ -1,8 +1,5 @@
-
-using UnityEngine.UI;
 using TMPro;
 using UnityEngine;
-using Steerings;
 using System;
 using System.Reflection;
 
@@ -24,7 +21,7 @@ public class FieldToText : MonoBehaviour
     void Start()
     {
         if (componentTypeName == null || componentTypeName.Length == 0)
-            componentTypeName = "Steerings.SteeringContext";
+            componentTypeName = "MotorManager"; // poor default. FAIL FAST would be better
 
         textMesh = GetComponent<TextMeshProUGUI>();
         originalText = textMesh.text;

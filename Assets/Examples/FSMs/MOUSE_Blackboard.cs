@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 
-public class MOUSE_Blackboard : MonoBehaviour {
+public class MOUSE_Blackboard : DynamicBlackboard {
 
 	public float hunger = 0f;   // How hungry am I?
 

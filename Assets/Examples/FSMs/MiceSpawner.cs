@@ -54,6 +54,10 @@ public class MiceSpawner : MonoBehaviour
             {
                 clone.GetComponent<FSMExecutor>().fsm = ScriptableObject.CreateInstance<FSM_MouseAware>();
             }
+            else
+            {
+                clone.GetComponent<FSMExecutor>().fsm = ScriptableObject.CreateInstance<FSM_MouseFeed>();
+            }
 
             generated++;
             elapsedTime = 0;
