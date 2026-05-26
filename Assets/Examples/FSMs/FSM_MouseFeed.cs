@@ -1,14 +1,15 @@
 using FSMs;
+using MotorBehaviours;
 using UnityEngine;
-using Steerings;
+
 
 [CreateAssetMenu(fileName = "FSM_MouseFeed", menuName = "Finite State Machines/FSM_MouseFeed", order = 1)]
 public class FSM_MouseFeed : FiniteStateMachine
 {
     
     private MOUSE_Blackboard blackboard;
-    private WanderPlusAvoid wanderPlusAvoid;
-    private ArrivePlusOA arrive;
+    private SB_Wander wander;
+    private SB_Arrive arrive;
     private float timeSinceLastBite;
     private GameObject cheese;
 
@@ -18,8 +19,8 @@ public class FSM_MouseFeed : FiniteStateMachine
          * It's equivalent to the on enter actionName of any state 
          * Usually this code includes .GetComponent<...> invocations */
         blackboard = GetComponent<MOUSE_Blackboard>();
-        wanderPlusAvoid = GetComponent<WanderPlusAvoid>();
-        arrive = GetComponent<ArrivePlusOA>();
+        wander = GetComponent<SB_Wander>();
+        arrive = GetComponent<SB_Arrive>();
         base.OnEnter(); // do not remove
     }
 
@@ -30,7 +31,8 @@ public class FSM_MouseFeed : FiniteStateMachine
          * Usually this code turns off behaviours that shouldn't be on when one the FSM has
          * been exited. */
 
-        DisableAllSteerings();
+        wander.Disable();
+        arrive.Disable();
         base.OnExit();
     }
 
@@ -41,15 +43,15 @@ public class FSM_MouseFeed : FiniteStateMachine
         /* STAGE 1: create the states with their logic(s) */
 
         State WANDERING = new State("WANDERING",
-            () => { wanderPlusAvoid.enabled = true; }, 
+            () => { wander.Enable(); }, 
             () => { blackboard.hunger += blackboard.normalHungerIncrement * Time.deltaTime; }, 
-            () => { wanderPlusAvoid.enabled = false; }  
+            () => { wander.Disable(); }  
         );
 
         State REACHING = new State("REACHING CHEESE",
-            () => { arrive.target = cheese; arrive.enabled = true; },
+            () => { arrive.target = cheese; arrive.Enable(); },
             () => { blackboard.hunger += blackboard.normalHungerIncrement * Time.deltaTime; },
-            () => { arrive.enabled = false;
+            () => { arrive.Disable();
             }
         );
 

@@ -1,4 +1,5 @@
 using FSMs;
+using MotorBehaviours;
 using UnityEngine;
 using Steerings;
 
@@ -8,11 +9,11 @@ public class FSM_MouseAware : FiniteStateMachine
     /* Declare here, as attributes, all the variables that need to be shared among
      * states and transitions and/or set in OnEnter or used in OnExit 
      * For instance: steering behaviours, blackboard, ...*/
-    private FleePlusOA flee;
+    private SB_Flee flee;
     private MOUSE_Blackboard blackboard;
-    private SteeringContext steeringContext;
+    private MotorManager motorManager;
     private GameObject peril;
-    private float normalSpeed, normalAcceleration;
+    private float normalSpeed, normalForce;
     private Color normalColor;
 
     public override void OnEnter()
@@ -21,12 +22,12 @@ public class FSM_MouseAware : FiniteStateMachine
          * It's equivalent to the on enter actionName of any state 
          * Usually this code includes .GetComponent<...> invocations */
 
-        flee = GetComponent<FleePlusOA>();
+        flee = GetComponent<SB_Flee>();
         blackboard = GetComponent<MOUSE_Blackboard>();
-        steeringContext = GetComponent<SteeringContext>();
+        motorManager = GetComponent<MotorManager>();
 
-        normalSpeed = steeringContext.maxSpeed;
-        normalAcceleration = steeringContext.maxAcceleration;
+        normalSpeed = motorManager.maxSpeed;
+        normalForce = motorManager.maxForce;
         normalColor = GetComponent<SpriteRenderer>().color;
 
         base.OnEnter(); // do not remove
@@ -39,11 +40,11 @@ public class FSM_MouseAware : FiniteStateMachine
          * Usually this code turns off behaviours that shouldn't be on when one the FSM has
          * been exited. */
 
-        steeringContext.maxSpeed = normalSpeed;
-        steeringContext.maxAcceleration = normalAcceleration;
+        motorManager.maxSpeed = normalSpeed;
+        motorManager.maxForce = normalForce;
         GetComponent<SpriteRenderer>().color = normalColor;
 
-        DisableAllSteerings();
+        flee.Disable();
 
         base.OnExit();
     }
@@ -62,19 +63,19 @@ public class FSM_MouseAware : FiniteStateMachine
                 if (Random.value>0.6f)
                 {
                     float boostFactor = 1.3f + Random.value;
-                    steeringContext.maxSpeed *= boostFactor;
-                    steeringContext.maxAcceleration *= boostFactor;
+                    motorManager.maxSpeed *= boostFactor;
+                    motorManager.maxForce *= boostFactor;
                 }
                 GetComponent<SpriteRenderer>().color = new Color(3f/256, 120f/256, 7f/256);
                 flee.target = peril;
-                flee.enabled = true;
+                flee.Enable();
             }, 
             () => {/* do nothing in particular, just flee */ }, 
             () => {
-                steeringContext.maxSpeed = normalSpeed;
-                steeringContext.maxAcceleration = normalAcceleration;
+                motorManager.maxSpeed = normalSpeed;
+                motorManager.maxForce = normalForce;
                 GetComponent<SpriteRenderer>().color = normalColor;
-                flee.enabled = false;
+                flee.Disable();
             }    
         );
 

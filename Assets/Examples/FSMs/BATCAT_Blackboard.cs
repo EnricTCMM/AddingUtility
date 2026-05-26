@@ -24,7 +24,7 @@ public class BATCAT_Blackboard : DynamicBlackboard {
 	public GameObject sardinePrefab;
 	public GameObject fishbonePrefab;
 
-	void Start () {
+	void Awake () {
 
 		if (hideout == null) {
 			hideout = GameObject.Find ("HIDEOUT");

@@ -1,6 +1,8 @@
 using FSMs;
 using UnityEngine;
 using Steerings;
+using MotorBehaviours;
+using UnityEngine.Rendering.Universal;
 
 [CreateAssetMenu(fileName = "FSM_BatcatChase", menuName = "Finite State Machines/FSM_BatcatChase", order = 1)]
 public class FSM_BatcatChase : FiniteStateMachine
@@ -10,8 +12,8 @@ public class FSM_BatcatChase : FiniteStateMachine
      * For instance: steering behaviours, blackboard, ...*/
 
     private GameObject mouse, otherMouse;
-    private PursuePlusOA pursue;
-    private ArrivePlusOA arrive;
+    private SB_Pursue pursue;
+    private SB_Arrive arrive;
     private BATCAT_Blackboard blackboard;
     private float pursuingTime;
     private float restingTime;
@@ -22,8 +24,8 @@ public class FSM_BatcatChase : FiniteStateMachine
          * It's equivalent to the on enter actionName of any state 
          * Usually this code includes .GetComponent<...> invocations */
 
-        pursue = GetComponent<PursuePlusOA>();
-        arrive = GetComponent<ArrivePlusOA>();
+        pursue = GetComponent<SB_Pursue>();
+        arrive = GetComponent<SB_Arrive>();
         blackboard = GetComponent<BATCAT_Blackboard>();
         pursuingTime = 0;
 
@@ -36,7 +38,8 @@ public class FSM_BatcatChase : FiniteStateMachine
          * It's equivalent to the on exit actionName of any state 
          * Usually this code turns off behaviours that shouldn't be on when one the FSM has
          * been exited. */
-        DisableAllSteerings();
+        arrive.Disable();
+        pursue.Disable();
         base.OnExit();
     }
 
@@ -55,10 +58,10 @@ public class FSM_BatcatChase : FiniteStateMachine
         State PURSUING = new State("PURSUING",
             () => { pursuingTime = 0; 
                     pursue.target = mouse; 
-                    pursue.enabled = true; 
+                    pursue.Enable(); 
             }, 
             () => { pursuingTime += Time.deltaTime; },
-            () => { pursue.enabled = false; }  
+            () => { pursue.Disable(); }  
         );
 
         State RESTING = new State("RESTING",
@@ -68,16 +71,22 @@ public class FSM_BatcatChase : FiniteStateMachine
         );
 
         State TRANSPORTING = new State("TRANSPORTING",
-            () => { mouse.transform.parent = transform; mouse.tag = "TRAPPED_MOUSE"; 
-                    arrive.target = blackboard.jail; arrive.enabled = true; }, 
+            () => { mouse.transform.parent = transform;
+                    mouse.transform.position = transform.position;
+                    mouse.tag = "TRAPPED_MOUSE"; 
+                    arrive.target = blackboard.jail; arrive.Enable(); }, 
             () => { }, 
-            () => { mouse.transform.parent = null; arrive.enabled = false; }  
+            () => { mouse.transform.parent = null; arrive.Disable(); }  
         );
 
         State RETURNING = new State("RETURNING",
-            () => { arrive.target = blackboard.hideout; arrive.enabled = true; }, 
+            () => { 
+                Debug.Log("hideout is: "+blackboard.hideout);
+                arrive.target = blackboard.hideout; 
+                Debug.Log("target set to "+arrive.target);
+                arrive.Enable(); }, 
             () => { },
-            () => { arrive.enabled = false; }  
+            () => { arrive.Disable(); }  
         );
 
         /* STAGE 2: create the transitions with their logic(s)
