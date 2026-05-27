@@ -7,7 +7,7 @@ namespace MotorBehaviours
     public class SB_Flocking : LinearMotorBehaviour
     {
         [Header("Flock Registry")]
-        public GroupRegistry registry;
+        public BoidRegistry registry;
 
         [Header("Global Vision Settings")]
         [Tooltip("If not applied cone is of 360 deg. Never applied to separation")]
@@ -42,7 +42,7 @@ namespace MotorBehaviours
         {
             if (registry == null)
             {
-                Debug.LogError($"[MotorBehaviours] Critical Error: Missing GroupRegistry on {GetType().Name} component of GameObject '{gameObject.name}'.");
+                Debug.LogError($"[MotorBehaviours] Critical Error: Missing BoidRegistry on {GetType().Name} component of GameObject '{gameObject.name}'.");
                 Debug.Break();
                 return Vector3.zero;
             }

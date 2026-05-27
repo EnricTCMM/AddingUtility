@@ -188,7 +188,7 @@ class BT_ConstrainedWander : BehaviourTree
                     GetComponent<SteeringContext>().seekWeight = 0.8f;
                     return Status.SUCCEEDED;
                 }),
-                new ACTION_WanderAround()
+                new ACTION_Wander()
            )
         ); // first child ends here
         
@@ -199,7 +199,7 @@ class BT_ConstrainedWander : BehaviourTree
                     GetComponent<SteeringContext>().seekWeight = 0.2f;
                     return Status.SUCCEEDED;
                 }),
-                new ACTION_WanderAround()
+                new ACTION_Wander()
             )
         ); // second child ends here
     }

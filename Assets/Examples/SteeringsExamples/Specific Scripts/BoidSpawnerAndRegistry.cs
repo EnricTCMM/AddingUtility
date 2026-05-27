@@ -1,12 +1,12 @@
 using UnityEngine;
 using MotorBehaviours;
 
-public class BoidSpawnerAndRegistry : GroupRegistry
+public class BoidSpawnerAndRegistry : BoidRegistry
 {
     public int numInstances = 20;
     public float delay = 0.5f;
     public GameObject prefab;
-    public GroupRegistry registry;
+    public BoidRegistry registry;
     public GameObject attractor;
 
     // the following attributes are specifically created to help listeners of UI

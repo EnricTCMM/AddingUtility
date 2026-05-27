@@ -5,10 +5,10 @@ namespace MotorBehaviours
     public class SB_Wander : LinearMotorBehaviour
     {
         [Header("Wander Settings")]
-        public float wanderRadius = 2f;
-        public float wanderOffset = 5f;
+        public float wanderRadius = 10f;
+        public float wanderOffset = 25f;
         // How much the target angle can change per frame (in degrees)
-        public float wanderRate = 30f; 
+        public float wanderRate = 15f; 
 
         [Header("Attractor Settings (WanderAround)")]
         [Tooltip("")]
@@ -38,7 +38,7 @@ namespace MotorBehaviours
             Vector3 agentPosition = me.transform.position;
             Vector3 forwardVector;
 
-            // In front of my velocity, definitely (as your old comment wisely pointed out!)
+            // In front of my velocity. 
             if (me.currentVelocity.magnitude > 0.01f)
             {
                 forwardVector = me.currentVelocity.normalized;
@@ -58,7 +58,8 @@ namespace MotorBehaviours
             Vector3 targetOffset = new Vector3(Mathf.Cos(targetRotRad), Mathf.Sin(targetRotRad), 0f) * wanderRadius;
             surrogateTargetPosition = circleCenter + targetOffset;
 
-            // pure wander intention (just seek the surrogate target)
+            // pure wander intention (just seek the surrogate target). Modulus of returned 
+            // velocity is 0 or maxSpeed. 
             Vector3 wanderVelocity = SB_Seek.GetDesiredVelocity(me, surrogateTargetPosition);
 
             if (attractor != null)

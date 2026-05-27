@@ -8,7 +8,7 @@ namespace MotorBehaviours
     public class SB_Cohesion : LinearMotorBehaviour
     {
         [Header("Flock Registry")]
-        public GroupRegistry registry;
+        public BoidRegistry registry;
 
         [Header("Cohesion Settings")]
         public float cohesionThreshold = 5f;
@@ -23,7 +23,7 @@ namespace MotorBehaviours
             // Fail Fast: Check if registry is missing
             if (registry == null)
             {
-                Debug.LogError($"[MotorBehaviours] Critical Error: Missing GroupRegistry on {GetType().Name} component of GameObject '{gameObject.name}'.");
+                Debug.LogError($"[MotorBehaviours] Critical Error: Missing BoidRegistry on {GetType().Name} component of GameObject '{gameObject.name}'.");
                 Debug.Break();
                 return Vector3.zero;
             }
@@ -33,17 +33,17 @@ namespace MotorBehaviours
         }
 
         // Math is done in this method. Also available for external calls
-        public static Vector3? GetDesiredVelocity(MotorManager me, GroupRegistry groupRegistry, float threshold, bool useVision, float visionAngle)
+        public static Vector3? GetDesiredVelocity(MotorManager me, BoidRegistry boidRegistry, float threshold, bool useVision, float visionAngle)
         {
             // Safe exit to prevent NullReferenceException if called dynamically without a valid registry
-            if (groupRegistry == null)
+            if (boidRegistry == null)
             {
-                Debug.LogWarning($"[MotorBehaviours] Warning: Cohesion invoked with a null GroupRegistry.");
+                Debug.LogWarning($"[MotorBehaviours] Warning: Cohesion invoked with a null BoidRegistry.");
                 return null; // Abstention
             }
 
             // High-efficiency roster retrieval O(1)
-            List<GameObject> targets = groupRegistry.GetMembers();
+            List<GameObject> targets = boidRegistry.GetMembers();
             
             Vector3 centreOfMasses = Vector3.zero;
             int mates = 0;

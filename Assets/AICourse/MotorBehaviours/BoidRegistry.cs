@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MotorBehaviours
 {
-    public class GroupRegistry : MonoBehaviour
+    public class BoidRegistry : MonoBehaviour
     {
         [Header("Registry Roster")]
         [Tooltip("The list of boids registered in this group.")]
@@ -19,7 +19,7 @@ namespace MotorBehaviours
         // add its children as members automatically.
         public virtual void AddInitialBoids()
         {
-            // Take all the objects parented by this GroupRegistry
+            // Take all the objects parented by this BoidRegistry
             // (i.e. the gameObject containing this component) 
             // and make them members of the group
             foreach (Transform child in transform)

@@ -1,36 +1,34 @@
 ﻿using UnityEngine;
 using BTs;
-using Steerings;
+using MotorBehaviours;
 
 public class ACTION_WanderAround : Action
 {
     public string keyAttractor;
-    public string keySeekWeight;
-
-    public ACTION_WanderAround() { }
-
-    public ACTION_WanderAround(string keyAttractor, string keySeekWeight)
+    public string keyAttractionWeight;
+    
+    public ACTION_WanderAround(string keyAttractor, string keyAttractionWeight)
     {
         this.keyAttractor = keyAttractor;
-        this.keySeekWeight = keySeekWeight;
+        this.keyAttractionWeight = keyAttractionWeight;
     }
     
-    private WanderAround wanderAround; 
+    private SB_Wander wander; 
 
     public override void OnInitialize()
     {
         // get the steering and initialize its parameters
-
-        wanderAround = GetComponent<WanderAround>();
-        if (wanderAround == null) wanderAround = AddComponent<WanderAround>();
-
-        // null keys mean: use the values in the Steering or the Context
-        if (keyAttractor!=null)
-            wanderAround.attractor = blackboard.Get<GameObject>(keyAttractor);
-        if  (keySeekWeight != null)
-            wanderAround.Context.seekWeight = blackboard.Get<float>(keySeekWeight);
+        wander = GetComponent<SB_Wander>();
         
-        wanderAround.enabled = true;
+        // we should consider a fail fast approach here, if the component is not found
+        
+        // null values mean use values already set in the editor
+        if (keyAttractor!=null)
+            wander.attractor = blackboard.Get<GameObject>(keyAttractor);
+        if  (keyAttractionWeight != null)
+            wander.attractionWeight = blackboard.Get<float>(keyAttractionWeight);
+        
+        wander.Enable();
     }
 
     public override Status OnTick ()
@@ -42,7 +40,7 @@ public class ACTION_WanderAround : Action
     public override void OnAbort()
     {
         // write here the code to be executed if the actionName is aborted while running
-        wanderAround.enabled = false;
+        wander.Disable();
     }
 
 }

@@ -26,7 +26,7 @@ namespace MotorBehaviours
             
             // Safety check. Don't try to normalize a zero vector (not strictly necessary
             // since Unity returns Vector3.zero for zero vectors) 
-            if (directionToTarget.sqrMagnitude == 0f) return Vector3.zero;
+            if (directionToTarget.sqrMagnitude == 0f) return Vector3.zero; // I'm there, no velocity needed (soft stop)
 
 			// intended velocity is full speed towards the target.
             return directionToTarget.normalized * me.maxSpeed;
