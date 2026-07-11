@@ -1,7 +1,6 @@
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine;
-using Steerings;
 using System;
 using System.Reflection;
 
@@ -17,6 +16,8 @@ public class SliderListener : MonoBehaviour
     public GameObject listenerObject;
     public string componentType;
     public string fieldName;
+
+    private string format = "0.00";
   
     void Start()
     {
@@ -30,16 +31,12 @@ public class SliderListener : MonoBehaviour
         minText.text = slider.minValue.ToString();
         maxText.text = slider.maxValue.ToString();
 
-        // By default take SteeringContext as the component's type (retro compatibility)
-        //if (componentType == null || componentType.Length == 0)
-        //    componentType = "SteeringContext";
-        // SteeringContext is no longer a default anything
-
         Component component = listenerObject.GetComponent(componentType);
-
-
+        
         Type type = component.GetType();
         FieldInfo field = type.GetField(fieldName);
+
+        if (slider.wholeNumbers) format = "0";
         
         // in some case the field may be null because its non-existent. Even so,
         // there could be a setter with an "equivalent" name (SetFieldName,,,) 
@@ -47,14 +44,14 @@ public class SliderListener : MonoBehaviour
         {
             // if the field exists, initialize slider with its value
             value = (float)field.GetValue(component);
-            currVal.text = value.ToString("0.00");
+            currVal.text = value.ToString(format);
             slider.value = value;
         }
         else
         {
             // if the field does not exit, use the slider's inital value
             value = slider.value;
-            currVal.text = value.ToString("0.00");
+            currVal.text = value.ToString(format);
         }
 
         // let's check if there's a setter for the field. If there's a setter the listener
@@ -62,10 +59,11 @@ public class SliderListener : MonoBehaviour
         string setterName = "Set" + ("" + fieldName[0]).ToUpper() + fieldName.Substring(1);
         MethodInfo method = type.GetMethod(setterName);
         // the listener will decide...
-
-
-        slider.onValueChanged.AddListener((x)=> { 
-            currVal.text = slider.value.ToString("0.00");
+        
+        slider.onValueChanged.AddListener((x)=>
+        {
+            
+            currVal.text = slider.value.ToString(format);
             if (method!=null)
             {
                 // use the setter if possible

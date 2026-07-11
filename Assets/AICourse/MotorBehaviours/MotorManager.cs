@@ -59,6 +59,7 @@ namespace MotorBehaviours
         // Internal state tracking (public so behaviours can read it, but hidden from inspector)
         [HideInInspector] public Vector3 currentVelocity = Vector3.zero;
         [HideInInspector] public float currentAngularSpeed = 0f;
+        public float speed => currentVelocity.magnitude;
 
         private bool anyLinearBehaviourSpoke = false;
 

@@ -11,6 +11,7 @@ public class FieldToText : MonoBehaviour
     private Component component;
     private Type type;
     private FieldInfo field;
+    private PropertyInfo property; // we also cater to properties 
 
     private float dummy = 10.0f;
 
@@ -20,6 +21,8 @@ public class FieldToText : MonoBehaviour
 
     void Start()
     {
+        object value;
+        
         if (componentTypeName == null || componentTypeName.Length == 0)
             componentTypeName = "MotorManager"; // poor default. FAIL FAST would be better
 
@@ -30,7 +33,12 @@ public class FieldToText : MonoBehaviour
        
         type = component.GetType();
         field = type.GetField(fieldName);
-        object value = field.GetValue(component);
+        if (field == null)
+        {
+            property = type.GetProperty(fieldName);
+            value = property.GetValue(component);
+        }
+        else value = field.GetValue(component);
 
         
         if (value.GetType().Equals(dummy.GetType()))
@@ -42,7 +50,11 @@ public class FieldToText : MonoBehaviour
     
     void Update()
     {
-        object value = field.GetValue(component);
+        object value;
+        if (field!=null)
+            value = field.GetValue(component);
+        else value = property.GetValue(component);
+        
         if (value.GetType().Equals(dummy.GetType()))
             textMesh.text = originalText + " " + ((float)value).ToString("0.00");
         else
