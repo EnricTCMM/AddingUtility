@@ -9,7 +9,7 @@ namespace MotorBehaviours
         public float blendingWeight = 1f; // weight for blending
         public int arbitrationPriority = 1; // arbitration priority (2 is higher priority)
         
-        // convenience methods to enable/disable the motor behaviour without having to resort 
+        // convenience methods to enable/disable the motor behaviours without having to resort to
         // enabled = true/false in the code. 
         public void Enable()
         {
