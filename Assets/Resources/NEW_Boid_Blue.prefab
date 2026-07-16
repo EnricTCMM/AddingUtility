@@ -160,7 +160,7 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 8
-  showWhiskers: 1
+  showWhiskers: 0
 --- !u!114 &2586829939434212908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +207,7 @@ MonoBehaviour:
   wanderRate: 30
   attractor: {fileID: 0}
   attractionWeight: 0.2
-  showWanderGizmos: 1
+  showWanderGizmos: 0
 --- !u!96 &8598474139295794393
 TrailRenderer:
   serializedVersion: 4

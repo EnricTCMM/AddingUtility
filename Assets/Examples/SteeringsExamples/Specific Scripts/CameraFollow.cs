@@ -19,7 +19,7 @@ public Transform target;
     private Vector3 velocity = Vector3.zero;
 
     private bool isRecentering = false;
-    private Vector3 recenterTarget; // ✅ objectiu FIX
+    private Vector3 recenterTarget; // FIXED GOAL this is where we should move towards
 
     void LateUpdate()
     {
@@ -38,14 +38,14 @@ public Transform target;
         float bottom = camPos.y - vertExtent + marginY;
         float top = camPos.y + vertExtent - marginY;
 
-        // ✅ Detectar sortida NOMÉS si no estem recentrant
+        // Detect exit only when not recentering
         if (!isRecentering &&
             (targetPos.x < left || targetPos.x > right ||
              targetPos.y < bottom || targetPos.y > top))
         {
             isRecentering = true;
 
-            // ✅ IMPORTANT: fixem el punt de recentrat UNA VEGADA
+            // Fix recenter point only once
             
             recenterTarget = new Vector3(
                 targetPos.x * 0.8f + camPos.x * 0.2f,
@@ -55,7 +55,7 @@ public Transform target;
 
         }
 
-        // ✅ Mourem cap a un objectiu FIX, no cap al target viu
+        // move towards fixed goal
         if (isRecentering)
         {
             transform.position = Vector3.SmoothDamp(
@@ -70,7 +70,7 @@ public Transform target;
                 new Vector2(recenterTarget.x, recenterTarget.y)
             );
 
-            // ✅ Quan arriba → parar del tot
+            // when reached stop completely
             if (dist < tolerance)
             {
                 isRecentering = false;

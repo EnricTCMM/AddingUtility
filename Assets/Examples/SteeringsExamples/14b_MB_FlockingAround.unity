@@ -2784,7 +2784,10 @@ MonoBehaviour:
   m_text: 'Use GUI to modify the flocking behaviour of the blue boids
 
     Enable
-    Gizmos to see cohesion and repulsion radii (thresholds)'
+    Gizmos to see cohesion, separation abd alignment radii (thresholds) and cone
+    of vision
+
+    Press T to toggle trail rendering on/off'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}

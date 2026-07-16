@@ -35,8 +35,6 @@ public class BoidSpawnerAndRegistry : BoidRegistry
         separationWeight = flocking.separationWeight;
         alignmentWeight = flocking.alignmentWeight;
         attractionWeight = flocking.attractionWeight;
-
-        Debug.Log(separationWeight + " " + alignmentWeight + " "+ cohesionWeight);
         
         Destroy(dummy);
     }
