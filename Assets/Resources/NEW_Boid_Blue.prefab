@@ -127,7 +127,7 @@ MonoBehaviour:
   maxSpeed: 40
   maxTorque: 720
   maxAngularSpeed: 360
-  rotationalPolicy: 1
+  rotationalPolicy: 2
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
@@ -155,6 +155,7 @@ MonoBehaviour:
   secondaryWhiskerAngle: 45
   secondaryWhiskerRatio: 0.7
   avoidDistance: 22
+  mainWhiskerRadius: 0.5
   perseveranceTime: 0.15
   obstacleLayer:
     serializedVersion: 2

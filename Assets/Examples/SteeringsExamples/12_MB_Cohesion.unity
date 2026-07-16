@@ -4008,7 +4008,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   listenerObject: {fileID: 407329148}
-  componentType: GroupRegistry
+  componentType: BoidRegistry
   fieldName: cohesionThreshold
 --- !u!114 &2024935087
 MonoBehaviour:
