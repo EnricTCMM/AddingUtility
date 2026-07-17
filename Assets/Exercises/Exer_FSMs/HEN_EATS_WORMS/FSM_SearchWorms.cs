@@ -1,6 +1,6 @@
 using FSMs;
 using UnityEngine;
-using Steerings;
+using MotorBehaviours;
 
 [CreateAssetMenu(fileName = "FSM_SearchWorms", menuName = "Finite State Machines/FSM_SearchWorms", order = 1)]
 public class FSM_SearchWorms : FiniteStateMachine
@@ -10,8 +10,8 @@ public class FSM_SearchWorms : FiniteStateMachine
      * For instance: steering behaviours, blackboard, ...*/
 
     private HEN_Blackboard blackboard;
-    private WanderAround wanderAround;
-    private Arrive arrive;
+    private SB_Wander wanderAround;
+    private SB_Arrive arrive;
     private AudioSource audioSource;
     private GameObject theWorm;
     private float elapsedTime;

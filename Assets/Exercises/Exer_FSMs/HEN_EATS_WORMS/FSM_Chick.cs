@@ -1,6 +1,6 @@
 using FSMs;
 using UnityEngine;
-using Steerings;
+using MotorBehaviours;
 
 [CreateAssetMenu(fileName = "FSM_Chick", menuName = "Finite State Machines/FSM_Chick", order = 1)]
 public class FSM_Chick : FiniteStateMachine
@@ -9,9 +9,9 @@ public class FSM_Chick : FiniteStateMachine
      * states and transitions and/or set in OnEnter or used in OnExit 
      * For instance: steering behaviours, blackboard, ...*/
 
-    private WanderAround wanderAround;
-    private Flee flee;
-    private SteeringContext steeringContext;
+    private SB_Wander wanderAround;
+    private SB_Flee flee;
+    private MotorManager motorManager;
     private HEN_Blackboard blackboard;
     public GameObject theHen;
 
@@ -21,14 +21,14 @@ public class FSM_Chick : FiniteStateMachine
          * It's equivalent to the on enter actionName of any state 
          * Usually this code includes .GetComponent<...> invocations */
 
-        wanderAround = GetComponent<WanderAround>();
+        wanderAround = GetComponent<SB_Wander>();
         theHen = GameObject.FindGameObjectWithTag("HEN");
-        flee = GetComponent<Flee>();
-        steeringContext = GetComponent<SteeringContext>();
+        flee = GetComponent<SB_Flee>();
+        motorManager = GetComponent<MotorManager>();
         blackboard = theHen.GetComponent<HEN_Blackboard>();
 
         wanderAround.attractor = theHen;
-        steeringContext.seekWeight = 0.4f;
+        wanderAround.attractionWeight = 0.4f;
         flee.target = theHen;
         base.DisableAllSteerings();
 
@@ -60,14 +60,14 @@ public class FSM_Chick : FiniteStateMachine
         State fleeState = new State("FLEE",
             () => {
                 GetComponent<AudioSource>().Play();
-                steeringContext.maxAcceleration *= 3;
-                steeringContext.maxSpeed *= 7;
+                motorManager.maxForce *= 3;
+                motorManager.maxSpeed *= 7;
                 flee.enabled = true;
             }, // write on enter logic inside {}
             () => { }, // write in state logic inside {}
             () => {
-                steeringContext.maxAcceleration /= 3;
-                steeringContext.maxSpeed /= 7;
+                motorManager.maxForce /= 3;
+                motorManager.maxSpeed /= 7;
                 flee.enabled = false;
             }  // write on exit logic inisde {}  
         );

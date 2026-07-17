@@ -1,25 +1,25 @@
 using UnityEngine;
 using System;
 using System.Reflection;
-using Steerings;
+using MotorBehaviours;
 
 public class DirectWithClick : MonoBehaviour
 {
 
     public bool rightClick = false;
 
-    private Arrive arrive;
-    private Seek seek;
-    private WanderAround wanderAround;
+    private SB_Arrive arrive;
+    private SB_Seek seek;
+    private SB_Wander wanderAround;
     private Component xAndSpin;
     private int buttonNumber;
     private GameObject target;
 
     void Start()
     {
-        arrive = GetComponent<Arrive>();
-        seek = GetComponent<Seek>();
-        wanderAround = GetComponent<WanderAround>();
+        arrive = GetComponent<SB_Arrive>();
+        seek = GetComponent<SB_Seek>();
+        wanderAround = GetComponent<SB_Wander>();
         xAndSpin = GetComponent("SeekAndSpin");
         if (xAndSpin == null || !((MonoBehaviour)xAndSpin).enabled) xAndSpin=  GetComponent("ArriveAndSpin");
         target = new GameObject(); target.SetActive(false);
