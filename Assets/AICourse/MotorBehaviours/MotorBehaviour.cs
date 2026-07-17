@@ -7,7 +7,7 @@ namespace MotorBehaviours
     {
         [Header("Base congfiguration")] [Range(0f, 1f)]
         public float blendingWeight = 1f; // weight for blending
-        public int arbitrationPriority = 1; // arbitration priority (2 is higher priority)
+        public int arbitrationPriority = 1; // arbitration priority 
         
         // convenience methods to enable/disable the motor behaviours without having to resort to
         // enabled = true/false in the code. 
@@ -18,6 +18,7 @@ namespace MotorBehaviours
         
         public void Disable()
         {
+            Debug.Log($"Disabling MB {this.GetType().Name}");
             enabled = false;
         }
 

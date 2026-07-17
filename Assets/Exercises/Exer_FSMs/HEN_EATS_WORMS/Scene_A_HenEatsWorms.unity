@@ -458,7 +458,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823459bfcabf59e4bbb7d30c1033e0ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fsm: {fileID: 11400000, guid: 2ab5c1579edc9a94b91ddf53e356db90, type: 2}
+  fsm: {fileID: 11400000, guid: b33cdda5ce610dc4f859aed961db9256, type: 2}
   currentState: 
   textMesh: {fileID: 717787871}
 --- !u!114 &673092628
@@ -468,18 +468,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 673092614}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adcc097a66ad4403b27b6510f6aff6c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Wander
   blendingWeight: 1
   arbitrationPriority: 1
-  wanderRadius: 10
-  wanderOffset: 20
-  wanderRate: 30
+  wanderRadius: 5
+  wanderOffset: 40
+  wanderRate: 15
   attractor: {fileID: 1459453988}
-  attractionWeight: 0.2
+  attractionWeight: 0.1
   showWanderGizmos: 1
 --- !u!114 &673092629
 MonoBehaviour:

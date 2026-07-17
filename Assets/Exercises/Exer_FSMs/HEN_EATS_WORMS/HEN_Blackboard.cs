@@ -8,12 +8,17 @@ public class HEN_Blackboard : MonoBehaviour
 
     public float chickDetectionRadius = 100;   // within this radius chicks are detected
     public float chickFarEnoughRadius = 250;   // from this distance on chicks stop being an annoyance
-
+    
     public GameObject attractor;     // hen wanders around this point
 
     public AudioClip angrySound;
     public AudioClip eatingSound;
     public AudioClip cluckingSound;
+
+    // DELETE FOLLOWING ATTRIBTUTES IN STUDENT'S VERSION
+    public Color restlessColor = Color.darkOliveGreen;
+    public float tooFarFromAttractor = 180f;
+    public float closeEnoughToAttractor = 60f;
 
     void Awake()
     {

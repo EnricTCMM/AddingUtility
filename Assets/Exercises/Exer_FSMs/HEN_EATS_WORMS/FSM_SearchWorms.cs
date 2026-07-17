@@ -23,6 +23,10 @@ public class FSM_SearchWorms : FiniteStateMachine
          * Usually this code includes .GetComponent<...> invocations */
 
         /* COMPLETE */
+        blackboard = GetComponent<HEN_Blackboard>();
+        wanderAround = GetComponent<SB_Wander>();
+        arrive = GetComponent<SB_Arrive>();
+        audioSource = GetComponent<AudioSource>();
 
         base.OnEnter(); // do not remove
     }
@@ -35,7 +39,11 @@ public class FSM_SearchWorms : FiniteStateMachine
          * been exited. */
        
         /* COMPLETE */
-
+        Debug.Log("FSM_SearchWorms exiting !!!");
+        audioSource.Stop();
+        wanderAround.Disable();
+        arrive.Disable();
+        
         base.OnExit();
     }
 
@@ -81,5 +89,72 @@ public class FSM_SearchWorms : FiniteStateMachine
         initialState = ... 
 
          */
+        
+        /* STAGE 1: create the states with their logic(s) */
+         
+        State wander = new State("Wander",
+            () => {
+                audioSource.clip = blackboard.cluckingSound;
+                audioSource.Play();
+                wanderAround.enabled = true;
+            }, 
+            () => { }, 
+            () => {
+                audioSource.Stop();
+                wanderAround.enabled = false; }
+        );
+
+        State reachWorm = new State("Reach Worm",
+            () => { arrive.target = theWorm; arrive.enabled = true; }, 
+            () => { }, 
+            () => { arrive.enabled = false; }  
+        );
+
+        State eating = new State("Eating",
+            () => {
+                audioSource.clip = blackboard.eatingSound;
+                audioSource.Play();
+                elapsedTime = 0f; 
+            }, // write on enter logic inside {}
+            () => { elapsedTime += Time.deltaTime; }, // write in state logic inside {}
+            () => {
+                audioSource.Stop();
+                Destroy(theWorm); 
+            }  
+        );
+
+        /* STAGE 2: create the transitions with their logic(s) */
+
+        Transition wormDetected = new Transition("Worm Detected",
+            () => { 
+                theWorm = SensingUtils.FindInstanceWithinRadius(gameObject, "WORM", blackboard.wormDetectableRadius);
+                return theWorm != null;
+            }
+        );
+
+        Transition wormVanished = new Transition("Worm Vanished",
+            () => { return theWorm == null || theWorm.Equals(null); }
+        );
+
+        Transition wormReached = new Transition("Worm Reached",
+            () => { return SensingUtils.DistanceToTarget(gameObject, theWorm) < blackboard.wormReachedRadius; }
+        );
+
+        Transition timeout = new Transition("Timeout",
+            () => { return elapsedTime >= blackboard.timeToEatWorm; }
+        );
+
+        /* STAGE 3: add states and transitions to the FSM  */
+         
+        AddStates(wander, reachWorm, eating);
+        AddTransition(wander, wormDetected, reachWorm);
+        AddTransition(reachWorm, wormVanished, wander);
+        AddTransition(reachWorm, wormReached, eating);
+        AddTransition(eating, timeout, wander);
+
+        /* STAGE 4: set the initial state */
+        initialState = wander;
+        
+        
     }
 }

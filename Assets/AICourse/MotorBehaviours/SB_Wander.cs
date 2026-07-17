@@ -11,7 +11,7 @@ namespace MotorBehaviours
         public float wanderRate = 15f; 
 
         [Header("Attractor Settings (WanderAround)")]
-        [Tooltip("")]
+        [Tooltip("Attraction point. If left null pure wander")]
         public GameObject attractor;
         [Range(0f, 1f)]
         [Tooltip("0 = Pure wander, 1 = Pure seek towards the attractor ")]
@@ -62,6 +62,12 @@ namespace MotorBehaviours
             // velocity is 0 or maxSpeed. 
             Vector3 wanderVelocity = SB_Seek.GetDesiredVelocity(me, surrogateTargetPosition);
 
+            // SORT OF A FAIL FAST...
+            if (attractionWeight > 0.0 && attractor == null)
+            {
+                Debug.LogWarning($"BEWARE: null attractor with non-zero weight in SB_Wander of {gameObject}");
+            }
+            
             if (attractor != null)
             {
                 Vector3 attractorVelocity = SB_Seek.GetDesiredVelocity(me, attractor.transform.position);

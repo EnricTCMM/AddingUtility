@@ -104,7 +104,11 @@ namespace FSMs
         }
 
         // FSMs must redefine this method if they have particular OnExit logic
-        public virtual void OnExit() { }
+        public virtual void OnExit()
+        {
+            // when exiting and FSM, exit its current state.
+            currentState.OnExit();
+        }
 
         public virtual void InState()
         {

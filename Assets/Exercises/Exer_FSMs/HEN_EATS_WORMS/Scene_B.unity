@@ -459,7 +459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823459bfcabf59e4bbb7d30c1033e0ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fsm: {fileID: 11400000, guid: c8a4f8f6accc6ea44ba5e247ac685030, type: 2}
+  fsm: {fileID: 11400000, guid: 29f73aa511a6f694592aaa5de902eeb9, type: 2}
   currentState: 
   textMesh: {fileID: 717787871}
 --- !u!114 &673092628
@@ -491,11 +491,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Wander
   blendingWeight: 1
   arbitrationPriority: 1
-  wanderRadius: 10
-  wanderOffset: 20
-  wanderRate: 30
+  wanderRadius: 5
+  wanderOffset: 40
+  wanderRate: 15
   attractor: {fileID: 1459453988}
-  attractionWeight: 0.2
+  attractionWeight: 0.1
   showWanderGizmos: 1
 --- !u!114 &673092630
 MonoBehaviour:

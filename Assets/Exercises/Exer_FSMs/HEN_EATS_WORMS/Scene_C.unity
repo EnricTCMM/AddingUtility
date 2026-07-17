@@ -437,16 +437,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f2e8edfd9e7be64eadd6c595e18332e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::HEN_Blackboard
   wormDetectableRadius: 60
   wormReachedRadius: 12
   timeToEatWorm: 1.5
   chickDetectionRadius: 100
   chickFarEnoughRadius: 250
-  attractor: {fileID: 0}
+  attractor: {fileID: 1459453988}
   angrySound: {fileID: 0}
   eatingSound: {fileID: 0}
   cluckingSound: {fileID: 0}
+  restlessColor: {r: 0.3333333, g: 0.4196079, b: 0.1843137, a: 1}
+  tooFarFromAttractor: 180
+  closeEnoughToAttractor: 60
 --- !u!114 &673092627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -459,7 +462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823459bfcabf59e4bbb7d30c1033e0ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fsm: {fileID: 11400000, guid: cf67e12f0cb1ade4d91e40507b40ba1e, type: 2}
+  fsm: {fileID: 11400000, guid: efd5882d1a6318949b54354fd72532a5, type: 2}
   currentState: 
   textMesh: {fileID: 717787871}
 --- !u!114 &673092628
@@ -491,11 +494,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Wander
   blendingWeight: 1
   arbitrationPriority: 1
-  wanderRadius: 10
-  wanderOffset: 20
-  wanderRate: 30
+  wanderRadius: 5
+  wanderOffset: 40
+  wanderRate: 15
   attractor: {fileID: 0}
-  attractionWeight: 0.2
+  attractionWeight: 0.1
   showWanderGizmos: 1
 --- !u!114 &673092630
 MonoBehaviour:
@@ -530,7 +533,7 @@ MonoBehaviour:
   maxSpeed: 10
   maxTorque: 360
   maxAngularSpeed: 90
-  rotationalPolicy: 0
+  rotationalPolicy: 2
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
   policySlowdownRadius: 30
@@ -924,6 +927,10 @@ PrefabInstance:
     - target: {fileID: 5489914894782065854, guid: 6d015f4fe74e86047b4146ff3b9cc1ed, type: 3}
       propertyPath: m_Name
       value: CHICK
+      objectReference: {fileID: 0}
+    - target: {fileID: 5489914894782065854, guid: 6d015f4fe74e86047b4146ff3b9cc1ed, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
