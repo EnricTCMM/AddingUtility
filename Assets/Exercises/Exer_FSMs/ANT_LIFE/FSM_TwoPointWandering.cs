@@ -1,14 +1,14 @@
 using FSMs;
+using MotorBehaviours;
 using UnityEngine;
-using Steerings;
+
 
 [CreateAssetMenu(fileName = "FSM_TwoPointWandering", menuName = "Finite State Machines/FSM_TwoPointWandering", order = 1)]
 public class FSM_TwoPointWandering : FiniteStateMachine
 {
-    
 
-    private WanderAround wanderAround;
-    private SteeringContext steeringContext;
+
+    private SB_Wander wanderAround;
     private ANT_Blackboard blackboard;
 
     private float elapsedTime = 0;
@@ -20,7 +20,9 @@ public class FSM_TwoPointWandering : FiniteStateMachine
          * It's equivalent to the on enter actionName of any state 
          * Usually this code includes .GetComponent<...> invocations */
 
-        /* COMPLETE */
+        blackboard = GetComponent<ANT_Blackboard>();
+        wanderAround = GetComponent<SB_Wander>();
+        wanderAround.attractionWeight = blackboard.initialAttractorWeight;
 
         base.OnEnter(); // do not remove
     }
@@ -32,7 +34,7 @@ public class FSM_TwoPointWandering : FiniteStateMachine
          * Usually this code turns off behaviours that shouldn't be on when one the FSM has
          * been exited. */
 
-        /* COMPLETE */
+        wanderAround.Disable();
 
         base.OnExit();
     }
@@ -44,15 +46,25 @@ public class FSM_TwoPointWandering : FiniteStateMachine
          */
 
         State goingA = new State("Going_A",
-           () => { /* COMPLETE */},
+            () =>
+            {
+                wanderAround.attractor = blackboard.locationA;
+                wanderAround.Enable();
+                elapsedTime = 0;
+            },
            () => { elapsedTime += Time.deltaTime;}, 
-           () => {/* COMPLETE */}
+           () => {wanderAround.Disable();}
        );
 
         State goingB = new State("Going_B",
-           () => {/* COMPLETE */ },
-           () => { elapsedTime += Time.deltaTime; },
-           () => { /* COMPLETE */ }
+            () =>
+            {
+                wanderAround.attractor = blackboard.locationB;
+                wanderAround.Enable();
+                elapsedTime = 0;
+            },
+            () => { elapsedTime += Time.deltaTime;}, 
+            () => {wanderAround.Disable();}
        );
 
 
@@ -60,24 +72,53 @@ public class FSM_TwoPointWandering : FiniteStateMachine
          * ---------------------------------------------------
         */
 
-        /*
-        Transition varName = new Transition("TransitionName",
-            () => { }, // write the condition checkeing code in {}
-            () => { }  // write the on trigger code in {} if any. Remove line if no on trigger actionName needed
+        
+        
+        Transition locationAReached = new Transition("Location A Reached",
+            () =>
+            {
+                return SensingUtils.DistanceToTarget(gameObject, blackboard.locationA) < blackboard.locationReachedRadius;
+            }, // write the condition checkeing code in {}
+            () =>
+            {
+                wanderAround.attractionWeight = blackboard.initialAttractorWeight;
+            }  // write the on trigger code in {} if any. Remove line if no on trigger actionName needed
         );
-        */
+        
+        Transition locationBReached = new Transition("Location B Reached",
+            () =>
+            {
+                return SensingUtils.DistanceToTarget(gameObject, blackboard.locationB) < blackboard.locationReachedRadius;
+            }, // write the condition checkeing code in {}
+            () =>
+            {
+                wanderAround.attractionWeight = blackboard.initialAttractorWeight;
+            }  // write the on trigger code in {} if any. Remove line if no on trigger actionName needed
+        );
 
-        /* COMPLETE, create the transitions */
+        Transition timeOut = new Transition("TimeOut",
+            () =>
+            {
+                return elapsedTime >= blackboard.intervalBetweenTimeOuts;
+            }, // write the condition checkeing code in {}
+            () =>
+            {
+                elapsedTime = 0;
+                wanderAround.attractionWeight += blackboard.attractorWeightIncrement;
+            }  // write the on trigger code in {} if any. Remove line if no on trigger actionName needed
+        );
 
         /* STAGE 3: add states and transitions to the FSM 
          * ----------------------------------------------
          */
 
         AddStates(goingA, goingB);
-
-        /* COMPLETE, add the transitions */
-
-        /* STAGE 4: set the initial state */
+        
+        AddTransition(goingA, locationAReached, goingB);
+        AddTransition(goingA, timeOut, goingA);
+        AddTransition(goingB, locationBReached, goingA);
+        AddTransition(goingB, timeOut, goingB);
+        
 
         initialState = goingA;
     }

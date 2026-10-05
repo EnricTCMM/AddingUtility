@@ -43,7 +43,7 @@ public class FSM_DriveAway : FiniteStateMachine
             motorManager.maxSpeed /= 2;
         }
 
-        Debug.Log("FSM_DriveAway exiting");
+        // Debug.Log("FSM_DriveAway exiting");
         audioSource.Stop();
         seek.Disable();
         

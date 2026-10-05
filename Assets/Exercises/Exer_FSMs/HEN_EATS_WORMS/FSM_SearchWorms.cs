@@ -39,7 +39,7 @@ public class FSM_SearchWorms : FiniteStateMachine
          * been exited. */
        
         /* COMPLETE */
-        Debug.Log("FSM_SearchWorms exiting !!!");
+        // Debug.Log("FSM_SearchWorms exiting !!!");
         audioSource.Stop();
         wanderAround.Disable();
         arrive.Disable();

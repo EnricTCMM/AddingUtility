@@ -18,7 +18,7 @@ namespace MotorBehaviours
         
         public void Disable()
         {
-            Debug.Log($"Disabling MB {this.GetType().Name}");
+            // Debug.Log($"Disabling MB {this.GetType().Name}");
             enabled = false;
         }
 
