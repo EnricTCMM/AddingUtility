@@ -2510,6 +2510,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 940822832}
     - target: {fileID: 5279228889649118977, guid: 117f0c9d991311544bd0608bb4a5f821, type: 3}
+      propertyPath: fsm
+      value: 
+      objectReference: {fileID: 11400000, guid: 5e97dd836a3422a4c81a1beda17d3df0, type: 2}
+    - target: {fileID: 5279228889649118977, guid: 117f0c9d991311544bd0608bb4a5f821, type: 3}
       propertyPath: textMesh
       value: 
       objectReference: {fileID: 1672749211}
@@ -2517,6 +2521,10 @@ PrefabInstance:
       propertyPath: hideout
       value: 
       objectReference: {fileID: 1007754145}
+    - target: {fileID: 8710130789981108964, guid: 117f0c9d991311544bd0608bb4a5f821, type: 3}
+      propertyPath: showWhiskers
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

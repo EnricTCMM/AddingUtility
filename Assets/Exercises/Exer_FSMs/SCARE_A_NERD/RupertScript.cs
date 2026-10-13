@@ -1,11 +1,13 @@
 using UnityEngine;
-using Steerings;
+using MotorBehaviours;
+
+
 
 public class RupertScript : MonoBehaviour
 {
     private GameObject destination;
-    private Evade evade;
-    private Seek seek;
+    private SB_Evade evade;
+    private SB_Seek seek;
     private bool evading = false;
     private GameObject ghost;
 
@@ -13,9 +15,9 @@ public class RupertScript : MonoBehaviour
     {
         GameObject[] targets = GameObject.FindGameObjectsWithTag("TARGETLOC");
         destination = targets[(new System.Random()).Next(targets.Length)];
-        seek = GetComponent<Seek>();
-        evade = GetComponent<Evade>();
-        GetComponent<SteeringContext>().maxSpeed += GetComponent<SteeringContext>().maxSpeed * Random.Range(0.2f, 0.8f);
+        seek = GetComponent<SB_Seek>();
+        evade = GetComponent<SB_Evade>();
+        GetComponent<MotorManager>().maxSpeed += GetComponent<MotorManager>().maxSpeed * Random.Range(0.2f, 0.8f);
         seek.target = destination;
         seek.enabled = true;
         evade.enabled = false;
@@ -34,7 +36,7 @@ public class RupertScript : MonoBehaviour
             seek.enabled = false;
             evade.target = ghost;
             evade.enabled = true;
-            GetComponent<SteeringContext>().maxSpeed *= 4f;
+            GetComponent<MotorManager>().maxSpeed *= 4f;
             GetComponent<TimeToLive>().Reset(15);
         }
     }

@@ -180,11 +180,12 @@ MonoBehaviour:
   secondaryWhiskerAngle: 40
   secondaryWhiskerRatio: 0.7
   avoidDistance: 25
+  mainWhiskerRadius: 0.5
   perseveranceTime: 0.8
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 8
-  showWhiskers: 1
+  showWhiskers: 0
 --- !u!114 &8667502247351062268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,8 +221,8 @@ MonoBehaviour:
   wanderOffset: 5
   wanderRate: 30
   attractor: {fileID: 0}
-  attractionWeight: 0.2
-  showWanderGizmos: 1
+  attractionWeight: 0
+  showWanderGizmos: 0
 --- !u!114 &489292825069274305
 MonoBehaviour:
   m_ObjectHideFlags: 0

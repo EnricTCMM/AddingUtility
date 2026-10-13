@@ -1241,6 +1241,10 @@ PrefabInstance:
       propertyPath: textMesh
       value: 
       objectReference: {fileID: 1672749211}
+    - target: {fileID: 8710130789981108964, guid: 117f0c9d991311544bd0608bb4a5f821, type: 3}
+      propertyPath: showWhiskers
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
