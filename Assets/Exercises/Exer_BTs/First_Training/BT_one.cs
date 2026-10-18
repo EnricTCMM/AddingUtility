@@ -9,6 +9,12 @@ public class BT_one : BehaviourTree
     {
 
        /* COMPLETE */
-       
+       root = new Sequence(
+            new ACTION_Arrive("home"),
+            new ACTION_Arrive("gym"),
+            new ACTION_Somersault(),
+            new ACTION_PlaySound("impactSound")
+       );
+
     }
 }

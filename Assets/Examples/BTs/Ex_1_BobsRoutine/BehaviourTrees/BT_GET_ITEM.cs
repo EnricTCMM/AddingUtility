@@ -24,6 +24,22 @@ public class BT_GET_ITEM : BehaviourTree
         this.keyoutObjectTaken = keyoutObjectTaken;
     }
 
+    // parameterless constructor
+    public BT_GET_ITEM() { }
+
+    // paremeter setter using a "fluid approach" (returns this). 
+    public BT_GET_ITEM SetParameters (string keyFindRadius, 
+                                        string keyTag, 
+                                        string keyLiftSound,
+                                        string keyoutObjectTaken) 
+    {
+        this.keyFindRadius = keyFindRadius;
+        this.keyTag = keyTag;
+        this.keyLiftSound = keyLiftSound;
+        this.keyoutObjectTaken = keyoutObjectTaken;
+        return this;
+    }
+    
 
     public override void OnConstruction()
     {

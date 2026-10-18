@@ -1,4 +1,4 @@
-using System.ComponentModel.Design.Serialization;
+
 using UnityEngine;
 using Utility;
 using BTs;
@@ -154,11 +154,11 @@ class ACTION_Eat : Action
 
 class ACTION_ConstrainedWander : Action
 {
-    private BT_ConstrainedWander constrainedWanderBehaviorTree;
+    private BT_GoatConstrainedWander constrainedWanderBehaviorTree;
 
     public override void OnInitialize()
     {
-        constrainedWanderBehaviorTree = ScriptableObject.CreateInstance<BT_ConstrainedWander>();
+        constrainedWanderBehaviorTree = ScriptableObject.CreateInstance<BT_GoatConstrainedWander>();
         constrainedWanderBehaviorTree.Contextualize(gameObject);
     }
     public override Status OnTick()
@@ -171,7 +171,7 @@ class ACTION_ConstrainedWander : Action
     }
 }
 
-class BT_ConstrainedWander : BehaviourTree
+class BT_GoatConstrainedWander : BehaviourTree
 {
     public override void OnConstruction()
     {

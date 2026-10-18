@@ -16,17 +16,21 @@ public class BT_MakeFire : BehaviourTree
 
         Selector getWood = new Selector(
             new CONDITION_ParentsObjectWithTag("WOOD"),
-            new BT_GET_ITEM("1000.0", "WOOD", "liftsound", "theWood")
+            // Unity complains if new is used with scriptable objects. It recommends ScriptableObject.CreateInstance<>() 
+            // new BT_GET_ITEM("1000.0", "WOOD", "liftsound", "theWood")
+            ScriptableObject.CreateInstance<BT_GET_ITEM>().SetParameters("1000.0", "WOOD", "liftsound", "theWood")
         );
 
         Selector getMatches = new Selector(
             new CONDITION_ParentsObjectWithTag("MATCHES"),
-            new BT_GET_ITEM("1000.0", "MATCHES", "liftsound", "theMatches")
+            //new BT_GET_ITEM("1000.0", "MATCHES", "liftsound", "theMatches")
+            ScriptableObject.CreateInstance<BT_GET_ITEM>().SetParameters("1000.0", "MATCHES", "liftsound", "theMatches")
         );
 
         Selector getNeswpaper = new Selector(
             new CONDITION_ParentsObjectWithTag("NEWSPAPER"),
-            new BT_GET_ITEM("1000.0", "NEWSPAPER", "liftsound", "theNewspaper")
+            // new BT_GET_ITEM("1000.0", "NEWSPAPER", "liftsound", "theNewspaper")
+            ScriptableObject.CreateInstance<BT_GET_ITEM>().SetParameters("1000.0", "NEWSPAPER", "liftsound", "theNeswpaper")
         );
 
         // ------------------------------------------------

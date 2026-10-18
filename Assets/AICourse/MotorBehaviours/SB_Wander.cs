@@ -15,7 +15,7 @@ namespace MotorBehaviours
         public GameObject attractor;
         [Range(0f, 1f)]
         [Tooltip("0 = Pure wander, 1 = Pure seek towards the attractor ")]
-        public float attractionWeight = 0.2f;
+        public float attractionWeight = 0.0f;
         
         [Header("Debug Settings")]
         public bool showWanderGizmos = true;

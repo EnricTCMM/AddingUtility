@@ -38,6 +38,17 @@ public class CONDITION_FeelUnsafe : Condition
     {
 
        /* COMPLETE */
+       
+       float distance = SensingUtils.DistanceToTarget(gameObject, attractor);
+       
+       // outside safe return true (outside safe => feel unsafe)
+       // inside extra safe return false
+       // any other case return same as at last tick
+       
+       if (distance > safeRadius)
+           lastTick = true;
+       if (distance < extraSafeRadius)
+           lastTick = false;
 
        return lastTick;
     }
