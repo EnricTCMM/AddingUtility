@@ -113,7 +113,7 @@ namespace MotorBehaviours
         {
             isActive = false; // no more updates will be processed by the manager
             
-            // following line set linear velocity and angular speed to zero.
+            // following line sets linear velocity and angular speed to zero.
             // This effectively stops the agent (kills Inertia)
             StopCompletely();
             
@@ -247,12 +247,16 @@ namespace MotorBehaviours
             {
                 if (behaviour.arbitrationPriority > currentPriorityLevel && finalForce.magnitude > 0.001f)
                 {
+                    // condition has detected that current behaviour has less priority and that 
+                    // higher priority behaviours have already contributed to a force
                     break; 
                 }
+             
                 
                 Vector3? desiredVelocity = behaviour.GetDesiredVelocity(this);
                 if (desiredVelocity == null)
                 {
+                    Debug.Log(behaviour.GetType().Name + " abstains");
                     continue;
                 }
                 

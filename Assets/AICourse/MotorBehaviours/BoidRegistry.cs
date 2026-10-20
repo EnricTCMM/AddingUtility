@@ -24,7 +24,8 @@ namespace MotorBehaviours
             // and make them members of the group
             foreach (Transform child in transform)
             {
-                AddBoid(child.gameObject);
+                if (child.gameObject.activeInHierarchy)  // disregard non-active gameobjects
+                    AddBoid(child.gameObject);
             }
         }
 
