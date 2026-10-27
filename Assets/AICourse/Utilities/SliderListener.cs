@@ -62,7 +62,6 @@ public class SliderListener : MonoBehaviour
         
         slider.onValueChanged.AddListener((x)=>
         {
-            
             currVal.text = slider.value.ToString(format);
             if (method!=null)
             {
