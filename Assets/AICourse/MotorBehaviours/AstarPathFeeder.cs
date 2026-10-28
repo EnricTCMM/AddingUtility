@@ -68,4 +68,17 @@ public class AstarPathFeeder : MonoBehaviour
         // into our generic path following behavior, maintaining zero-allocation.
         pathFollowingSteering.SetPath(p.vectorPath);
     }
+    
+    // convenience methods to enable/disable without having to resort to
+    // enabled = true/false in the code. 
+    public void Enable()
+    {
+        enabled = true;
+    }
+        
+    public void Disable()
+    {
+        
+        enabled = false;
+    }
 }

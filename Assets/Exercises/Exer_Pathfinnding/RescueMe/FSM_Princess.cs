@@ -1,6 +1,6 @@
 using FSMs;
 using UnityEngine;
-using Steerings;
+using MotorBehaviours;
 
 [CreateAssetMenu(fileName = "FSM_Princess", menuName = "Finite State Machines/FSM_Princess", order = 1)]
 public class FSM_Princess : FiniteStateMachine
@@ -10,8 +10,8 @@ public class FSM_Princess : FiniteStateMachine
       * For instance: steering behaviours, blackboard, ...*/
 
     private ROYAL_Blackboard blackboard;
-    private PathFeeder pathFeeder;
-    private PathFollowing pathFollowing;
+    private AstarPathFeeder pathFeeder;
+    private SB_PathFollowing pathFollowing;
 
     public override void OnEnter()
     {
@@ -20,8 +20,8 @@ public class FSM_Princess : FiniteStateMachine
          * Usually this code includes .GetComponent<...> invocations */
 
         blackboard = GetComponent<ROYAL_Blackboard>();
-        pathFeeder = GetComponent<PathFeeder>();
-        pathFollowing = GetComponent<PathFollowing>();
+        pathFeeder = GetComponent<AstarPathFeeder>();
+        pathFollowing = GetComponent<SB_PathFollowing>();
 
         base.OnEnter(); // do not remove
     }
@@ -33,13 +33,50 @@ public class FSM_Princess : FiniteStateMachine
          * Usually this code turns off behaviours that shouldn't be on when one the FSM has
          * been exited. */
 
-        base.DisableAllSteerings();
+        pathFollowing.Disable();
         base.OnExit();
     }
 
     public override void OnConstruction()
     {
+        
+        
+        //++++++-----------------------
+        // això és el que cal eliminar de cara als estudiants. La resta no cal
+        //+++++------------------------
 
+        State waitingForPrince = new State("WAITING FOR PRINCE",
+            () => {},
+            () => {},
+            () => {}
+        );
+
+        State followingPrince = new State("FOLLOWING PRINCE",
+            () => {
+                pathFeeder.target = blackboard.partner;
+                pathFeeder.Enable();
+                pathFollowing.Enable();
+            },
+            () => {},
+            () => {}
+        );
+
+
+        Transition princeShowUp = new Transition("Prince Show Up",
+            () => { return SensingUtils.DistanceToTarget(gameObject, blackboard.partner) < 20; }
+        );
+
+
+        AddStates(waitingForPrince, followingPrince);
+
+        AddTransition(waitingForPrince, princeShowUp, followingPrince);
+
+        initialState = waitingForPrince;
+
+        
+        
+        
+        // Això és el que es deixa. 
         /* COMPLETE */
 
         /* STAGE 1: create the states with their logic(s)
@@ -48,7 +85,7 @@ public class FSM_Princess : FiniteStateMachine
          State varName = new State("StateName",
              () => { }, // write on enter logic inside {}
              () => { }, // write in state logic inside {}
-             () => { }  // write on exit logic inisde {}  
+             () => { }  // write on exit logic inisde {}
          );
 
           */
@@ -65,9 +102,9 @@ public class FSM_Princess : FiniteStateMachine
         */
 
 
-        /* STAGE 3: add states and transitions to the FSM 
+        /* STAGE 3: add states and transitions to the FSM
          * ----------------------------------------------
-            
+
         AddStates(...);
 
         AddTransition(sourceState, transition, destinationState);
@@ -76,8 +113,8 @@ public class FSM_Princess : FiniteStateMachine
 
 
         /* STAGE 4: set the initial state
-         
-        initialState = ... 
+
+        initialState = ...
 
          */
     }

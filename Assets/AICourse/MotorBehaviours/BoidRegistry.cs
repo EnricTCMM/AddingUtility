@@ -70,6 +70,7 @@ namespace MotorBehaviours
             {
                 SB_Separation separation = member.GetComponent<SB_Separation>();
                 if (separation!=null) separation.repulsionThreshold=value;
+                
                 SB_Flocking flocking = member.GetComponent<SB_Flocking>();
                 if (flocking!=null) flocking.separationThreshold=value;
             }
@@ -81,6 +82,7 @@ namespace MotorBehaviours
             {
                 SB_Cohesion cohesion = member.GetComponent<SB_Cohesion>();
                 if (cohesion!=null) cohesion.cohesionThreshold=value;
+                
                 SB_Flocking flocking = member.GetComponent<SB_Flocking>();
                 if (flocking!=null) flocking.cohesionThreshold=value;
             }
@@ -135,8 +137,11 @@ namespace MotorBehaviours
         {
             foreach (GameObject member in members)
             {
+                SB_Separation separation = member.GetComponent<SB_Separation>();
+                if (separation!=null) separation.blendingWeight=value;
+                
                 SB_Flocking sb = member.GetComponent<SB_Flocking>();
-                sb.separationWeight = value;
+                if (sb!=null) sb.separationWeight = value;
             }
         }
         

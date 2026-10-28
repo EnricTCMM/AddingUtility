@@ -1,6 +1,5 @@
 using FSMs;
 using UnityEngine;
-using Steerings;
 
 [CreateAssetMenu(fileName = "FSM_CapsuleControl", menuName = "Finite State Machines/FSM_CapsuleControl", order = 1)]
 public class FSM_CapsuleControl : FiniteStateMachine
@@ -36,15 +35,46 @@ public class FSM_CapsuleControl : FiniteStateMachine
     public override void OnConstruction()
     {
         
+        
+        State capsule_ON = new State("CAPSULE ON",
+            () => { capsule.SetActive(true); }, 
+            () => { }, 
+            () => { }   
+        );
+
         State capsule_OFF = new State("CAPSULE OFF",
-            () => { /* COMPLETE */ }, 
+            () => { capsule.SetActive(false); }, 
             () => { }, 
             () => { }  
         );
 
-        /* COMPLETE */
+        Transition fireIsClose = new Transition("Fire is Close",
+            () => { return SensingUtils.FindInstanceWithinRadius(gameObject, "FIRE", 20) != null; } 
+        );
+
+        Transition fireIsNotClose = new Transition("Fire is Not Close",
+            () => { return SensingUtils.FindInstanceWithinRadius(gameObject, "FIRE", 20) == null; }
+        );
+
+        AddStates(capsule_ON, capsule_OFF);
+        AddTransition(capsule_OFF, fireIsClose, capsule_ON);
+        AddTransition(capsule_ON, fireIsNotClose, capsule_OFF);
 
         initialState = capsule_OFF;
+
+        
+        /* Això és el que es dona als estudiants 
+        State capsule_OFF = new State("CAPSULE OFF",
+            () => { // COMPLETE }, 
+            () => { }, 
+            () => { }  
+        );
+
+        // COMPLETE
+
+        initialState = capsule_OFF;
+        
+        /* Final del que es dona als estudiants */
 
     }
 }
