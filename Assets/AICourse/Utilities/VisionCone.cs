@@ -1,7 +1,6 @@
 
 using AICourse.Utilities;
 using UnityEngine;
-using Steerings;
 
 public class VisionCone : MonoBehaviour
 {

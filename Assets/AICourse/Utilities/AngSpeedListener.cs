@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
-using Steerings;
+using MotorBehaviours;
 
 public class AngSpeedListener : MonoBehaviour
 {
-    private SteeringContext ks;
+    private MotorManager ks;
 
     public void Awake()
     {
-        ks = GetComponent<SteeringContext>();
+        ks = GetComponent<MotorManager>();
        
     }
 

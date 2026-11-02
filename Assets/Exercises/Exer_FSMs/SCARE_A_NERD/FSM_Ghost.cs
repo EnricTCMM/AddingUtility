@@ -1,7 +1,6 @@
 using FSMs;
 using MotorBehaviours;
 using UnityEngine;
-using Steerings;
 
 [CreateAssetMenu(fileName = "FSM_Ghost", menuName = "Finite State Machines/FSM_Ghost", order = 1)]
 public class FSM_Ghost : FiniteStateMachine

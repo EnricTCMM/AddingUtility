@@ -1,6 +1,6 @@
 using FSMs;
 using UnityEngine;
-using Steerings;
+using MotorBehaviours;
 
 [CreateAssetMenu(fileName = "WanderPingPongAB", menuName = "Finite State Machines/WanderPingPongAB", order = 1)]
 public class WanderPingPongAB : FiniteStateMachine
@@ -13,16 +13,14 @@ public class WanderPingPongAB : FiniteStateMachine
     public float initialSeekWeight = 0.2f;
     public float seekIncrement = 0.1f; 
     
-    private WanderAround wanderAround;
-    private SteeringContext steeringContext;
+    private SB_Wander wanderAround;
     private DynamicBlackboard blackboard;
     
     private float elapsedTime = 0;
     
     public override void OnEnter()
     {
-        wanderAround = GetComponent<WanderAround>(); // should be off
-        steeringContext = GetComponent<SteeringContext>();
+        wanderAround = GetComponent<SB_Wander>(); // should be off
         blackboard = GetComponent<DynamicBlackboard>();
         
         locationA = blackboard.Get<GameObject>(keyLocationA);
@@ -33,7 +31,7 @@ public class WanderPingPongAB : FiniteStateMachine
 
     public override void OnExit()
     {
-        base.DisableAllSteerings();
+        wanderAround.Disable();
         base.OnExit();
     }
 
@@ -63,14 +61,14 @@ public class WanderPingPongAB : FiniteStateMachine
             () => {
                 return SensingUtils.DistanceToTarget(gameObject, locationA) < locationReachedRadius;
             },
-            () => { steeringContext.seekWeight = initialSeekWeight;}
+            () => { wanderAround.attractionWeight = initialSeekWeight;}
         );
 
         Transition locationBReached = new Transition("Location B reached",
             () => {
                 return SensingUtils.DistanceToTarget(gameObject, locationB) < locationReachedRadius;
             },
-            () => { steeringContext.seekWeight = initialSeekWeight; }
+            () => { wanderAround.attractionWeight = initialSeekWeight; }
         );
 
         Transition timeOut = new Transition("TimeOut",
@@ -78,8 +76,8 @@ public class WanderPingPongAB : FiniteStateMachine
                 bool to = elapsedTime >= intervalBetweenTimeouts;
                 return to; },
             () => {
-                float sk = Mathf.Min(1, steeringContext.seekWeight + seekIncrement);
-                steeringContext.seekWeight = sk;
+                float sk = Mathf.Min(1, wanderAround.attractionWeight + seekIncrement);
+                wanderAround.attractionWeight = sk;
                 elapsedTime = 0.0f;
             }
         );

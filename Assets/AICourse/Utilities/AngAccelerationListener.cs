@@ -1,18 +1,18 @@
 ﻿using UnityEngine;
-using Steerings;
+using MotorBehaviours;
 
 
 public class AngAccelerationListener : MonoBehaviour
 {
-    private SteeringContext ks;
+    private MotorManager ks;
 
     public void Awake()
     {
-        ks = GetComponent<SteeringContext>();
+        ks = GetComponent<MotorManager>();
     }
 
     public void AcceptInput(float userInput)
     {
-        ks.maxAngularAcceleration  = userInput;
+        ks.maxTorque  = userInput;
     }
 }

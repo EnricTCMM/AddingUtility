@@ -2,7 +2,8 @@
 using UnityEngine;
 using Utility;
 using BTs;
-using Steerings;
+using MotorBehaviours;
+
 
 [CreateAssetMenu(fileName = "UT_Goat", menuName = "Utility/UT_Goat", order = 1)]
 public class UT_Goat : UtilityActionSet
@@ -52,17 +53,17 @@ class ACTION_Evade : Action
         this.keyTarget = keyTarget;
     }
 
-    private Steerings.Evade evade;
-    private SteeringContext context;
+    private SB_Evade evade;
+    private MotorManager context;
 
     public override void OnInitialize()
     {
-        evade = GetComponent<Steerings.Evade>();
-        if (evade == null) evade = AddComponent<Steerings.Evade>();
+        evade = GetComponent<SB_Evade>();
+        if (evade == null) evade = AddComponent<SB_Evade>();
 
-        context = GetComponent<SteeringContext>();
+        context = GetComponent<MotorManager>();
         context.maxSpeed *= 3;
-        context.maxAcceleration *= 9;
+        context.maxForce *= 9;
         
         evade.target = blackboard.Get<GameObject>(keyTarget);
         evade.enabled = true;
@@ -79,7 +80,7 @@ class ACTION_Evade : Action
     {
         evade.enabled = false;
         context.maxSpeed /= 3;
-        context.maxAcceleration /= 9;
+        context.maxForce /= 9;
     }
 }
 
@@ -185,7 +186,7 @@ class BT_GoatConstrainedWander : BehaviourTree
             new Sequence(
                 new LambdaAction(() =>
                 {
-                    GetComponent<SteeringContext>().seekWeight = 0.8f;
+                    GetComponent<SB_Wander>().attractionWeight = 0.8f;
                     return Status.SUCCEEDED;
                 }),
                 new ACTION_Wander()
@@ -196,7 +197,7 @@ class BT_GoatConstrainedWander : BehaviourTree
             new Sequence(
                 new LambdaAction(() =>
                 {
-                    GetComponent<SteeringContext>().seekWeight = 0.2f;
+                    GetComponent<SB_Wander>().attractionWeight = 0.2f;
                     return Status.SUCCEEDED;
                 }),
                 new ACTION_Wander()

@@ -18,7 +18,7 @@ namespace MotorBehaviours
             me.transform.eulerAngles = currentRotation;
 
             // delegate
-            return SB_GoWhereYouLook.CalculateDesiredVelocity(me); 
+            return SB_GoWhereYouLook.GetDesiredVelocity(me, 0); // 0 is a dummy parameter. See SB_GoWhereYouLook 
         }
     }
 }

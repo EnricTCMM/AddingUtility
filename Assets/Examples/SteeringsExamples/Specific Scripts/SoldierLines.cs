@@ -1,6 +1,5 @@
 using AICourse.Utilities;
 using MotorBehaviours;
-using Steerings;
 using UnityEngine;
 
 public class SoldierLines : MonoBehaviour

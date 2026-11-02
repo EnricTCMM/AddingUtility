@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using AICourse.Utilities;
 using UnityEngine;
-using Steerings; // Required for Utils.InCone
 
 namespace MotorBehaviours
 {

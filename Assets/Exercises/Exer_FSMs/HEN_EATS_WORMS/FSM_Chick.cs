@@ -30,7 +30,6 @@ public class FSM_Chick : FiniteStateMachine
         wanderAround.attractor = theHen;
         wanderAround.attractionWeight = 0.4f;
         flee.target = theHen;
-        base.DisableAllSteerings();
 
         base.OnEnter(); // do not remove
     }
@@ -42,7 +41,8 @@ public class FSM_Chick : FiniteStateMachine
          * Usually this code turns off behaviours that shouldn't be on when one the FSM has
          * been exited. */
 
-        base.DisableAllSteerings();
+        flee.Disable();
+        wanderAround.Disable();
         base.OnExit();
     }
 

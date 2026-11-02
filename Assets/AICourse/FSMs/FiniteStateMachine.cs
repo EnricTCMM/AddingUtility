@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using MotorBehaviours;
 
 // All code by ESN 
 
@@ -181,18 +182,26 @@ namespace FSMs
                                    () => { });
         }
 
-        // this is a deprecated method since it has to do with the old steerings framework.
+        
+        /*
+         
+         // Dangerous: this may disable obstacleAvoidance-like behaviours that will be kept disabled
+         
         // another convenience method 
-        [Obsolete("Only for the old steerings framework.")]
         protected void DisableAllSteerings ()
         {
             if (gameObject!=null)
             {
-                Steerings.SteeringBehaviour[] allSteerings = gameObject.GetComponents<Steerings.SteeringBehaviour>();
-                foreach (Steerings.SteeringBehaviour steering in allSteerings)
-                    steering.enabled = false;
+                MotorBehaviour[] allSteerings = gameObject.GetComponents<MotorBehaviour>();
+                foreach (var mb in allSteerings)
+                    mb.Disable();
             }
-
         }
+
+        protected void DisableAllMotorBehaviours()
+        {
+            DisableAllSteerings();
+        }
+        */
     }
 }

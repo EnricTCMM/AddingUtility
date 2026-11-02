@@ -20,6 +20,7 @@ namespace MotorBehaviours
         }
         
         // Math is done in this method
+        // Notice: we get the position of the target, not the target itself
         public static Vector3 GetDesiredVelocity(MotorManager me, Vector3 targetPosition)
         {
             Vector3 directionToTarget = targetPosition - me.transform.position;

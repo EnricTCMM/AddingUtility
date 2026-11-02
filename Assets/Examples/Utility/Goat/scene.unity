@@ -403,15 +403,15 @@ GameObject:
   - component: {fileID: 256909055}
   - component: {fileID: 256909054}
   - component: {fileID: 256909056}
-  - component: {fileID: 256909058}
-  - component: {fileID: 256909057}
-  - component: {fileID: 256909060}
-  - component: {fileID: 256909059}
   - component: {fileID: 256909061}
-  - component: {fileID: 256909062}
   - component: {fileID: 256909063}
   - component: {fileID: 256909064}
   - component: {fileID: 256909065}
+  - component: {fileID: 256909069}
+  - component: {fileID: 256909068}
+  - component: {fileID: 256909067}
+  - component: {fileID: 256909066}
+  - component: {fileID: 256909070}
   m_Layer: 0
   m_Name: GOAT
   m_TagString: Untagged
@@ -522,102 +522,6 @@ MonoBehaviour:
   centre: {fileID: 314152226}
   predator: {fileID: 0}
   cabbage: {fileID: 0}
---- !u!114 &256909057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 256909053}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e84d2230696b2ad4faaab4976079504e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Steerings.WanderAround
-  rotationalPolicy: 1
-  attractor: {fileID: 314152226}
---- !u!114 &256909058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 256909053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15fadfb23a909584e8ff82b91a0977c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Steerings.SteeringContext
-  maxAcceleration: 40
-  maxSpeed: 10
-  clipVelocity: 1
-  maxAngularAcceleration: 360
-  maxAngularSpeed: 90
-  clipAngularSpeed: 1
-  timeToDesiredSpeed: 0.1
-  closeEnoughRadius: 1
-  slowdownRadius: 5
-  timeToDesiredAngularSpeed: 0.1
-  closeEnoughAngle: 2
-  slowDownAngle: 10
-  maxPredictionTime: 3
-  showFutureTargetGizmos: 0
-  idTag: 
-  repulsionThreshold: 15
-  cohesionThreshold: 30
-  coneOfVisionAngle: 270
-  applyVision: 0
-  cohesionWeight: 0.3
-  repulsionWeight: 0.5
-  alignmentWeight: 0.2
-  addWanderIfZero: 1
-  wanderRate: 10
-  wanderRadius: 10
-  wanderOffset: 40
-  showWanderGizmos: 1
-  wanderTargetOrientation: 0
-  seekWeight: 0.2
-  lookAheadLength: 10
-  avoidDistance: 12
-  secondaryWhiskerAngle: 30
-  secondaryWhiskerRatio: 0.7
-  perseveranceTime: 0
-  showAvoidanceGizmos: 0
-  perseveranceElapsed: 0
-  persevering: 0
-  avoidanceAcceleration: {x: 0, y: 0, z: 0}
-  velocity: {x: 0, y: 0, z: 0}
-  speed: 0
-  angularSpeed: 0
-  groupManager: {fileID: 0}
---- !u!114 &256909059
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 256909053}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b1c6fa0d5ba45c4eb509c1ad6e53e63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Steerings.Arrive
-  rotationalPolicy: 1
-  target: {fileID: 0}
---- !u!114 &256909060
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 256909053}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51021b399ad270942b4928c10c0a1e71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Steerings.Flee
-  rotationalPolicy: 1
-  target: {fileID: 0}
 --- !u!114 &256909061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,20 +541,6 @@ MonoBehaviour:
   scoringInterval: 0.5
   debugInfoText: 
   onScreenInfo: {fileID: 1503354545}
---- !u!114 &256909062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 256909053}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38f112c9822224f4fa8ba0af659b7c86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Steerings.Evade
-  rotationalPolicy: 1
-  target: {fileID: 0}
 --- !u!114 &256909063
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -671,6 +561,7 @@ MonoBehaviour:
     uiBar: {fileID: 1106262765}
   - blackboardKey: panicLevel
     uiBar: {fileID: 1799456379}
+  textsToTrack: []
 --- !u!114 &256909064
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -700,6 +591,105 @@ MonoBehaviour:
   innerFieldName: cabbageDetectionRadius
   outerFieldName: 
   listenedObject: {fileID: 0}
+--- !u!114 &256909066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256909053}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adcc097a66ad4403b27b6510f6aff6c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Wander
+  blendingWeight: 1
+  arbitrationPriority: 1
+  wanderRadius: 10
+  wanderOffset: 25
+  wanderRate: 15
+  attractor: {fileID: 314152226}
+  attractionWeight: 0.2
+  showWanderGizmos: 1
+--- !u!114 &256909067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256909053}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6351d50196cc418ba7abb6a63c1cda59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Flee
+  blendingWeight: 1
+  arbitrationPriority: 1
+  target: {fileID: 0}
+  maxFleeDistance: 0
+  signalErrorIfNoTarget: 1
+--- !u!114 &256909068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256909053}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8909e2abc17840b8bba6c7eb48721594, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Evade
+  blendingWeight: 1
+  arbitrationPriority: 1
+  target: {fileID: 0}
+  maxPredictionTime: 3
+  maxEvadeDistance: 0
+  signalErrorIfNoTarget: 1
+  showGizmos: 0
+--- !u!114 &256909069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256909053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
+  maxForce: 40
+  maxSpeed: 10
+  maxTorque: 360
+  maxAngularSpeed: 90
+  rotationalPolicy: 2
+  rotationalPolicyTarget: {fileID: 0}
+  policyToleranceRadius: 2
+  policySlowdownRadius: 30
+  forcePolicy: 0
+  timeToDesiredSpeed: 0.1
+  torquePolicy: 0
+  timeToDesiredAngularSpeed: 0.1
+  currentVelocity: {x: 0, y: 0, z: 0}
+  currentAngularSpeed: 0
+--- !u!114 &256909070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256909053}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ce21040e24479bb4f2c69af89b6018, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Arrive
+  blendingWeight: 1
+  arbitrationPriority: 1
+  target: {fileID: 0}
+  toleranceRadius: 1
+  slowdownRadius: 20
 --- !u!1 &314152226
 GameObject:
   m_ObjectHideFlags: 0
@@ -6572,11 +6562,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1012428480}
   - component: {fileID: 1012428479}
-  - component: {fileID: 1012428484}
-  - component: {fileID: 1012428483}
   - component: {fileID: 1012428482}
   - component: {fileID: 1012428481}
   - component: {fileID: 1012428485}
+  - component: {fileID: 1012428487}
+  - component: {fileID: 1012428486}
   m_Layer: 0
   m_Name: WOLF
   m_TagString: PREDATOR
@@ -6687,74 +6677,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Wolf_BLACKBOARD
   locationA: {fileID: 1751793829}
   locationB: {fileID: 1996243402}
---- !u!114 &1012428483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012428478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e84d2230696b2ad4faaab4976079504e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Steerings.WanderAround
-  rotationalPolicy: 1
-  attractor: {fileID: 0}
---- !u!114 &1012428484
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012428478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15fadfb23a909584e8ff82b91a0977c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Steerings.SteeringContext
-  maxAcceleration: 40
-  maxSpeed: 10
-  clipVelocity: 1
-  maxAngularAcceleration: 360
-  maxAngularSpeed: 90
-  clipAngularSpeed: 1
-  timeToDesiredSpeed: 0.1
-  closeEnoughRadius: 1
-  slowdownRadius: 5
-  timeToDesiredAngularSpeed: 0.1
-  closeEnoughAngle: 2
-  slowDownAngle: 10
-  maxPredictionTime: 3
-  showFutureTargetGizmos: 0
-  idTag: 
-  repulsionThreshold: 15
-  cohesionThreshold: 30
-  coneOfVisionAngle: 270
-  applyVision: 0
-  cohesionWeight: 0.3
-  repulsionWeight: 0.5
-  alignmentWeight: 0.2
-  addWanderIfZero: 1
-  wanderRate: 15
-  wanderRadius: 10
-  wanderOffset: 40
-  showWanderGizmos: 1
-  wanderTargetOrientation: 0
-  seekWeight: 0.2
-  lookAheadLength: 10
-  avoidDistance: 12
-  secondaryWhiskerAngle: 30
-  secondaryWhiskerRatio: 0.7
-  perseveranceTime: 0
-  showAvoidanceGizmos: 0
-  perseveranceElapsed: 0
-  persevering: 0
-  avoidanceAcceleration: {x: 0, y: 0, z: 0}
-  velocity: {x: 0, y: 0, z: 0}
-  speed: 0
-  angularSpeed: 0
-  groupManager: {fileID: 0}
 --- !u!114 &1012428485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6768,6 +6690,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoveToClick
   rightClick: 0
+--- !u!114 &1012428486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012428478}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adcc097a66ad4403b27b6510f6aff6c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Wander
+  blendingWeight: 1
+  arbitrationPriority: 1
+  wanderRadius: 10
+  wanderOffset: 25
+  wanderRate: 15
+  attractor: {fileID: 0}
+  attractionWeight: 0.2
+  showWanderGizmos: 1
+--- !u!114 &1012428487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012428478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
+  maxForce: 40
+  maxSpeed: 10
+  maxTorque: 360
+  maxAngularSpeed: 90
+  rotationalPolicy: 2
+  rotationalPolicyTarget: {fileID: 0}
+  policyToleranceRadius: 2
+  policySlowdownRadius: 30
+  forcePolicy: 0
+  timeToDesiredSpeed: 0.1
+  torquePolicy: 0
+  timeToDesiredAngularSpeed: 0.1
+  currentVelocity: {x: 0, y: 0, z: 0}
+  currentAngularSpeed: 0
 --- !u!1 &1069565889
 GameObject:
   m_ObjectHideFlags: 0
