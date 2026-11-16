@@ -13,6 +13,9 @@ public class Kitty_UT_ActionSet : UtilityActionSet
         Action feedAction = ScriptableObject.CreateInstance<FeedAction>();
         Action sleepAction = ScriptableObject.CreateInstance<SleepAction>();
         Action playAction = ScriptableObject.CreateInstance<PlayAction>();
+        feedAction.Name = "FEED";
+        sleepAction.Name = "SLEEP";
+        playAction.Name = "PLAY";
 
         // ==========================================
         // 2. CONSIDERATIONS & SCORERS
@@ -60,7 +63,7 @@ public class Kitty_UT_ActionSet : UtilityActionSet
         public override void OnConstruction()
         {
             KittyBlackboard kbb = (KittyBlackboard)blackboard;
-            this.name = "FEED";
+            Name = "FEED";
             root = new Sequence(
                 new ACTION_Arrive("Food"), // go where food is
                 // let's say it takes some 3 seconds for Kitty to get satiated
@@ -77,7 +80,7 @@ public class Kitty_UT_ActionSet : UtilityActionSet
         public override void OnConstruction()
         {
             KittyBlackboard kbb = (KittyBlackboard)blackboard;
-            this.name = "SLEEP";
+            Name = "SLEEP";
             root = new Sequence(
                 new ACTION_Arrive("Mat"),
                 new LambdaAction(() => { 
@@ -94,7 +97,7 @@ public class Kitty_UT_ActionSet : UtilityActionSet
         public override void OnConstruction()
         {
             KittyBlackboard kbb = (KittyBlackboard)blackboard;
-            this.name = "PLAY";
+            Name = "PLAY";
             root = new Sequence(
                 new ACTION_Arrive("Wool"),
                 new LambdaAction(() =>

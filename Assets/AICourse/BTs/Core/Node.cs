@@ -10,7 +10,7 @@ namespace BTs
         protected Status status = Status.LIMBO;
         protected bool initialized = false;
 
-        public string Name { get; protected set; }
+        public string Name { get; set; }
 
         public Node() { }
         public Node(string name) { Name = name; }

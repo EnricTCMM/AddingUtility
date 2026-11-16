@@ -45,6 +45,6 @@ public class KittyBlackboard : DynamicBlackboard
     
     public void PlayABit()
     {
-        fatigue = Mathf.Clamp(boredom - 6*boredomRate * Time.deltaTime, 0f, 100f);
+        boredom = Mathf.Clamp(boredom - 6*boredomRate * Time.deltaTime, 0f, 100f);
     }
 }
