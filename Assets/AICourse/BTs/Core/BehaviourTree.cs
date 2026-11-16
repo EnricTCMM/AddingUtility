@@ -23,6 +23,8 @@ namespace BTs
         }
         
         protected Node root; // value must be set in onConstruction
+        
+        
         public string Name { get; set; }
 
         // NOTA: aquest constructor l'utilitza "el sistema". Quan es fa la creació 
@@ -111,13 +113,15 @@ namespace BTs
 
         // BEWARE: gameobjects should only have one Blackboard object for if they have more
         // the one returned may be "random". 
-        // As a result of this, SteeringContext cannot extend from Blackboard 
         // In future releases this issue could be addressed (maybe merging all blackboards in a single
         // object?)
+        
         public DynamicBlackboard blackboard
         {
-            get => GetComponent<DynamicBlackboard>();
-        }
+            get => GetComponent<DynamicBlackboard>(); // gets the blackboard from the gameObject since
+                                                      // GetComponent has been redefined to work on the gameObject
+        } 
+        
         
         private class BTBasedAction : Action
         {
