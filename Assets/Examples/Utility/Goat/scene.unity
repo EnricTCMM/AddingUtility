@@ -538,7 +538,7 @@ MonoBehaviour:
   actionName: 
   currentScore: 0
   status: 0
-  scoringInterval: 0.5
+  scoringInterval: 2
   debugInfoText: 
   onScreenInfo: {fileID: 1503354545}
 --- !u!114 &256909063
@@ -589,7 +589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShowRadiiPro
   componentTypeName: Goat_BLACKBOARD
   innerFieldName: cabbageDetectionRadius
-  outerFieldName: 
+  outerFieldName: cabbageDetectionRadius
   listenedObject: {fileID: 0}
 --- !u!114 &256909066
 MonoBehaviour:
@@ -7589,7 +7589,7 @@ PrefabInstance:
     - target: {fileID: 8360964658666552994, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
       propertyPath: specificProviderComponent
       value: 
-      objectReference: {fileID: 256909056}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9095,6 +9095,14 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2781688464797009668, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_fontSize
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 2781688464797009668, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -9121,11 +9129,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 100
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9157,11 +9165,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -34
+      value: 626
       objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -41
+      value: -118
       objectReference: {fileID: 0}
     - target: {fileID: 3893975232776243450, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -9207,9 +9215,17 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5099857487011336460, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5963889856255096846, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5963889856255096846, guid: 755333095287db449a70215cd1672f26, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.00005340576
       objectReference: {fileID: 0}
     - target: {fileID: 9070068844041358358, guid: 755333095287db449a70215cd1672f26, type: 3}
       propertyPath: m_AnchorMax.x

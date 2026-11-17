@@ -19,9 +19,9 @@ public class KittyBlackboard : DynamicBlackboard
     public float boredom = 0f;
 
     [Header("Degradation Rates (Units per second)")]
-    public float hungerRate = 2.5f;
-    public float fatigueRate = 1.0f;
-    public float boredomRate = 4.0f;
+    public float hungerRate = 1.5f;
+    public float fatigueRate = 3.5f;
+    public float boredomRate = 3.0f;
 
     [Header("Places")] 
     public GameObject food;

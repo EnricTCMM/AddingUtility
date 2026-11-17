@@ -63,6 +63,12 @@ public class OnScreenInfo : MonoBehaviour
                 visualContent.SetActive(!visualContent.activeSelf);
             }
         }
+        
+        // Spacebar pauses / unpauses
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Time.timeScale = Time.timeScale == 0f ? 1f : 0f;
+        }
     }
     
     /// <summary>
