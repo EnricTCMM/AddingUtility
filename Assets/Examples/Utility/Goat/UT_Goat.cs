@@ -186,7 +186,7 @@ class BT_GoatConstrainedWander : BehaviourTree
             new Sequence(
                 new LambdaAction(() =>
                 {
-                    GetComponent<SB_Wander>().attractionWeight = 0.8f;
+                    GetComponent<SB_Wander>().attractionWeight = 0.5f;
                     return Status.SUCCEEDED;
                 }),
                 new ACTION_Wander()
@@ -197,7 +197,7 @@ class BT_GoatConstrainedWander : BehaviourTree
             new Sequence(
                 new LambdaAction(() =>
                 {
-                    GetComponent<SB_Wander>().attractionWeight = 0.2f;
+                    GetComponent<SB_Wander>().attractionWeight = 0.05f;
                     return Status.SUCCEEDED;
                 }),
                 new ACTION_Wander()
