@@ -10,35 +10,54 @@ public class UT_Goat : UtilityActionSet
 {
     public override void OnConstruction()
     {
-        //----- EATING
-        Action eat = new ACTION_Eat();
-        Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
-        eatScorer.AddConsideration(new Consideration("hunger", Curves.MILD_EXPONENTIAL, "hunger Level"));
-        eatScorer.AddConsideration(new Consideration("DistanceToCabbage", Curves.INVERTED_AGGRESSIVE_EXPONENTIAL, "Distance to Cabbage"));
-        Bind(eat, eatScorer);
-        SetInertia(eat, 0.10f); // commitment to eating is quite high 
-    
-        
-        // --- SLEEPING
+        // ==========================================
+        // 1. ACTION INSTANTIATION 
+        // ==========================================
+        Action eat = ScriptableObject.CreateInstance<BT_Eat>();
         Action sleep = new ACTION_Sleep();
+        Action evade = new ACTION_Evade("predator");
+        Action wander = ScriptableObject.CreateInstance<BT_GoatConstrainedWander>();
+        eat.Name = "Eat";
+        wander.Name = "Wander";
+        
+        // ==========================================
+        // 2. CONSIDERATIONS & SCORERS
+        // ==========================================
+        
+        //--- EATING (hunger, distance to cabbage)
+        Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
+        eatScorer.AddConsideration(new Consideration("hunger", Curves.MILD_EXPONENTIAL, "hunger/eat consid."));
+        eatScorer.AddConsideration(new Consideration("DistanceToCabbage", Curves.INVERTED_AGGRESSIVE_EXPONENTIAL, "dist cabbage consid."));
+        
+        // --- SLEEPING (energy, panicLevel)
         Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.ADJUSTED_MULTIPLY);
-        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(20, 0.3f), "energy Level"));
-        sleepScorer.AddConsideration(new Consideration("panicLevel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "panic Level"));
+        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(20, 0.3f), "energy consid."));
+        sleepScorer.AddConsideration(new Consideration("panicLevel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "panic/sleep consid"));
         // uncomment the following line for "hungry goats don't sleep" (they rather find food)
-        // sleepScorer.AddConsideration(new Consideration("hunger", Curves.InverseLinear, "hunger Level"));
-        Bind(sleep, sleepScorer);
-        SetInertia(sleep, 0.2f); // sleep has a considerable inertia 
+        // sleepScorer.AddConsideration(new Consideration("hunger", Curves.InverseLinear, "hunger/sleep consid"));
         
-        
-        // --- FLEEING
-        Consideration fleeingConsideration = new Consideration("panicLevel", Curves.AGGRESSIVE_LOGARITHMIC, "Distance to Predator");
-        Bind(new ACTION_Evade("predator"), fleeingConsideration);
+        // --- FLEEING (panicLevel)
+        Consideration fleeingConsideration = new Consideration("panicLevel", Curves.AGGRESSIVE_LOGARITHMIC, "panic/flee consid.");
         
         // --- WANDERING (fallback action)
-        Action wander = new ACTION_ConstrainedWander();
-        Consideration wanderingConsideration = new Consideration("WanderDrive", Curves.Linear, "Wander Drive");
+        Consideration wanderingConsideration = new Consideration("WanderDrive", Curves.Linear, "wanderDrive consid.");
+        
+        
+        // ============================================
+        // 3. BINDING ACTIONS TO CONSIDERATIONS/SCORERS
+        // ============================================
+        Bind(eat, eatScorer);
+        Bind(sleep, sleepScorer);
+        Bind(evade, fleeingConsideration);
         Bind(wander, wanderingConsideration);
-        SetInertia(wander, 0); // wander has no inertia at all. It's a fallback hence interrupting it is not an issue.
+        
+        // ==========================================
+        // 4. INERTIA SETUP
+        // ==========================================
+        SetInertia(eat, 0.10f); // commitment to eating is quite high 
+        SetInertia(sleep, 0.2f); // sleep has a considerable inertia
+        // fleeing has no inertia
+        // wandering has no inertia
     }
 }
 
@@ -47,28 +66,25 @@ public class UT_Goat : UtilityActionSet
 class ACTION_Evade : Action
 {
     public string keyTarget;
-
     public ACTION_Evade(string keyTarget)
     {
         this.keyTarget = keyTarget;
     }
 
     private SB_Evade evade;
-    private MotorManager context;
+    private MotorManager motorManager;
 
     public override void OnInitialize()
     {
         evade = GetComponent<SB_Evade>();
         if (evade == null) evade = AddComponent<SB_Evade>();
 
-        context = GetComponent<MotorManager>();
-        context.maxSpeed *= 3;
-        context.maxForce *= 9;
+        motorManager = GetComponent<MotorManager>();
+        motorManager.maxSpeed *= 3;
+        motorManager.maxForce *= 9;
         
         evade.target = blackboard.Get<GameObject>(keyTarget);
         evade.enabled = true;
-        
-        
     }
 
     public override Status OnTick()
@@ -79,8 +95,8 @@ class ACTION_Evade : Action
     public override void OnAbort()
     {
         evade.enabled = false;
-        context.maxSpeed /= 3;
-        context.maxForce /= 9;
+        motorManager.maxSpeed /= 3;
+        motorManager.maxForce /= 9;
     }
 }
 
@@ -133,44 +149,6 @@ class BT_Eat : BehaviourTree
     }
 }
 
-// making an action out of a Behaviour tree
-class ACTION_Eat : Action
-{
-    private BT_Eat eatBehaviorTree;
-    
-    public override void OnInitialize()
-    {
-        eatBehaviorTree = ScriptableObject.CreateInstance<BT_Eat>();
-        eatBehaviorTree.Contextualize(gameObject);
-    }
-    public override Status OnTick()
-    {
-        return eatBehaviorTree.Tick();
-    }
-    public override void OnAbort()
-    {
-        eatBehaviorTree.Abort();
-    }
-}
-
-class ACTION_ConstrainedWander : Action
-{
-    private BT_GoatConstrainedWander constrainedWanderBehaviorTree;
-
-    public override void OnInitialize()
-    {
-        constrainedWanderBehaviorTree = ScriptableObject.CreateInstance<BT_GoatConstrainedWander>();
-        constrainedWanderBehaviorTree.Contextualize(gameObject);
-    }
-    public override Status OnTick()
-    {
-        return constrainedWanderBehaviorTree.Tick();
-    }
-    public override void OnAbort()
-    {
-        constrainedWanderBehaviorTree.Abort();
-    }
-}
 
 class BT_GoatConstrainedWander : BehaviourTree
 {

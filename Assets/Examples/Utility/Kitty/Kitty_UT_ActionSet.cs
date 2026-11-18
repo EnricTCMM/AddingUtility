@@ -42,9 +42,9 @@ public class Kitty_UT_ActionSet : UtilityActionSet
         // dragging the total play score down regardless of how bored the kitty is.
         Scorer playScorer = new Scorer("Play Scorer", AggregationPolicy.MULTIPLY, boredomConsideration, playFatigueInhibitor);
 
-        // ==========================================
-        // 3. BINDING ACTIONS TO SCORERS
-        // ==========================================
+        // =============================================
+        // 3. BINDING ACTIONS TO CONSIDERATIONS/SCORERS
+        // =============================================
         Bind(feedAction, hungerConsideration);
         Bind(sleepAction, fatigueConsideration);
         Bind(playAction, playScorer);

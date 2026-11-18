@@ -16,55 +16,83 @@ public class UT_Landlady : UtilityActionSet
     
     public override void OnConstruction()
     {
+        
+        // ==========================================
+        // 1. ACTION INSTANTIATION
+        // ==========================================
         Action serveBeer = ScriptableObject.CreateInstance<BT_ServeBeer>();
+        Action cleanTables = ScriptableObject.CreateInstance<BT_CleanTable>();
+        Action refill = ScriptableObject.CreateInstance<BT_Refill>();
+        Action kickOutDrunkards = ScriptableObject.CreateInstance<BT_KickOutDrunkards>();
+        Action stopQuarrel = ScriptableObject.CreateInstance<BT_StopQuarrel>();
+        Action contemplateUniverse = ScriptableObject.CreateInstance<BT_Contemplate>();
+        
+        // ==========================================
+        // 2. CONSIDERATIONS & SCORERS
+        // ==========================================
+        
+        // --- SERVE BEER (clientsWaitingbeer, tankardsInBarrel, clientsQuarreling)
         Scorer serveBeerScorer = new Scorer("ServeBeerScorer", AggregationPolicy.MULTIPLY);
         // the more clients waiting for beer, the more urgent it is to serve them
-        serveBeerScorer.AddConsideration(new Consideration("clientsWaitingBeer", Curves.AGGRESSIVE_LOGARITHMIC, "clientsWaitingBeer"));
+        serveBeerScorer.AddConsideration(new Consideration("clientsWaitingBeer", Curves.AGGRESSIVE_LOGARITHMIC, "clients consid."));
         // zero tankards makes serving beer impossible (veto). Else go ahead and serve
         serveBeerScorer.AddConsideration(new Consideration("tankardsInBarrel",
             (x) => { return x == 0 ? 0 : 1;}, "tankardsInBarrel"));
         // A quarrel makes any other activity impossible (veto)
-        serveBeerScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
-        Bind(serveBeer, serveBeerScorer);
-        SetInertia(serveBeer, 0.35f); // high inertia for serving a single beer
+        serveBeerScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "quarrels/serve consid."));
         
-        Action cleanTables = ScriptableObject.CreateInstance<BT_CleanTable>();
+        
+        // --- CLEAN TABLE (dirtyTables, clientsQuarreling)
         Scorer cleanTablesScorer = new Scorer("CleanTablesScorer", AggregationPolicy.MULTIPLY);
         // the more dirty tables, the more urgent it is to clean them
         cleanTablesScorer.AddConsideration(new Consideration("dirtyTables", Curves.Linear, "dirtyTables"));
         // A quarrel makes any other activity almost impossible
         cleanTablesScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
-        Bind(cleanTables, cleanTablesScorer);
-        SetInertia(cleanTables, 0.2f); // mid inertia for cleaning tables
-
-        Action refill = ScriptableObject.CreateInstance<BT_Refill>();
+        
+        
+        // --- REFILL (tankardsInBarrel, clientsQuarreling)
         Scorer refillScorer = new Scorer("RefillScorer", AggregationPolicy.MULTIPLY);
         refillScorer.AddConsideration(new Consideration("tankardsInBarrel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "tankardsInBarrel"));
         // A quarrel makes any other activity impossible (veto)
         refillScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
-        Bind(refill, refillScorer);
-        SetInertia(refill, 0.4f); // very high inertia for refilling the barrel
         
-        Action kickOutDrunkards = ScriptableObject.CreateInstance<BT_KickOutDrunkards>();
+        
+        // --- KICK OUT DRUNKARDS (sleepingDrunkards, clientsQuarreling) 
         Scorer kickOutDrunkardsScorer = new Scorer("KickOutDrunkardsScorer", AggregationPolicy.MULTIPLY);
         // the more drunkards sleeping, the more urgent it is to kick them out
         kickOutDrunkardsScorer.AddConsideration(new Consideration("sleepingDrunkards", Curves.MEDIUM_EXPONENTIAL, "sleepingDrunkards"));
         // A quarrel makes any other activity impossible (veto)
         kickOutDrunkardsScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
-        Bind(kickOutDrunkards, kickOutDrunkardsScorer);
-        SetInertia(kickOutDrunkards, 0.25f); // once started, end the job 
         
-        Action stopQuarreling = ScriptableObject.CreateInstance<BT_StopQuarrel>();
+        
+        // --- STOP QUARREL (clientsQuarreling) 
         Consideration conClientsQuarreling = new Consideration("clientsQuarreling", Curves.Linear, "clientsQuarreling");
-        Bind(stopQuarreling, conClientsQuarreling);
-        // Notice: no scorer needed since there's only one consideration.
         // this action does not need inertia. Its utility is 0 or 1. If it starts, it will go uniterrupted to the end.
 
-        Action contemplateUniverse = ScriptableObject.CreateInstance<BT_Contemplate>();
+        
+        // --- CONTEMPLATE THE UNIVERSE [FALLBACK ACTION]
         Consideration conBaseLine = new Consideration("baselineUtility", Curves.Linear, "baselineUtility");
+        
+        
+        // =============================================
+        // 3. BINDING ACTIONS TO CONSIDERATIONS/SCORERS
+        // =============================================
+        Bind(serveBeer, serveBeerScorer);
+        Bind(cleanTables, cleanTablesScorer);
+        Bind(refill, refillScorer);
+        Bind(kickOutDrunkards, kickOutDrunkardsScorer);
+        Bind(stopQuarrel, conClientsQuarreling);
         Bind(contemplateUniverse, conBaseLine);
-        // Notice: no scorer needed since there's only one consideration.
-        // this action does not need inertia. It's just a fallback.
+        
+        // ==========================================
+        // 4. INERTIA SETUP
+        // ==========================================
+        SetInertia(serveBeer, 0.35f); // high inertia for serving a single beer
+        SetInertia(cleanTables, 0.2f); // mid inertia for cleaning tables
+        SetInertia(refill, 0.4f); // very high inertia for refilling the barrel
+        SetInertia(kickOutDrunkards, 0.25f); // once started, end the job 
+        // stopping a quarrel does not need inertia
+        // contemplating the universe does not need inertia since it's just a fallback action
         
     }
 }

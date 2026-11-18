@@ -6114,7 +6114,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &812318325
 Transform:
   m_ObjectHideFlags: 0
@@ -7502,6 +7502,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 256909055}
     m_Modifications:
+    - target: {fileID: 797440412441597669, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
+      propertyPath: m_fontSize
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 797440412441597669, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 797440412441597669, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 797440412441597669, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 797440412441597669, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.05271244
+      objectReference: {fileID: 0}
+    - target: {fileID: 797440412441597669, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 797440412441597669, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294901773
+      objectReference: {fileID: 0}
     - target: {fileID: 880345794650380046, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
       propertyPath: m_Name
       value: StateLabel
@@ -7568,11 +7596,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5624582020673062915, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -5.94
+      value: -5.5
       objectReference: {fileID: 0}
     - target: {fileID: 5624582020673062915, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 3.89
+      value: 4.4
       objectReference: {fileID: 0}
     - target: {fileID: 5624582020673062915, guid: bdc87ad71272daf47b0984cf5d31d446, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
