@@ -103,10 +103,12 @@ namespace Utility
                         else
                         {
                             debugInfo.AppendLine($"*** INERTIA KEPT ACTION: {currentAction.Name} (Score: {currentActionScoreNow:F4} + {currentActionInertia:F4} = {currentActionScoreNow+currentActionInertia:F4}). Top was {currentScores[0].action.Name} ({currentScores[0].score}) ***\n");
+                            currentScore = currentActionScoreNow;
                         }
                     }
                     else
                     {
+                        // Current action is still the best action. Current action remains unchanged 
                         debugInfo.AppendLine($"*** MAINTAINING ACTION: {currentAction.Name} score: {currentScores[0].score:F4} ***\n");
                         currentScore = currentScores[0].score;
                     }

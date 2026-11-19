@@ -7,32 +7,56 @@ public class #SCRIPTNAME# : UtilityActionSet
 {
     public override void OnConstruction()
     {
-        /* STAGE 1: Create a Scorer for a specific Action
-         * ----------------------------------------------
-         * Choose an AggregationPolicy (MULTIPLY, ADJUSTED_MULTIPLY, AVERAGE)
-         
-        Scorer myActionScorer = new Scorer("MyActionScorer", AggregationPolicy.ADJUSTED_MULTIPLY);
+    
+        // ==========================================
+        // 1. ACTION INSTANTIATION & NAMING
+        // ==========================================
+        /* Instantiate actions and (optionally) set a proper name
+           Action sleep = ...
+           sleep.Name = "";
         */
-
-
-        /* STAGE 2: Add Considerations to the Scorer
-         * -----------------------------------------
-         * Use blackboard property names and select an appropriate Curve from Curves.cs.
-         * You can also define min/max if the property doesn't have a [Range] attribute.
-         
-        myActionScorer.AddConsideration(new Consideration("BlackboardKey", Curves.Linear, "ConsiderationName"));
-        // myActionScorer.AddConsideration(new Consideration("AnotherKey", Curves.InvertedExponential(2f), 0f, 100f, "AnotherName"));
+    
+        // ==========================================
+        // 2. CONSIDERATIONS & SCORERS
+        // ==========================================
+        
+        /* --For each action create its considerations.
+        
+           // --- SLEEP (mention properties it depends on)
+           considerationOne = new Consideration("BlackboardKey", Curves.Linear, "ConsiderationName")
+           considerationTwo = new Consideration("AnotherKey", Curves.InvertedExponential(3f), "AnotherConsiderationName")
+           ...
+           --if an action has more than a consideration, create a scorer and add the considerations to the scorer
+           Scorer myActionScorer = new Scorer("MyActionScorer", AggregationPolicy.ADJUSTED_MULTIPLY);
+           myActionScorer.AddConsiderations(considerationOne, considerationTwo, ...)
+            
         */
-
-
-        /* STAGE 3: Bind the Action to the Scorer
-         * --------------------------------------
-         * Make sure the action inherits from BTs.Action.
-         
-        Bind(new MyCustomAction(), myActionScorer);
+           
+        // =============================================
+        // 3. BINDING ACTIONS TO CONSIDERATIONS/SCORERS
+        // =============================================
+        /* bind each action to its consideration or scorer with Bind(action, consideration/scorer)
+           Bind(walk, walkConsideration)
+           Bind(sleep, sleepScorer);
+           ...
+        */
+    
+    
+        // ==========================================
+        // 4. INERTIA SETUP
+        // ==========================================
+        /* for each action set its appropiate inertia with SetInertia(action, inertiaLevel)
+           SetInertia(walk, 0);
+           SetInertia(sleep, 0.3);
+           ...
         */
         
-        
-        /* Repeat STAGES 1 to 3 for all the actions this Utility AI needs to evaluate */
-    }
-}
+    } // OnConstruction ends here
+    
+    // ACTION DEFINITION HERE
+    // Actions defined here do not name-collide with actions defined elsewhere
+    
+} // UtilityActionSet ends here
+
+// ACTION DEFINITION HERE 
+// Actions defined here may name-collide with actions defined elsewhere 

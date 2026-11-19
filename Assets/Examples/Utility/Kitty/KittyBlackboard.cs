@@ -11,10 +11,8 @@ public class KittyBlackboard : DynamicBlackboard
     // to the Utility Considerations for normalization.
     [Range(0f, 100f)]
     public float hunger = 0f;
-
     [Range(0f, 100f)]
     public float fatigue = 0f;
-
     [Range(0f, 100f)]
     public float boredom = 0f;
 
