@@ -8,14 +8,26 @@ public class UT_Sim : UtilityActionSet
 {
     public override void OnConstruction()
     {
-        Action ACTION_Sleep = ScriptableObject.CreateInstance<BT_Sleep>();
-        Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
-        // better sleep at night, from 22 to 7
-        // (do not normalize attribute [0,24) is ok in this case since curve is ad-hoc)
-        // this is a "cultural" soft veto
-        Consideration conTimeOfDay = new Consideration("timeOfDay",
-            (t) => { return t >= 22 || t <= 7 ? 1 : 0.5f; }, 
-            "timeOfDay", false);
+        // ==========================================
+        // 1. ACTION INSTANTIATION & NAMING
+        // ==========================================
+        Action sleep = ScriptableObject.CreateInstance<BT_Sleep>();
+        sleep.Name = "SLEEP";
+        Action work = ScriptableObject.CreateInstance<UT_Sim.BT_Work>();
+        work.Name = "WORK";
+        Action useBathroom = ScriptableObject.CreateInstance<UT_Sim.BT_UseBathroom>();
+        useBathroom.Name = "USE BATHROOM";
+        Action eat = ScriptableObject.CreateInstance<UT_Sim.BT_Eat>();
+        eat.Name = "EAT";
+        Action entertain = ScriptableObject.CreateInstance<UT_Sim.BT_Entertain>();
+        entertain.Name = "ENTERTAIN";
+        
+        
+        // ==========================================
+        // 2. CONSIDERATIONS & SCORERS
+        // ==========================================
+        
+        // --- SLEEP (sleepiness)
         Consideration sleepinessConsideration = new Consideration("sleepiness", 
             (t) =>
             {
@@ -25,63 +37,75 @@ public class UT_Sim : UtilityActionSet
                     return Curves.MILD_EXPONENTIAL(t); // at night almost linear
                 else return Curves.AGGRESSIVE_EXPONENTIAL(t); // at day more aggressive
             },
-            "sleepiness"
+            "sleepiness consid."
         );
-        
-        sleepScorer.AddConsideration(conTimeOfDay);
-        sleepScorer.AddConsideration(sleepinessConsideration);
-        Bind(ACTION_Sleep, sleepScorer);
-        SetInertia(ACTION_Sleep, 0.5f); // very high inertia for sleeping
+       
 
-        Action ACTION_Work = ScriptableObject.CreateInstance<UT_Sim.BT_Work>();
+        // --- WORK (dayOfWeek, timeOfDay)
         // work Monday to Friday (do not normalize)
         Consideration dayOfWeekConsideration = new Consideration("dayOfWeek",
             (t) => { return t >= 6 ? 0f : 1f; }, 
-            "dayOfWeek", false);
-        // work from 9 to 17 (do not normalize)
+            "dayOfWeek consid.", false);
+        // work from 9 to 17 (do not normalize). Constant utility 0.9 during working hours. 0 at any other time
         Consideration timeOfDayConsideration = new Consideration("timeOfDay",
             (t) => { return t >= 9 && t <= 17 ? 0.9f : 0f; }, 
-            "timeOfDay", false);
-        Scorer workScorer = new Scorer("WorkScorer", AggregationPolicy.MULTIPLY);
-        workScorer.AddConsideration(dayOfWeekConsideration);
-        workScorer.AddConsideration(timeOfDayConsideration);
-        Bind(ACTION_Work, workScorer);
-        // no inertia for working. It's 0 or 0.9. 0.9 makes it hard to interrupt.
+            "timeOfDay consid.", false);
         
-        Action ACTION_UseBathroom = ScriptableObject.CreateInstance<UT_Sim.BT_UseBathroom>();
+        Scorer workScorer = new Scorer("WorkScorer", AggregationPolicy.MULTIPLY);
+        workScorer.AddConsiderations(dayOfWeekConsideration, timeOfDayConsideration);
+        
+        
+        // --- USE BATHROOM (bladder)
         Consideration bladderConsideration = new Consideration("bladder", 
-            Curves.AGGRESSIVE_EXPONENTIAL, "bladder");
-        Bind(ACTION_UseBathroom, bladderConsideration);
-        SetInertia(ACTION_UseBathroom, 1); // this makes it uninterruptible.
+            Curves.AGGRESSIVE_EXPONENTIAL, "bladder consid.");
+       
 
-        Action ACTION_Eat = ScriptableObject.CreateInstance<UT_Sim.BT_Eat>();
-        Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
-        eatScorer.AddConsideration(new Consideration("hunger", 
-            Curves.Sigmoid(12, 0.75f), "hunger") // shifted sigmoid. 
-        );
-        Bind(ACTION_Eat, eatScorer);
-        SetInertia(ACTION_Eat, 1f); // max inertia. Nothing can interrupt eating.
-
+        // --- EAT (hunger)
+        // shifted sigmoid. 
+        Consideration hungerConsideration = new Consideration("hunger", Curves.Sigmoid(12, 0.7f), "hunger consid.");
+        
+        
+        // --- ENTERTAIN (boredom)
         // this action is a fallback. That's the reason of the 0.2
-        Action ACTION_Entertainment = ScriptableObject.CreateInstance<UT_Sim.BT_Entertain>();
         Consideration entertainmentConsideration = new Consideration( "boredom",
             (v) =>
             {
                 return Mathf.Max(0.2f, Curves.MILD_EXPONENTIAL(v)); 
             }, 
-            "boredom"
+            "boredom consid."
         );
-        Bind(ACTION_Entertainment, entertainmentConsideration);
-        SetInertia(ACTION_Entertainment, 0.25f); // moderate inertia. 
-    }
+        
+        
+        // =============================================
+        // 3. BINDING ACTIONS TO CONSIDERATIONS/SCORERS
+        // =============================================
+        Bind(sleep, sleepinessConsideration);
+        Bind(work, workScorer);
+        Bind(eat, hungerConsideration);
+        Bind(useBathroom, bladderConsideration);
+        Bind(entertain, entertainmentConsideration);
+        
+        
+        // ==========================================
+        // 4. INERTIA SETUP
+        // ==========================================
+        SetInertia(sleep, 0.5f); // very high inertia for sleeping 
+        // no inertia for working. It's 0 or 0.9. 0.9 makes it hard to interrupt.
+        SetInertia(eat, 1f); // max inertia. Nothing can interrupt eating (not even bathroom)
+        SetInertia(useBathroom, 1f); // this makes it uninterruptible.
+        SetInertia(entertain, 0.25f); // moderate inertia. 
+        
+    } // OnConstruction ends here
 
-
+    
+    // ACTION DEFINITION
+    
     // placing actions here (inside the UT class) avoids name clashes with other actions
     // that might be used elsewhere and have the same name.
 
     class BT_Sleep : BehaviourTree
     {
-        override public void OnConstruction()
+        public override void OnConstruction()
         {
             root = new Sequence(
                 // this SIM always sleeps at home. 
@@ -126,7 +150,7 @@ public class UT_Sim : UtilityActionSet
 
     class BT_Work : BehaviourTree
     {
-        override public void OnConstruction()
+        public override void OnConstruction()
         {
             root = new Sequence(
                 // this SIM always works in the office. 
@@ -333,7 +357,7 @@ public class UT_Sim : UtilityActionSet
 
     class BT_UseBathroom : BehaviourTree
     {
-        override public void OnConstruction()
+        public override void OnConstruction()
         {
             root = new Sequence(
                 new ACTION_DebugLog("taking a leak..."),

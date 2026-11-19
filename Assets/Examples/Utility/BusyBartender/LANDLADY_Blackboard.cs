@@ -6,7 +6,7 @@ public class LANDLADY_Blackboard : DynamicBlackboard
     [Range(0, 20)]  public int clientsWaitingBeer = 0;
     [Range(0, 5)] public int dirtyTables = 0;
     [Range(0, 4)] public int sleepingDrunkards = 0;
-    [Range(0, 1)] public int clientsQuarreling = 0;
+    [Range(0, 1)] public int activeQuarrels = 0;
     [Range(0, 100)] public int  tankardsInBarrel = 0;
     
     [Range(0, 1)] public float  baselineUtility = 0.1f;
@@ -20,8 +20,8 @@ public class LANDLADY_Blackboard : DynamicBlackboard
     public void incSleepingDrunkards() { sleepingDrunkards = Mathf.Min(sleepingDrunkards + 1, 4); }
     public void decSleepingDrunkards() { sleepingDrunkards = Mathf.Max(sleepingDrunkards - 1, 0); }
     
-    public void incClientsQuarreling() { clientsQuarreling = Mathf.Min(clientsQuarreling + 1, 1); }
-    public void decClientsQuarreling() { clientsQuarreling = Mathf.Max(clientsQuarreling - 1, 0); }
+    public void incClientsQuarreling() { activeQuarrels = Mathf.Min(activeQuarrels + 1, 1); }
+    public void decClientsQuarreling() { activeQuarrels = Mathf.Max(activeQuarrels - 1, 0); }
     
     public void incTankardsInBarrel() { tankardsInBarrel = Mathf.Min(tankardsInBarrel + 1, 100); }
     public void decTankardsInBarrel() { tankardsInBarrel = Mathf.Max(tankardsInBarrel - 1, 0); }

@@ -9,7 +9,7 @@ public class UT_Landlady : UtilityActionSet
     [Range(0, 20)]  public int clientsWaitingBeer = 0;
     [Range(0, 5)] public int dirtyTables = 0;
     [Range(0, 4)] public int sleepingDrunkards = 0;
-    [Range(0, 1)] public int clientsQuarreling = 0;
+    [Range(0, 1)] public int activeQuarrels = 0;
     [Range(0, 100)] public int tankardsInBarrel = 0;
     [Range(0, 1)] public float baselineUtility = 0.1f;
     */
@@ -18,14 +18,20 @@ public class UT_Landlady : UtilityActionSet
     {
         
         // ==========================================
-        // 1. ACTION INSTANTIATION
+        // 1. ACTION INSTANTIATION & NAMING
         // ==========================================
         Action serveBeer = ScriptableObject.CreateInstance<BT_ServeBeer>();
+        serveBeer.Name = "SERVE BEER";
         Action cleanTables = ScriptableObject.CreateInstance<BT_CleanTable>();
+        cleanTables.Name = "CLEAN TABLES";
         Action refill = ScriptableObject.CreateInstance<BT_Refill>();
+        refill.Name = "REFILL";
         Action kickOutDrunkards = ScriptableObject.CreateInstance<BT_KickOutDrunkards>();
+        kickOutDrunkards.Name = "KICK OUT DRUNKARDS";
         Action stopQuarrel = ScriptableObject.CreateInstance<BT_StopQuarrel>();
+        stopQuarrel.Name = "STOP QUARREL";
         Action contemplateUniverse = ScriptableObject.CreateInstance<BT_Contemplate>();
+        contemplateUniverse.Name = "CONTEMPLATE UNIVERSE";
         
         // ==========================================
         // 2. CONSIDERATIONS & SCORERS
@@ -39,7 +45,7 @@ public class UT_Landlady : UtilityActionSet
         serveBeerScorer.AddConsideration(new Consideration("tankardsInBarrel",
             (x) => { return x == 0 ? 0 : 1;}, "tankardsInBarrel"));
         // A quarrel makes any other activity impossible (veto)
-        serveBeerScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "quarrels/serve consid."));
+        serveBeerScorer.AddConsideration(new Consideration("activeQuarrels", Curves.InverseLinear, "quarrels/serve consid."));
         
         
         // --- CLEAN TABLE (dirtyTables, clientsQuarreling)
@@ -47,14 +53,14 @@ public class UT_Landlady : UtilityActionSet
         // the more dirty tables, the more urgent it is to clean them
         cleanTablesScorer.AddConsideration(new Consideration("dirtyTables", Curves.Linear, "dirtyTables"));
         // A quarrel makes any other activity almost impossible
-        cleanTablesScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
+        cleanTablesScorer.AddConsideration(new Consideration("activeQuarrels", Curves.InverseLinear, "clientsQuarreling"));
         
         
         // --- REFILL (tankardsInBarrel, clientsQuarreling)
         Scorer refillScorer = new Scorer("RefillScorer", AggregationPolicy.MULTIPLY);
         refillScorer.AddConsideration(new Consideration("tankardsInBarrel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "tankardsInBarrel"));
         // A quarrel makes any other activity impossible (veto)
-        refillScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
+        refillScorer.AddConsideration(new Consideration("activeQuarrels", Curves.InverseLinear, "clientsQuarreling"));
         
         
         // --- KICK OUT DRUNKARDS (sleepingDrunkards, clientsQuarreling) 
@@ -62,11 +68,11 @@ public class UT_Landlady : UtilityActionSet
         // the more drunkards sleeping, the more urgent it is to kick them out
         kickOutDrunkardsScorer.AddConsideration(new Consideration("sleepingDrunkards", Curves.MEDIUM_EXPONENTIAL, "sleepingDrunkards"));
         // A quarrel makes any other activity impossible (veto)
-        kickOutDrunkardsScorer.AddConsideration(new Consideration("clientsQuarreling", Curves.InverseLinear, "clientsQuarreling"));
+        kickOutDrunkardsScorer.AddConsideration(new Consideration("activeQuarrels", Curves.InverseLinear, "clientsQuarreling"));
         
         
         // --- STOP QUARREL (clientsQuarreling) 
-        Consideration conClientsQuarreling = new Consideration("clientsQuarreling", Curves.Linear, "clientsQuarreling");
+        Consideration conClientsQuarreling = new Consideration("activeQuarrels", Curves.Linear, "activeQuarrels");
         // this action does not need inertia. Its utility is 0 or 1. If it starts, it will go uniterrupted to the end.
 
         
