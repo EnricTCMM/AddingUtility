@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using BTs;
-using UnityEditor.Tilemaps;
 
 namespace Utility
 {
@@ -52,6 +51,9 @@ namespace Utility
 
         public void SetInertia(Action action, float inertia)
         {
+            if (inertia < 0) throw new System.ArgumentException("Inertia cannot be negative");
+            else if (inertia > 1) throw new System.ArgumentException("Inertia cannot be greater than 1");
+            
             int index = list.FindIndex((p)=> p.action == action);
             if (index<0)
                 throw new System.ArgumentException($"Cannot set inertia. Action {action.Name} is not bound yet.");

@@ -62,18 +62,27 @@ namespace Utility
                              float min, float max,
                              string name = null)
         {
+            Name = name == null ? "Synth. Consideration" : name;
+            
+            if (min >= max)
+                throw new Exception(
+                    $"Invalid range for synthetic property '{name}': min={min}, max={max}");
+            
             this.syntheticProperty = syntheticProperty;
             this.responseCurve = responseCurve;
             // this.explicitRangeProvided = true;
             propertyMin = min;
             propertyMax = max;
-            Name = name == null ? "Synth. Consideration" : name;
         }
         
         public void Contextualize(GameObject go)
         {
             gameObject = go;
             blackboard = gameObject.GetComponent<DynamicBlackboard>();
+            
+            // if property is synthetic, propertyMin and propertyMax have already been set at construction time
+            if (syntheticProperty!=null)
+                return; // return now because synthetic properties have not blackboarded ranges
             
             // contextualization time is when getting min and max makes sense
             //if (!explicitRangeProvided)
@@ -82,8 +91,10 @@ namespace Utility
                 // remember that TryGetRange defaults to [0, 100] if property is not ranged
                 if(!hasRange) Debug.LogWarning("In "+Name+" " + propertyKey + " is not ranged. Using [0, 100] as default range"); 
             //}
-            if (propertyMin==propertyMax)
-                Debug.LogError("In "+Name+" " + propertyKey + " has zero range. This is not allowed");
+            
+            if (propertyMin>=propertyMax)
+                throw new Exception(
+                    $"In consideration {Name} property '{propertyKey}' has an invalid range (zero or inverted): min={propertyMin}, max={propertyMax}.");
         }
 
         public float GetScore()

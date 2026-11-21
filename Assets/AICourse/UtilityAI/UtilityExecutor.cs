@@ -31,7 +31,7 @@ namespace Utility
         
         void Start()
         {
-            if (actionSet == null) return; // should we complain instead of silently returning?
+            if (actionSet == null) throw new System.NullReferenceException("UtilityExecutor.actionSet is null");
 
             if (GetComponent<DynamicBlackboard>() == null)
             {
@@ -52,7 +52,7 @@ namespace Utility
 
         void Update()
         {
-            if (actionSet == null) throw new System.NullReferenceException("UtilityExecutor.actionSet is null");
+            // checking of actionSet==null is done in Start()
 
             timeSinceLastScoring += Time.deltaTime;
 

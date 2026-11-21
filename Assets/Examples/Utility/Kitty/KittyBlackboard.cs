@@ -1,7 +1,5 @@
 using UnityEngine;
 
-using UnityEngine;
-
 // This blackboard inherits from DynamicBlackboard to expose its fields 
 // to the Utility AI system via reflection.
 public class KittyBlackboard : DynamicBlackboard
