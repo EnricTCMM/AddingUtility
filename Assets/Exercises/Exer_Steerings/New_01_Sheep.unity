@@ -11146,7 +11146,7 @@ MonoBehaviour:
   wanderOffset: 40
   wanderRate: 15
   attractor: {fileID: 2060626135}
-  attractionWeight: 0.095
+  attractionWeight: 0.12
   showWanderGizmos: 1
 --- !u!114 &1543964296
 MonoBehaviour:

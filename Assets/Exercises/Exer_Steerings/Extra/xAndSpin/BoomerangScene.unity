@@ -131,6 +131,9 @@ GameObject:
   - component: {fileID: 583049239}
   - component: {fileID: 583049243}
   - component: {fileID: 583049244}
+  - component: {fileID: 583049245}
+  - component: {fileID: 583049246}
+  - component: {fileID: 583049247}
   m_Layer: 0
   m_Name: boomerang
   m_TagString: Untagged
@@ -237,10 +240,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32214b354077401ebabdea7a1de3f6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.MotorManager
-  maxForce: 80
-  maxSpeed: 20
-  maxTorque: 360
-  maxAngularSpeed: 180
+  maxForce: 200
+  maxSpeed: 50
+  maxTorque: 2000
+  maxAngularSpeed: 720
   rotationalPolicy: 0
   rotationalPolicyTarget: {fileID: 0}
   policyToleranceRadius: 2
@@ -251,6 +254,53 @@ MonoBehaviour:
   timeToDesiredAngularSpeed: 0.1
   currentVelocity: {x: 0, y: 0, z: 0}
   currentAngularSpeed: 0
+--- !u!114 &583049245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583049238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e681c417b7b31e46a054d8b07ace128, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_ConstantRotation
+  blendingWeight: 1
+  arbitrationPriority: 1
+  constantAngularVelocity: 360
+--- !u!114 &583049246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583049238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ce21040e24479bb4f2c69af89b6018, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Arrive
+  blendingWeight: 1
+  arbitrationPriority: 1
+  target: {fileID: 919272023}
+  toleranceRadius: 1
+  slowdownRadius: 20
+--- !u!114 &583049247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583049238}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d5eb766d61f414d9dc0f79ef49f7540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MotorBehaviours.SB_Seek
+  blendingWeight: 1
+  arbitrationPriority: 1
+  target: {fileID: 919272023}
 --- !u!1 &919272023
 GameObject:
   m_ObjectHideFlags: 0

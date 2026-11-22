@@ -2,8 +2,10 @@ using UnityEngine;
 using Utility;
 using BTs;
 
-[CreateAssetMenu(fileName = "Kitty_UT_ActionSet", menuName = "Utility/Kitty_UT_ActionSet", order = 1)]
-public class Kitty_UT_ActionSet : UtilityActionSet
+// removing inertia shows what thrashing means in this context
+
+[CreateAssetMenu(fileName = "UT_LinearKitty_ActionSet", menuName = "Utility/UT_LinearKitty_ActionSet", order = 1)]
+public class UT_LinearKitty_ActionSet : UtilityActionSet
 {
     public override void OnConstruction()
     {
@@ -22,17 +24,13 @@ public class Kitty_UT_ActionSet : UtilityActionSet
         // ==========================================
         
         // --- FEED (Hunger) ---
-        // Kitty tolerates hunger quite well until it is really high. Then it becomes an urgency
-        Consideration hungerConsideration = new Consideration("Hunger", Curves.MEDIUM_EXPONENTIAL, "Hunger Consid.");
-
-        // --- SLEEP (Fatigue) ---
-        // Smooth transition: kitty resists sleep quite well until a midpoint, then gets quite sleepy.
-        Consideration fatigueConsideration = new Consideration("Fatigue", Curves.MILD_SIGMOID, "Sleep Fatigue Consid.");
+        Consideration hungerConsideration = new Consideration("Hunger", Curves.Linear, "Hunger Consid.");
         
-
+        // --- SLEEP (Fatigue) ---
+        Consideration fatigueConsideration = new Consideration("Fatigue", Curves.Linear, "Sleep Fatigue Consid.");
+        
         // --- PLAY (Boredom + Fatigue Inhibitor) ---
-        // 1st Consideration: Boredom drives the desire to play (triggers early). 
-        Consideration boredomConsideration = new Consideration("Boredom", Curves.MEDIUM_LOGARITHMIC, "Boredom Consid.");
+        Consideration boredomConsideration = new Consideration("Boredom", Curves.Linear, "Boredom Consid.");
         
         // 2nd Consideration: Fatigue inhibits play. INVERTED CURVE
         // As Fatigue goes from 0 to 100, the output of this consideration goes from 1 to 0.
@@ -53,8 +51,8 @@ public class Kitty_UT_ActionSet : UtilityActionSet
         // 4. INERTIA SETUP
         // ==========================================
         // Prevents state thrashing when scores are too close.
-        SetInertia(feedAction, 0.10f);  // Keep eating once started
-        SetInertia(sleepAction, 0.50f); // Vey high inertia: do not wake up easily
+        SetInertia(feedAction, 0.40f);  // Keep eating once started
+        SetInertia(sleepAction, 0.65f); // Vey high inertia: do not wake up easily (sleep soundly)
         SetInertia(playAction, 0.25f);  // Not easily distracted from playing
     }
 
@@ -110,5 +108,7 @@ public class Kitty_UT_ActionSet : UtilityActionSet
         }
     }
     
-    
-}
+} // UtilityActionSet ends here
+
+// ACTION DEFINITION HERE 
+// Actions defined here may name-collide with actions defined elsewhere 

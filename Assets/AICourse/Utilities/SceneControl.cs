@@ -50,7 +50,7 @@ public class SceneControl : MonoBehaviour
     public void Recall ()
     {
         // find all recallable objects
-        RecallPosition[] recallables = FindObjectsOfType<RecallPosition>();
+        RecallPosition[] recallables = FindObjectsByType<RecallPosition>(FindObjectsSortMode.None);
         foreach (RecallPosition r in recallables)
             r.Invoke("Recall",0);
     }

@@ -11,7 +11,7 @@ public class SoldierLines : MonoBehaviour
         GameObject target = GetComponent<SB_KeepPosition>().target;
         MotorManager me = GetComponent<MotorManager>();
         Vector3 velocityDirection = me.currentVelocity.normalized;
-        Vector3 myLookDir = Utils. OrientationToVector(me.transform.eulerAngles.z);
+        // Vector3 myLookDir = Utils. OrientationToVector(me.transform.eulerAngles.z);
         
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, target.transform.position);

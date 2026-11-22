@@ -8,10 +8,10 @@ namespace Utility
     public abstract class UtilityActionSet : ScriptableObject
     {
         public List<ActionConsiderationPair> list = new List<ActionConsiderationPair>();
-        private List<ActionScorePair> scores = new List<ActionScorePair>();
+        public List<ActionScorePair> scores = new List<ActionScorePair>();
         
         // May 2026. Access to the blackboard may come handy.
-        public DynamicBlackboard blackboard;
+        protected DynamicBlackboard blackboard;
 
         public void Contextualize(GameObject go)
         {
