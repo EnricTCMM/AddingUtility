@@ -23,26 +23,26 @@ public class UT_Goat : UtilityActionSet
         // ==========================================
         // 2. CONSIDERATIONS & SCORERS
         // ==========================================
-        
+
         //--- EATING (hunger, distance to cabbage)
         Scorer eatScorer = new Scorer("EatScorer", AggregationPolicy.MULTIPLY);
-        eatScorer.AddConsideration(new Consideration("hunger", Curves.MILD_EXPONENTIAL, "hunger/eat consid."));
+        eatScorer.AddConsideration(new Consideration("hunger", Curves.Linear, "hunger/eat consid."));
         eatScorer.AddConsideration(new Consideration("DistanceToCabbage", Curves.INVERTED_AGGRESSIVE_EXPONENTIAL, "dist cabbage consid."));
-        
+
         // --- SLEEPING (energy, panicLevel)
-        Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.ADJUSTED_MULTIPLY);
-        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(20, 0.3f), "energy consid."));
+        Scorer sleepScorer = new Scorer("SleepScorer", AggregationPolicy.MULTIPLY);
+        sleepScorer.AddConsideration(new Consideration("energy", Curves.InvertedSigmoid(24f, 0.2f), "energy consid."));
         sleepScorer.AddConsideration(new Consideration("panicLevel", Curves.INVERTED_AGGRESSIVE_LOGARITHMIC, "panic/sleep consid"));
-        // uncomment the following line for "hungry goats don't sleep" (they rather find food)
-        // sleepScorer.AddConsideration(new Consideration("hunger", Curves.InverseLinear, "hunger/sleep consid"));
         
+
         // --- FLEEING (panicLevel)
-        Consideration fleeingConsideration = new Consideration("panicLevel", Curves.AGGRESSIVE_LOGARITHMIC, "panic/flee consid.");
-        
+        // panic is a very strong emotion. Very little panic is enough
+        Consideration fleeingConsideration = new Consideration("panicLevel", Curves.MEDIUM_LOGARITHMIC, "panic/flee consid.");
+
         // --- WANDERING (fallback action)
         Consideration wanderingConsideration = new Consideration("WanderDrive", Curves.Linear, "wanderDrive consid.");
-        
-        
+
+
         // ============================================
         // 3. BINDING ACTIONS TO CONSIDERATIONS/SCORERS
         // ============================================
@@ -50,12 +50,12 @@ public class UT_Goat : UtilityActionSet
         Bind(sleep, sleepScorer);
         Bind(evade, fleeingConsideration);
         Bind(wander, wanderingConsideration);
-        
+
         // ==========================================
         // 4. INERTIA SETUP
         // ==========================================
-        SetInertia(eat, 0.10f); // commitment to eating is quite high 
-        SetInertia(sleep, 0.2f); // sleep has a considerable inertia
+           SetInertia(eat, 0.10f); // some commitment to eating make come handy 
+           SetInertia(sleep, 0.2f); // sleep has a considerable inertia (inertia being higher than wander drive, only hunger or wolf wake up goat)
         // fleeing has no inertia
         // wandering has no inertia
     }
