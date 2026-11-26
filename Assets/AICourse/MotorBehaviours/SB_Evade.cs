@@ -109,7 +109,7 @@ namespace MotorBehaviours
             float predictedTimeToTarget = 0f;
             if (me.maxSpeed > 0.001f)
             {
-                predictedTimeToTarget = distanceToTarget / me.maxSpeed;
+                predictedTimeToTarget = distanceToTarget / targetVelocity.magnitude;
             }
 
             // Cap the prediction time so the agent doesn't predict too far into the future
